@@ -1,0 +1,62 @@
+name: planago
+description: "A new Flutter project."
+
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.7.0
+
+#---------------- packages ------------------#
+dependencies:
+  flutter:
+    sdk: flutter
+  # utility packages
+
+  # icons
+  iconsax: ^0.0.8
+  cupertino_icons: ^1.0.8
+
+  # state management
+  get: ^4.7.2
+
+#--------------- end of packages -------------#
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+
+  #------------ local assets -------------#
+  assets:
+    - assets/images/
+    - assets/logos/
+    - assets/icons/
+
+  #------------ local fonts --------------#
+  fonts:
+    - family: Poppins
+      fonts:
+        - asset: assets\fonts\Poppins-Light.ttf
+          weight: 300
+        - asset: assets\fonts\Poppins-Regular.ttf
+          weight: 400
+        - asset: assets\fonts\Poppins-Medium.ttf
+          weight: 500
+        - asset: assets\fonts\Poppins-SemiBold.ttf
+          weight: 600
+        - asset: assets\fonts\Poppins-Bold.ttf
+          weight: 700
+        - asset: assets\fonts\Poppins-Black.ttf
+          weight: 900
+        - asset: assets\fonts\Poppins-Italic.ttf
+          style: italic
+        - asset: assets\fonts\Poppins-MediumItalic.ttf
+          style: italic
+          weight: 500
+    - family: Cal Sans
+      fonts:
+        - asset: assets\fonts\CalSans-Regular.ttf
