@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:planago/navigation_menu.dart';
+// import 'package:planago/navigation_menu.dart';
+import 'package:planago/screens/login_page.dart';
 import 'package:planago/utils/theme/theme.dart';
 
 class App extends StatelessWidget {
@@ -10,7 +11,7 @@ class App extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: AppTheme.defaultTheme,
-      home: const NavigationMenu(),
+      home: const LoginPage(),
     );
   }
 }
