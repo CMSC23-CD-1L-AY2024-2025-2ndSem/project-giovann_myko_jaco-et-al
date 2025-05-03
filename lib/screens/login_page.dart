@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:planago/utils/constants/colors.dart';
-import 'package:planago/utils/constants/sizes.dart';
 import 'package:simple_gradient_text/simple_gradient_text.dart';
 
 class LoginPage extends StatefulWidget {
@@ -338,15 +337,20 @@ class _LoginPageState extends State<LoginPage> {
                   width: width * 0.0638,
                   height: height * 0.0298,
                 ),
-                SizedBox(width: width * 0.1173),
-                Text(
-                  "Continue with Google",
-                  style: TextStyle(
-                    color: Color.fromARGB(255, 82, 82, 82),
-                    fontSize: height * 0.0183,
-                    fontWeight: FontWeight.w600,
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      "Continue with Google",
+                      style: TextStyle(
+                        color: Color.fromARGB(255, 82, 82, 82),
+                        fontSize: height * 0.0183,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
                 ),
+                SizedBox(width: width * 0.0638),
               ],
             ),
           ),
