@@ -29,28 +29,32 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    // responsive UI - for phones only
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       backgroundColor: AppColors.mutedWhite,
       body: SingleChildScrollView(
         child: Container(
           padding: EdgeInsets.only(
-            left: AppSizes.defaultSpace,
-            right: AppSizes.defaultSpace,
+            left: screenWidth * 0.06,
+            right: screenWidth * 0.06,
           ),
           child: Form(
             key: _formKey,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              spacing: AppSizes.spaceBtwItems,
+              spacing: screenHeight * 0.0183,
               children: [
-                loginText,
-                usernameField,
-                passwordField,
-                loginOptions,
-                signIn,
-                divider,
-                googleSignIn,
-                brand,
+                loginText(screenWidth, screenHeight),
+                usernameField(screenWidth, screenHeight),
+                passwordField(screenWidth, screenHeight),
+                loginOptions(screenWidth, screenHeight),
+                signIn(screenWidth, screenHeight),
+                divider(screenWidth, screenHeight),
+                googleSignIn(screenWidth, screenHeight),
+                brand(screenWidth, screenHeight),
               ],
             ),
           ),
@@ -59,10 +63,10 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget get loginText => Container(
+  Widget loginText(double width, double height) => Container(
     padding: EdgeInsets.fromLTRB(0, 0, 0, 87),
-    width: 338,
-    height: 194,
+    width: width * 0.88,
+    height: height * 0.22,
     child: Center(
       child: Text(
         "Login",
@@ -75,23 +79,28 @@ class _LoginPageState extends State<LoginPage> {
     ),
   );
 
-  Widget get usernameField => Container(
+  Widget usernameField(double width, double height) => Container(
     padding: EdgeInsets.zero,
-    width: 338,
-    height: 58,
+    width: width * 0.88,
+    height: height * 0.065,
     child: Column(
       children: [
-        SizedBox(
-          height: 20,
-          width: double.maxFinite,
-          child: Text(
-            "Username",
-            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
-            textAlign: TextAlign.left,
+        Flexible(
+          flex: 1,
+          child: SizedBox(
+            width: width * 0.88,
+            child: Text(
+              "Username",
+              style: TextStyle(
+                fontSize: height * 0.015,
+                fontWeight: FontWeight.w500,
+              ),
+              textAlign: TextAlign.left,
+            ),
           ),
         ),
-        SizedBox(
-          height: 38,
+        Flexible(
+          flex: 2,
           child: TextFormField(
             controller: usernameController,
             textAlignVertical: TextAlignVertical.center,
@@ -109,18 +118,18 @@ class _LoginPageState extends State<LoginPage> {
               ),
               prefixIcon: Icon(
                 Iconsax.user,
-                size: 18,
+                size: height * 0.02,
                 color: Color.fromARGB(255, 155, 155, 156),
               ),
               labelText: "Enter your username",
               labelStyle: TextStyle(
-                fontSize: 13,
+                fontSize: height * 0.015,
                 color: Color.fromARGB(255, 155, 155, 156),
               ),
               floatingLabelBehavior: FloatingLabelBehavior.never,
             ),
-            style: TextStyle(fontSize: 13),
-            cursorHeight: 18,
+            style: TextStyle(fontSize: height * 0.015),
+            cursorHeight: height * 0.02,
             cursorColor: Color.fromARGB(255, 155, 155, 156),
           ),
         ),
@@ -128,23 +137,28 @@ class _LoginPageState extends State<LoginPage> {
     ),
   );
 
-  Widget get passwordField => Container(
+  Widget passwordField(double width, double height) => Container(
     padding: EdgeInsets.zero,
-    width: 338,
-    height: 58,
+    width: width * 0.88,
+    height: height * 0.065,
     child: Column(
       children: [
-        SizedBox(
-          height: 20,
-          width: double.maxFinite,
-          child: Text(
-            "Password",
-            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
-            textAlign: TextAlign.left,
+        Flexible(
+          flex: 1,
+          child: SizedBox(
+            width: width * 0.88,
+            child: Text(
+              "Password",
+              style: TextStyle(
+                fontSize: height * 0.015,
+                fontWeight: FontWeight.w500,
+              ),
+              textAlign: TextAlign.left,
+            ),
           ),
         ),
-        SizedBox(
-          height: 38,
+        Flexible(
+          flex: 2,
           child: TextFormField(
             controller: passwordController,
             textAlignVertical: TextAlignVertical.center,
@@ -162,12 +176,12 @@ class _LoginPageState extends State<LoginPage> {
               ),
               prefixIcon: Icon(
                 Iconsax.lock,
-                size: 18,
+                size: height * 0.02,
                 color: Color.fromARGB(255, 155, 155, 156),
               ),
               labelText: "Password",
               labelStyle: TextStyle(
-                fontSize: 13,
+                fontSize: height * 0.015,
                 color: Color.fromARGB(255, 155, 155, 156),
               ),
               suffixIcon: IconButton(
@@ -178,15 +192,15 @@ class _LoginPageState extends State<LoginPage> {
                 },
                 icon: Icon(
                   isPasswordObscured ? Iconsax.eye : Iconsax.eye_slash,
-                  size: 18,
+                  size: height * 0.02,
                   color: Color.fromARGB(255, 155, 155, 156),
                 ),
               ),
               floatingLabelBehavior: FloatingLabelBehavior.never,
             ),
             obscureText: isPasswordObscured,
-            style: TextStyle(fontSize: 13),
-            cursorHeight: 18,
+            style: TextStyle(fontSize: height * 0.015),
+            cursorHeight: height * 0.02,
             cursorColor: Color.fromARGB(255, 155, 155, 156),
           ),
         ),
@@ -194,10 +208,10 @@ class _LoginPageState extends State<LoginPage> {
     ),
   );
 
-  Widget get loginOptions => Container(
+  Widget loginOptions(double width, double height) => Container(
     padding: EdgeInsets.zero,
-    width: 332,
-    height: 34, // adjusted, hindi nakikita text button kapag 18px
+    width: width * 0.88,
+    height: height * 0.039, // adjusted, hindi nakikita text button kapag 18px
     child: Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -214,7 +228,6 @@ class _LoginPageState extends State<LoginPage> {
                 width: 1.5,
               ),
               activeColor: AppColors.primary,
-              visualDensity: VisualDensity(horizontal: 0, vertical: -4),
               onChanged: (value) {
                 setState(() {
                   rememberMe = value!;
@@ -224,7 +237,7 @@ class _LoginPageState extends State<LoginPage> {
             Text(
               "Remember me",
               style: TextStyle(
-                fontSize: 12,
+                fontSize: height * 0.0138,
                 color: Color.fromARGB(255, 155, 155, 156),
               ),
             ),
@@ -235,7 +248,7 @@ class _LoginPageState extends State<LoginPage> {
           child: Text(
             "Forgot password?",
             style: TextStyle(
-              fontSize: 12,
+              fontSize: height * 0.0138,
               fontWeight: FontWeight.w500,
               color: AppColors.black,
             ),
@@ -245,9 +258,9 @@ class _LoginPageState extends State<LoginPage> {
     ),
   );
 
-  Widget get signIn => Container(
-    width: 338,
-    height: 46,
+  Widget signIn(double width, double height) => Container(
+    width: width * 0.88,
+    height: height * 0.0527,
     decoration: BoxDecoration(
       gradient: LinearGradient(
         colors: [AppColors.primary, AppColors.secondary],
@@ -265,44 +278,53 @@ class _LoginPageState extends State<LoginPage> {
         "Sign in",
         style: TextStyle(
           color: AppColors.mutedWhite,
-          fontSize: 20,
+          fontSize: height * 0.023,
           fontWeight: FontWeight.w600,
         ),
       ),
     ),
   );
 
-  Widget get divider => SizedBox(
-    width: 338,
+  Widget divider(double width, double height) => SizedBox(
+    height: height * 0.018,
+    width: width * 0.88,
     child: Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         Expanded(
-          child: Divider(color: Color.fromARGB(255, 42, 42, 42), indent: 12, endIndent: 8),
+          child: Divider(
+            color: Color.fromARGB(255, 42, 42, 42),
+            indent: width * 0.0306,
+            endIndent: width * 0.0204,
+          ),
         ),
         Text(
           "or",
           style: TextStyle(
-            fontSize: 13,
+            fontSize: height * 0.015,
             fontWeight: FontWeight.w500,
             color: Color.fromARGB(255, 42, 42, 42),
           ),
         ),
         Expanded(
-          child: Divider(color: Color.fromARGB(255, 42, 42, 42), indent: 12, endIndent: 8),
+          child: Divider(
+            color: Color.fromARGB(255, 42, 42, 42),
+            indent: width * 0.0306,
+            endIndent: width * 0.0204,
+          ),
         ),
       ],
     ),
   );
 
-  Widget get googleSignIn => Container(
+  Widget googleSignIn(double width, double height) => Container(
     padding: EdgeInsets.zero,
-    width: 338,
-    height: 80,
+    width: width * 0.88,
+    height: height * 0.0915,
     child: Column(
       children: [
         SizedBox(
-          height: 46,
+          height: height * 0.0527,
           child: OutlinedButton(
             onPressed: () {},
             style: OutlinedButton.styleFrom(
@@ -313,15 +335,15 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 Image.asset(
                   'assets/images/google_logo.png',
-                  width: 25,
-                  height: 26,
+                  width: width * 0.0638,
+                  height: height * 0.0298,
                 ),
-                SizedBox(width: 46),
+                SizedBox(width: width * 0.1173),
                 Text(
                   "Continue with Google",
                   style: TextStyle(
                     color: Color.fromARGB(255, 82, 82, 82),
-                    fontSize: 16,
+                    fontSize: height * 0.0183,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -330,8 +352,7 @@ class _LoginPageState extends State<LoginPage> {
           ),
         ),
         SizedBox(
-          width: 338,
-          height: 34,
+          height: height * 0.037,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -339,7 +360,7 @@ class _LoginPageState extends State<LoginPage> {
                 "Don't have an account?",
                 style: TextStyle(
                   color: Color.fromARGB(255, 82, 82, 82),
-                  fontSize: 12,
+                  fontSize: height * 0.0138,
                   fontWeight: FontWeight.w400,
                 ),
               ),
@@ -349,7 +370,7 @@ class _LoginPageState extends State<LoginPage> {
                   "Sign up",
                   style: TextStyle(
                     color: Color.fromARGB(255, 82, 82, 82),
-                    fontSize: 12,
+                    fontSize: height * 0.0138,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -361,20 +382,24 @@ class _LoginPageState extends State<LoginPage> {
     ),
   );
 
-  Widget get brand => SizedBox(
-    height: 280,
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      mainAxisAlignment: MainAxisAlignment.center,
+  Widget brand(double width, double height) => Container(
+    padding: EdgeInsets.zero,
+    width: width * 0.88,
+    height: height * 0.3207,
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        /* logo here */
-        GradientText(
-          "PlanaGo",
-          style: TextStyle(fontSize: 35, fontFamily: 'Cal Sans'),
-          colors: [AppColors.primary, AppColors.secondary],
-          gradientType: GradientType.linear,
-          gradientDirection: GradientDirection.ltr,
+        Flexible(
+          flex: 5,
+          child: GradientText(
+            "PlanaGo",
+            style: TextStyle(fontSize: height * 0.0401, fontFamily: 'Cal Sans'),
+            colors: [AppColors.primary, AppColors.secondary],
+            gradientType: GradientType.linear,
+            gradientDirection: GradientDirection.ltr,
+          ),
         ),
+        Spacer(flex: 1,),
       ],
     ),
   );
