@@ -278,18 +278,18 @@ class _LoginPageState extends State<LoginPage> {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         Expanded(
-          child: Divider(color: Color(0xFF2a2a2a), indent: 12, endIndent: 8),
+          child: Divider(color: Color.fromARGB(255, 42, 42, 42), indent: 12, endIndent: 8),
         ),
         Text(
           "or",
           style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w500,
-            color: Color(0xFF2a2a2a),
+            color: Color.fromARGB(255, 42, 42, 42),
           ),
         ),
         Expanded(
-          child: Divider(color: Color(0xFF2a2a2a), indent: 12, endIndent: 8),
+          child: Divider(color: Color.fromARGB(255, 42, 42, 42), indent: 12, endIndent: 8),
         ),
       ],
     ),
