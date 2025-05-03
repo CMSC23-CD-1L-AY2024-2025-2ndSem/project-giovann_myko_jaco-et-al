@@ -28,7 +28,73 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    // responsive UI - for phones only
+    /* 
+      responsive UI - for phones only
+      -------------------------------
+      - percentages calculated using standard phone size
+      multiplied with wireframe dimensions and/or utils/constant
+
+      Common fontSize {
+        fonts relative to height
+        13 => 1.5%
+        12 => 1.38%
+        16 => 1.83%
+        20 => 2.3%
+        35 => 4.01%
+      }
+
+      Icons: 18 => 2% 
+
+      Main Container {
+        left and right padding: 6% each
+        remaining phone width: 88%
+        spacing: AppSizes.spaceBtwItems => 1.83%
+      }
+
+      loginText {
+        width: 88%
+        height: 22%
+      }
+
+      usernameField & passwordField{
+        width: 88%
+        height: 6.5%
+        cursorHeight: 18 => 2%
+      }
+
+      loginOptions {
+        width: 88%
+        height: 3.9%
+        cursorHeight: 18 => 2%
+      }
+
+      signIn {
+        width: 88%
+        height: 5.27%
+      }
+
+      divider {
+        width: 88%
+        height: 1.8%
+        Divider indent: 3.06%
+        Divider endIndent: 2.04%
+      }
+
+      googleSignIn {
+        width: 88%
+        height: 9.15%
+        OutlinedButton height: 5.27%
+        Sign up TextButton: 3.7%
+      }
+
+      brand {
+        width: 88%
+        height: 32.07% - remaining phone height
+      }
+      -------------------------------
+
+    
+    */
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
