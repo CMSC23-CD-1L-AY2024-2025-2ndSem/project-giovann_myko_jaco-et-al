@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:planago/screens/edit_profile_page.dart';
 import 'package:planago/utils/constants/colors.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -129,7 +131,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget profilePicture(double width, double height) {
     return SizedBox(
       width: width * 0.88,
-      height: height * 0.1728, //142
+      height: height * 0.1828, //updated height val
       child: Column(
         children: [
           SizedBox.square(
@@ -174,7 +176,7 @@ class _ProfilePageState extends State<ProfilePage> {
           TextButton(
             style: TextButton.styleFrom(padding: EdgeInsets.zero),
             onPressed: () {
-              /* TO EDIT PAGE */
+              Get.to(EditProfilePage());
             },
             child: Text(
               "Edit Profile",
