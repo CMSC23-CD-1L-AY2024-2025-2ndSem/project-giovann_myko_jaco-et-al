@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:planago/utils/constants/colors.dart';
 
 class EditProfilePage extends StatefulWidget {
@@ -15,6 +18,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final firstNameController = TextEditingController();
   final lastNameController = TextEditingController();
   final phoneNumberController = TextEditingController();
+
+  File? _imageFile;
 
   // Temporary variables habang wala pa data model + database
   // ifefetch yung current details para mapalitan
@@ -98,11 +103,32 @@ class _EditProfilePageState extends State<EditProfilePage> {
     ),
   );
 
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final XFile? pickedFile = await picker.pickImage(
+      source: ImageSource.gallery,
+    );
+
+    if (pickedFile != null) {
+      setState(() {
+        _imageFile = File(pickedFile.path);
+      });
+    }
+  }
+
   Widget profilePicture(double width, double height) {
-    return SizedBox.square(
-      dimension: height * 0.1169, //102
-      child: ClipOval(
-        child: Image.asset('assets/images/default_profile.png'), // temp only
+    return GestureDetector(
+      onTap: _pickImage,
+      child: SizedBox.square(
+        dimension: height * 0.1169, //102
+        child: ClipOval(
+          child:
+              _imageFile != null
+                  ? Image.file(_imageFile!, fit: BoxFit.cover)
+                  : Image.asset(
+                    'assets/images/default_profile.png',
+                  ), // temp only
+        ),
       ),
     );
   }
@@ -289,7 +315,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     child: OutlinedButton(
       onPressed: () {
         /* SAVE PROFILE HERE*/
-        Get.back();
+        Get.back(result: _imageFile);
       },
       style: OutlinedButton.styleFrom(
         side: BorderSide(color: Colors.transparent),
