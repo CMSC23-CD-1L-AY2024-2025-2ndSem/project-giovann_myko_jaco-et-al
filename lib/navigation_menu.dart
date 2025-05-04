@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:planago/screens/profile_page.dart';
 import 'package:planago/utils/constants/colors.dart';
 
 class NavigationMenu extends StatelessWidget {
@@ -36,6 +37,6 @@ class NavigationController extends GetxController {
   final screens = [
     Container(color: AppColors.primary),
     Container(color: AppColors.secondary),
-    Container(color: AppColors.secondaryComplement),
+    ProfilePage(),
   ];
 }
