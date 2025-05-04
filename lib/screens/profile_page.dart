@@ -1,22 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:planago/screens/profile_detail_page.dart';
 import 'package:planago/utils/constants/colors.dart';
 
-class ProfilePage extends StatefulWidget {
+// Temporary model
+class ProfileInfo
+{
+  final String title;
+  final String subtitle;
+  final IconData icon;
+
+  ProfileInfo({required this.title, required this.subtitle, required this.icon});
+}
+
+class ProfilePage extends StatefulWidget 
+{
   const ProfilePage({super.key});
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
+class _ProfilePageState extends State<ProfilePage> 
+{
   // Temporary variables habang wala pa data model + database
   bool isPrivate = false;
   String fullName = 'Lorem Ipsum';
   String username = '@loremlorem23';
 
+  final List<ProfileInfo> profileItems = 
+  [
+    ProfileInfo(icon: Icons.phone, title: 'Phone', subtitle: '09289956730'),
+    ProfileInfo(icon: Icons.email, title: 'Email', subtitle: 'arnoche1@up.edu.ph'),
+    ProfileInfo(icon: Icons.favorite, title: 'Interests', subtitle: 'food, art, music'),
+    ProfileInfo(icon: Icons.flight_takeoff, title: 'Travel Styles', subtitle: 'theme-based, for-nearby'),
+  ];
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) 
+  {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
@@ -36,6 +58,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 headButtons(screenWidth, screenHeight),
                 profilePicture(screenWidth, screenHeight),
                 editProfile(screenWidth, screenHeight),
+                profileInfo(screenWidth, screenHeight)
               ],
             ),
           ),
@@ -44,9 +67,65 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget headButtons(double width, double height) {
+  Widget profileInfo(double width, double height) 
+  {
+    return ListView.builder(
+      shrinkWrap: true,
+      itemCount: profileItems.length,
+      itemBuilder: (context, index) 
+      {
+        final item = profileItems[index];
+
+        return GestureDetector(
+          onTap: () 
+          {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ProfileDetailPage(item: item),
+              ),
+            );
+          },
+          child: Column(
+            children: 
+            [
+              Container(
+                margin: EdgeInsets.symmetric(vertical: height * 0.01),
+                padding: EdgeInsets.symmetric(horizontal: width * 0.05, vertical: height * 0.02),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12), // Rounded borders
+                  boxShadow: 
+                  [
+                    BoxShadow(
+                      color: Colors.grey[400]!.withValues(), // Light shadow
+                      spreadRadius: 2,
+                      blurRadius: 5,
+                      offset: Offset(0, 3), // Shadow position
+                    ),
+                  ],
+                ),
+                child: ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: Icon(item.icon, color: AppColors.primary),
+                  title: Text(item.title),
+                  subtitle: Text(item.subtitle),
+                  trailing: Icon(Icons.arrow_forward, color: AppColors.primary),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+
+  Widget headButtons(double width, double height) 
+  {
     final WidgetStateProperty<Icon> thumbIcon =
-        WidgetStateProperty<Icon>.fromMap(<WidgetStatesConstraint, Icon>{
+        WidgetStateProperty<Icon>.fromMap(<WidgetStatesConstraint, Icon>
+        {
           WidgetState.selected: Icon(Iconsax.lock5, color: AppColors.black),
           WidgetState.any: Icon(
             Iconsax.global,
@@ -55,32 +134,40 @@ class _ProfilePageState extends State<ProfilePage> {
         });
 
     final WidgetStateProperty<Color?> overlayColor =
-        WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) {
+        WidgetStateProperty.resolveWith((states) 
+        {
+          if (states.contains(WidgetState.selected))
+          {
             return Color.fromRGBO(122, 215, 240, 0.6);
           }
           return Color.fromRGBO(30, 30, 30, 0.4);
         });
 
     final WidgetStateProperty<Color?> thumbColor =
-        WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) {
+        WidgetStateProperty.resolveWith((states) 
+        {
+          if (states.contains(WidgetState.selected)) 
+          {
             return AppColors.primary;
           }
           return AppColors.black;
         });
 
     final WidgetStateProperty<Color?> trackColor =
-        WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) {
+        WidgetStateProperty.resolveWith((states) 
+        {
+          if (states.contains(WidgetState.selected)) 
+          {
             return AppColors.black;
           }
           return AppColors.primary;
         });
 
     final WidgetStateProperty<Color?> trackOutlineColor =
-        WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) {
+        WidgetStateProperty.resolveWith((states) 
+        {
+          if (states.contains(WidgetState.selected)) 
+          {
             return AppColors.black;
           }
           return AppColors.primary;
@@ -91,7 +178,8 @@ class _ProfilePageState extends State<ProfilePage> {
       height: height * 0.0585,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
+        children: 
+        [
           Transform.scale(
             // make slider bigger
             scale: 1.2,
@@ -102,8 +190,10 @@ class _ProfilePageState extends State<ProfilePage> {
               overlayColor: overlayColor,
               thumbColor: thumbColor,
               thumbIcon: thumbIcon,
-              onChanged: (value) {
-                setState(() {
+              onChanged: (value) 
+              {
+                setState(() 
+                {
                   isPrivate = value;
                 });
               },
@@ -126,7 +216,8 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget profilePicture(double width, double height) {
+  Widget profilePicture(double width, double height) 
+  {
     return SizedBox(
       width: width * 0.88,
       height: height * 0.1728, //142
@@ -154,7 +245,7 @@ class _ProfilePageState extends State<ProfilePage> {
             username,
             style: TextStyle(
               color: Color.fromARGB(255, 82, 82, 82),
-              fontSize: height * 0.0183,
+              fontSize: height * 0.0105, //temporarily 105
               fontWeight: FontWeight.w400,
             ),
           ),
@@ -163,17 +254,20 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget editProfile(double width, double height) {
+  Widget editProfile(double width, double height) 
+  {
     return SizedBox(
       width: width * 0.88,
       height: height * 0.0218,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: [
+        children: 
+        [
           Icon(Iconsax.edit, color: AppColors.primary, size: height * 0.0195),
           TextButton(
             style: TextButton.styleFrom(padding: EdgeInsets.zero),
-            onPressed: () {
+            onPressed: () 
+            {
               /* TO EDIT PAGE */
             },
             child: Text(

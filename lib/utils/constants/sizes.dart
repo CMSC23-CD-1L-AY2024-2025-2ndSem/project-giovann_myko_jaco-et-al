@@ -1,4 +1,5 @@
-class AppSizes {
+class AppSizes 
+{
   AppSizes._();
 
 

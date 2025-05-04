@@ -4,13 +4,16 @@
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
-class AppDeviceUtils {
+class AppDeviceUtils 
+{
 
-  static void hideKeyboard(BuildContext context){
+  static void hideKeyboard(BuildContext context)
+  {
     FocusScope.of(context).requestFocus(FocusNode());
   }
 
-  static Future<void> setStatusBarColor(Color color) async {
+  static Future<void> setStatusBarColor(Color color) async 
+  {
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
         statusBarColor: color
@@ -18,11 +21,13 @@ class AppDeviceUtils {
     ); 
   }
 
-  static double getStatusBarHeight(){
+  static double getStatusBarHeight()
+  {
     return MediaQuery.of(Get.context!).padding.top;
   }
 
-  static double getBottomNavigationBarHeight(){
+  static double getBottomNavigationBarHeight()
+  {
     return kBottomNavigationBarHeight;
   }
 

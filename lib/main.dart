@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:planago/app.dart';
 
-  void main() {
+void main() 
+{
   runApp(const App());
 }
