@@ -129,7 +129,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget profilePicture(double width, double height) {
     return SizedBox(
       width: width * 0.88,
-      height: height * 0.1728, //142
+      height: height * 0.1828, //142
       child: Column(
         children: [
           SizedBox.square(
