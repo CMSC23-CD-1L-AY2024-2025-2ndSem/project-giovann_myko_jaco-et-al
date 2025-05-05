@@ -276,7 +276,6 @@ class _ProfilePageState extends State<ProfilePage> {
             style: TextButton.styleFrom(padding: EdgeInsets.zero),
             onPressed: () async {
               final profilePicture = await Get.to(EditProfilePage());
-
               if (profilePicture != null && profilePicture is File) {
                 setState(() {
                   _imageFile = profilePicture;
