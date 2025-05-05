@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:planago/screens/profile_detail_page.dart';
 import 'package:planago/utils/constants/colors.dart';
@@ -269,6 +270,7 @@ class _ProfilePageState extends State<ProfilePage>
             onPressed: () 
             {
               /* TO EDIT PAGE */
+              Get.to(() => EditProfilePage());
             },
             child: Text(
               "Edit Profile",

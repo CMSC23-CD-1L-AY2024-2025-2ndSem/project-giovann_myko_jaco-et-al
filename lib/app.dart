@@ -17,7 +17,7 @@ class App extends StatelessWidget
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       theme: AppTheme.defaultTheme,
-      initialRoute: "/",
+      initialRoute: "/login",
       onGenerateRoute: (settings) {
         switch(settings.name){
           case "/":

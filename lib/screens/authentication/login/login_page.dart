@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:planago/controllers/login_controller.dart';
+import 'package:planago/navigation_menu.dart';
 import 'package:planago/provider/auth_provider.dart';
 import 'package:planago/utils/constants/colors.dart';
 import 'package:provider/provider.dart';
@@ -116,7 +117,7 @@ class _LoginPageState extends State<LoginPage>
     final screenHeight = MediaQuery.of(context).size.height;
     
 
-    return Scaffold(
+    return Obx(()=> Scaffold(
       backgroundColor: AppColors.mutedWhite,
       body: SingleChildScrollView(
         child: Container(
@@ -144,7 +145,7 @@ class _LoginPageState extends State<LoginPage>
           ),
         ),
       ),
-    );
+    ));
   }
 
   Widget loginText(double width, double height) => Container(
@@ -375,7 +376,10 @@ class _LoginPageState extends State<LoginPage>
         _formKey.currentState!.save();
         String? message = await context.read<UserAuthProvider>()
             .authService
-            .signIn(controller.username.text.trim(), controller.password.text.trim());
+            .signIn(controller.username.text, controller.password.text);
+            print(controller.username.text);
+            print( controller.password.text);
+            print(message);
         setState(() {
           if (message.isNotEmpty) {
             setState(() {
@@ -383,6 +387,7 @@ class _LoginPageState extends State<LoginPage>
             }); 
           } else {
             setState(() {
+              Get.to(NavigationMenu());
               showSignInErrorMessage = false; 
             });
           }

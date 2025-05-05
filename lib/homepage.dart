@@ -33,8 +33,6 @@ class _HomePageState extends State<HomePage> {
         } else if (!snapshot.hasData) {
           return const LoginPage();
         }
-
-        // if user is logged in, display the scaffold containing the streambuilder for the todos
         return NavigationMenu();
       },
     );
