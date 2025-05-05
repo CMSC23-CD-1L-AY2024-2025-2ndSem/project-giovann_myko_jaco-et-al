@@ -8,6 +8,10 @@ class AuthenticationController extends GetxController{
   //variables
   final _auth = FirebaseAuth.instance;
 
+  Stream<User?> getUserStream(){
+    return _auth.authStateChanges();
+  }
+
   Future<UserCredential> registerWithEmailAndPassword(String email, String password) async {
     try{
       return await _auth.createUserWithEmailAndPassword(email: email, password: password);

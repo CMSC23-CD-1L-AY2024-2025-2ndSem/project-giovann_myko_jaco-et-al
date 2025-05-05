@@ -199,8 +199,8 @@ class SignUpPage3 extends StatelessWidget {
                           borderRadius: BorderRadius.circular(100),
                         ),
                         child: OutlinedButton(
-                          onPressed:(){
-                            
+                          onPressed:() async {
+                            await controller.signUp();
                           },
                           style: OutlinedButton.styleFrom(
                             side: BorderSide(color: Colors.transparent),

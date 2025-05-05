@@ -57,7 +57,6 @@ class UserModel {
       return UserModel(uid: document.id, 
       username: data["Username"], email: data["Email"], interests: data["Interests"], travelStyle: data["TravelStyle"], firstName: data["FirstName"], lastName: data["LastName"], phoneNumber: data["phoneNumber"]);
     }
-
     throw StateError("Data can't be fetch");
   }
 

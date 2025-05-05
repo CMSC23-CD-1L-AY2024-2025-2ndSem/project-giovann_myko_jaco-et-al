@@ -6,6 +6,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:planago/components/app_bar.dart';
 import 'package:planago/components/custom_app_bar.dart';
 import 'package:planago/controllers/signup_controller.dart';
+import 'package:planago/screens/authentication/signup/sign_up_page3.dart';
 import 'package:planago/utils/constants/colors.dart';
 import 'package:planago/utils/helper/validator.dart';
 import 'package:simple_gradient_text/simple_gradient_text.dart';
@@ -241,7 +242,7 @@ class SignUpPage2 extends StatelessWidget {
                       ),
                     ),
                   SizedBox(height: 40,),
-                    //Continue Button
+                  //Continue Button
                   Container(
                     width: screenWidth * 0.88,
                     height: screenHeight * 0.0527,
@@ -261,7 +262,7 @@ class SignUpPage2 extends StatelessWidget {
                       onPressed: controller.isValid.value ? 
                       (){
                         if(_formKey.currentState!.validate()){
-                          Get.toNamed("/login");
+                          Get.to(()=> SignUpPage3());
                         }
                       } : null,
                       style: OutlinedButton.styleFrom(

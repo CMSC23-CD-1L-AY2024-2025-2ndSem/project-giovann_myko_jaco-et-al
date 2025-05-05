@@ -8,11 +8,11 @@ class UserController extends GetxController {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   //Function for saving user data
-  Future <void> saveUserRecord(UserModel user) {
+  Future <void> saveUserRecord(UserModel user) async{
     try{
       await _db.collection("Users").doc(user.uid).set(user.toJson());
     } on FirebaseException catch (e){
-      throw "Error: ${e}"
+      throw "Error: ${e}";
     }
   }
 }

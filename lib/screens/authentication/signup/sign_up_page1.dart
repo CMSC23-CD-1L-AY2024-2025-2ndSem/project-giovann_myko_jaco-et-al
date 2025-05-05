@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:planago/controllers/signup_controller.dart';
 import 'package:planago/screens/authentication/login/login_page.dart';
+import 'package:planago/screens/authentication/signup/sign_up_page2.dart';
 import 'package:planago/utils/constants/colors.dart';
 import 'package:planago/utils/constants/texts.dart';
 import 'package:planago/utils/helper/validator.dart';
@@ -436,7 +437,7 @@ class SignUpPage1 extends StatelessWidget {
     ),
     child: OutlinedButton(
       onPressed: () {
-        Get.to(() => LoginPage());
+        Get.to(() => SignUpPage2());
       },
       style: OutlinedButton.styleFrom(
         side: BorderSide(color: Colors.transparent),
