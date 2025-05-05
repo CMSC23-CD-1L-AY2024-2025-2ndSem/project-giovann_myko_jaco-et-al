@@ -1,4 +1,5 @@
-class AppImages {
+class AppImages 
+{
   AppImages._();
 
   //Images

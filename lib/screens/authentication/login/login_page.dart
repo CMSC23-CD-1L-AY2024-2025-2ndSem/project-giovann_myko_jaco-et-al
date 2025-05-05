@@ -5,14 +5,16 @@ import 'package:iconsax/iconsax.dart';
 import 'package:planago/utils/constants/colors.dart';
 import 'package:simple_gradient_text/simple_gradient_text.dart';
 
-class LoginPage extends StatefulWidget {
+class LoginPage extends StatefulWidget 
+{
   const LoginPage({super.key});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends State<LoginPage> 
+{
   final _formKey = GlobalKey<FormState>();
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
@@ -22,7 +24,8 @@ class _LoginPageState extends State<LoginPage> {
   bool isPasswordObscured = false;
 
   @override
-  void dispose() {
+  void dispose() 
+  {
     usernameController.dispose();
     passwordController.dispose();
     super.dispose();
@@ -37,7 +40,8 @@ class _LoginPageState extends State<LoginPage> {
       - percentages calculated using standard phone size
       multiplied with wireframe dimensions and/or utils/constant
 
-      Common fontSize {
+      Common fontSize 
+      {
         fonts relative to height
         13 => 1.5%
         12 => 1.38%
@@ -48,49 +52,57 @@ class _LoginPageState extends State<LoginPage> {
 
       Icons: 18 => 2% 
 
-      Main Container {
+      Main Container 
+      {
         left and right padding: 6% each
         remaining phone width: 88%
         spacing: AppSizes.spaceBtwItems => 1.83%
       }
 
-      loginText {
+      loginText 
+      {
         width: 88%
         height: 22%
       }
 
-      usernameField & passwordField{
+      usernameField & passwordField
+      {
         width: 88%
         height: 6.5%
         cursorHeight: 18 => 2%
       }
 
-      loginOptions {
+      loginOptions 
+      {
         width: 88%
         height: 3.9%
         cursorHeight: 18 => 2%
       }
 
-      signIn {
+      signIn 
+      {
         width: 88%
         height: 5.27%
       }
 
-      divider {
+      divider 
+      {
         width: 88%
         height: 1.8%
         Divider indent: 3.06%
         Divider endIndent: 2.04%
       }
 
-      googleSignIn {
+      googleSignIn 
+      {
         width: 88%
         height: 9.15%
         OutlinedButton height: 5.27%
         Sign up TextButton: 3.7%
       }
 
-      brand {
+      brand 
+      {
         width: 88%
         height: 32.07% - remaining phone height
       }
@@ -153,7 +165,8 @@ class _LoginPageState extends State<LoginPage> {
     width: width * 0.88,
     height: height * 0.065,
     child: Column(
-      children: [
+      children: 
+      [
         Flexible(
           flex: 1,
           child: SizedBox(
@@ -301,8 +314,10 @@ class _LoginPageState extends State<LoginPage> {
                 width: 1.5,
               ),
               activeColor: AppColors.primary,
-              onChanged: (value) {
-                setState(() {
+              onChanged: (value) 
+              {
+                setState(() 
+                {
                   rememberMe = value!;
                 });
               },

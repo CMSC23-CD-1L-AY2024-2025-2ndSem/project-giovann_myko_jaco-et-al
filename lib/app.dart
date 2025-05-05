@@ -8,7 +8,8 @@ import 'package:planago/screens/authentication/signup/sign_up_page2.dart';
 import 'package:planago/screens/authentication/signup/sign_up_page3.dart';
 import 'package:planago/utils/theme/theme.dart';
 
-class App extends StatelessWidget {
+class App extends StatelessWidget 
+{
   const App({super.key});
 
   @override

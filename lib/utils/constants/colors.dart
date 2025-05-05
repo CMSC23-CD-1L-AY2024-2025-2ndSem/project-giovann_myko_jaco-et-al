@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-class AppColors {
+class AppColors 
+{
   AppColors._();
 
   //Main App Colors
