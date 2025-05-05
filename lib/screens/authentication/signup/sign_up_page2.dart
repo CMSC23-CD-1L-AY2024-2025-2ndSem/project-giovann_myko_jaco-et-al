@@ -247,7 +247,7 @@ class SignUpPage2 extends StatelessWidget {
                     width: screenWidth * 0.88,
                     height: screenHeight * 0.0527,
                     decoration: BoxDecoration(
-                      gradient: (controller.isValid.value && _formKey.currentState!.validate()) ? LinearGradient(
+                      gradient: (controller.isValid.value) ? LinearGradient(
                         colors: [AppColors.primary, AppColors.secondary],
                         begin: Alignment.centerLeft,
                         end: Alignment.centerRight,
