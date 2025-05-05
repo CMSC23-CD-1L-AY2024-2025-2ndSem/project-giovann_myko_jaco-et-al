@@ -313,7 +313,7 @@ class SignUpPage1 extends StatelessWidget {
                       onPressed: controller.isValid.value ? 
                       (){
                         if(_formKey.currentState!.validate()){
-                          Get.toNamed("/login");
+                          Get.to(() => SignUpPage2());
                         }
                       } : null,
                       style: OutlinedButton.styleFrom(

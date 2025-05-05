@@ -16,15 +16,15 @@ class App extends StatelessWidget {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       theme: AppTheme.defaultTheme,
-      initialRoute: "/signup",
+      initialRoute: "/login",
       onGenerateRoute: (settings) {
         switch(settings.name){
           case "/":
-          return MaterialPageRoute(builder: (context) => HomePage());
+          return MaterialPageRoute(builder: (context) => NavigationMenu());
           case "/login":
           return MaterialPageRoute(builder: (context) => LoginPage());
           case "/signup":
-          return MaterialPageRoute(builder: (context) => SignUpPage3());
+          return MaterialPageRoute(builder: (context) => SignUpPage1());
         }
       },
     );
