@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:planago/screens/edit_profile_page.dart';
 import 'package:planago/screens/profile_detail_page.dart';
 import 'package:planago/utils/constants/colors.dart';
 
@@ -22,8 +25,9 @@ class ProfilePage extends StatefulWidget
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> 
-{
+class _ProfilePageState extends State<ProfilePage> {
+  File? _imageFile;
+
   // Temporary variables habang wala pa data model + database
   bool isPrivate = false;
   String fullName = 'Lorem Ipsum';
@@ -221,15 +225,18 @@ class _ProfilePageState extends State<ProfilePage>
   {
     return SizedBox(
       width: width * 0.88,
-      height: height * 0.1728, //142
+      height: height * 0.1828, //updated height val
       child: Column(
         children: [
           SizedBox.square(
             dimension: height * 0.1169, //102
             child: ClipOval(
-              child: Image.asset(
-                'assets/images/default_profile.png',
-              ), // temp only
+              child:
+                  _imageFile != null
+                      ? Image.file(_imageFile!, fit: BoxFit.cover)
+                      : Image.asset(
+                        'assets/images/default_profile.png',
+                      ), // temp only
             ),
           ),
           // spacing between profile pic and texts
@@ -267,10 +274,14 @@ class _ProfilePageState extends State<ProfilePage>
           Icon(Iconsax.edit, color: AppColors.primary, size: height * 0.0195),
           TextButton(
             style: TextButton.styleFrom(padding: EdgeInsets.zero),
-            onPressed: () 
-            {
-              /* TO EDIT PAGE */
-              Get.to(() => EditProfilePage());
+            onPressed: () async {
+              final profilePicture = await Get.to(EditProfilePage());
+
+              if (profilePicture != null && profilePicture is File) {
+                setState(() {
+                  _imageFile = profilePicture;
+                });
+              }
             },
             child: Text(
               "Edit Profile",
