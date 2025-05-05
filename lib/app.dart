@@ -17,11 +17,11 @@ class App extends StatelessWidget
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       theme: AppTheme.defaultTheme,
-      initialRoute: "/login",
+      initialRoute: "/",
       onGenerateRoute: (settings) {
         switch(settings.name){
           case "/":
-          return MaterialPageRoute(builder: (context) => NavigationMenu());
+          return MaterialPageRoute(builder: (context) => HomePage());
           case "/login":
           return MaterialPageRoute(builder: (context) => LoginPage());
           case "/signup":

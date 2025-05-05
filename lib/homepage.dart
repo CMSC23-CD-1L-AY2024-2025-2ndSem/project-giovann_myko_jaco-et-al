@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:planago/controllers/authentication_controller.dart';
 import 'package:planago/navigation_menu.dart';
+import 'package:planago/provider/auth_provider.dart';
 import 'package:planago/screens/authentication/login/login_page.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,9 +17,9 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
-    Stream<User?> userStream = AuthenticationController.instance.getUserStream();
+    Stream<User?> userStream = context.watch<UserAuthProvider>().userStream;
 
-    return Obx(()=> StreamBuilder(
+    return StreamBuilder(
       stream: userStream,
       builder: (context, snapshot) {
         if (snapshot.hasError) {
@@ -35,6 +37,6 @@ class _HomePageState extends State<HomePage> {
         // if user is logged in, display the scaffold containing the streambuilder for the todos
         return NavigationMenu();
       },
-    ));
+    );
   }
 }

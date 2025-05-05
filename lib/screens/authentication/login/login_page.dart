@@ -2,7 +2,10 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:planago/controllers/login_controller.dart';
+import 'package:planago/provider/auth_provider.dart';
 import 'package:planago/utils/constants/colors.dart';
+import 'package:provider/provider.dart';
 import 'package:simple_gradient_text/simple_gradient_text.dart';
 
 class LoginPage extends StatefulWidget 
@@ -15,19 +18,18 @@ class LoginPage extends StatefulWidget
 
 class _LoginPageState extends State<LoginPage> 
 {
-  final _formKey = GlobalKey<FormState>();
-  final usernameController = TextEditingController();
-  final passwordController = TextEditingController();
+
+  final controller = LoginController.instance;
+    final _formKey = GlobalKey<FormState>();
 
   // Temporary variables habang wala pa data model + database
   bool rememberMe = false;
   bool isPasswordObscured = false;
+  bool showSignInErrorMessage = false;
 
   @override
   void dispose() 
   {
-    usernameController.dispose();
-    passwordController.dispose();
     super.dispose();
   }
 
@@ -112,6 +114,7 @@ class _LoginPageState extends State<LoginPage>
     */
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+    
 
     return Scaffold(
       backgroundColor: AppColors.mutedWhite,
@@ -132,6 +135,7 @@ class _LoginPageState extends State<LoginPage>
                 passwordField(screenWidth, screenHeight),
                 loginOptions(screenWidth, screenHeight),
                 signIn(screenWidth, screenHeight),
+                showSignInErrorMessage ? signInErrorMessage : Container(),
                 divider(screenWidth, screenHeight),
                 googleSignIn(screenWidth, screenHeight),
                 brand(screenWidth, screenHeight),
@@ -160,6 +164,14 @@ class _LoginPageState extends State<LoginPage>
     ),
   );
 
+  Widget get signInErrorMessage => const Padding(
+    padding: EdgeInsets.only(bottom: 30),
+    child: Text(
+      "Invalid email or password",
+      style: TextStyle(color: Colors.red),
+    ),
+  );
+
   Widget usernameField(double width, double height) => Container(
     padding: EdgeInsets.zero,
     width: width * 0.88,
@@ -185,7 +197,7 @@ class _LoginPageState extends State<LoginPage>
         Flexible(
           flex: 2,
           child: TextFormField(
-            controller: usernameController,
+            controller: controller.username,
             textAlignVertical: TextAlignVertical.center,
             decoration: InputDecoration(
               contentPadding: EdgeInsets.symmetric(vertical: 4),
@@ -245,7 +257,7 @@ class _LoginPageState extends State<LoginPage>
         Flexible(
           flex: 2,
           child: TextFormField(
-            controller: passwordController,
+            controller: controller.password,
             textAlignVertical: TextAlignVertical.center,
             decoration: InputDecoration(
               contentPadding: EdgeInsets.symmetric(vertical: 4),
@@ -272,19 +284,17 @@ class _LoginPageState extends State<LoginPage>
               ),
               suffixIcon: IconButton(
                 onPressed: () {
-                  setState(() {
-                    isPasswordObscured = !isPasswordObscured;
-                  });
+                controller.isPassObscured.value = !controller.isPassObscured.value;  
                 },
                 icon: Icon(
-                  isPasswordObscured ? Iconsax.eye : Iconsax.eye_slash,
+                  controller.isPassObscured.value ? Iconsax.eye : Iconsax.eye_slash,
                   size: height * 0.02,
                   color: Color.fromARGB(255, 155, 155, 156),
                 ),
               ),
               floatingLabelBehavior: FloatingLabelBehavior.never,
             ),
-            obscureText: isPasswordObscured,
+            obscureText: controller.isPassObscured.value,
             style: TextStyle(fontSize: height * 0.015),
             cursorHeight: height * 0.02,
             cursorColor: Color.fromARGB(255, 155, 155, 156),
@@ -360,7 +370,25 @@ class _LoginPageState extends State<LoginPage>
       borderRadius: BorderRadius.circular(100),
     ),
     child: OutlinedButton(
-      onPressed: () {},
+      onPressed: () async {
+      if (_formKey.currentState!.validate()) {
+        _formKey.currentState!.save();
+        String? message = await context.read<UserAuthProvider>()
+            .authService
+            .signIn(controller.username.text.trim(), controller.password.text.trim());
+        setState(() {
+          if (message.isNotEmpty) {
+            setState(() {
+              showSignInErrorMessage = true;  
+            }); 
+          } else {
+            setState(() {
+              showSignInErrorMessage = false; 
+            });
+          }
+        });
+      }
+    },
       style: OutlinedButton.styleFrom(
         side: BorderSide(color: Colors.transparent),
       ),
