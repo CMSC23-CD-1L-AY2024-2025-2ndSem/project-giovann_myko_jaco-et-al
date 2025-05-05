@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:planago/utils/constants/colors.dart';
+import 'package:planago/utils/helper/validator.dart';
 import 'package:simple_gradient_text/simple_gradient_text.dart';
 
 class LoginPage extends StatefulWidget {
@@ -30,7 +31,6 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-
     /* 
       responsive UI - for phones only
       -------------------------------
@@ -142,7 +142,7 @@ class _LoginPageState extends State<LoginPage> {
           fontSize: 22,
           fontWeight: FontWeight.w600,
           color: AppColors.secondary,
-          letterSpacing: -0.5
+          letterSpacing: -0.5,
         ),
       ),
     ),
@@ -151,7 +151,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget usernameField(double width, double height) => Container(
     padding: EdgeInsets.zero,
     width: width * 0.88,
-    height: height * 0.065,
+    height: height * 0.085,
     child: Column(
       children: [
         Flexible(
@@ -163,7 +163,7 @@ class _LoginPageState extends State<LoginPage> {
               style: TextStyle(
                 fontSize: height * 0.015,
                 fontWeight: FontWeight.w500,
-                letterSpacing: -0.3
+                letterSpacing: -0.3,
               ),
               textAlign: TextAlign.left,
             ),
@@ -172,6 +172,8 @@ class _LoginPageState extends State<LoginPage> {
         Flexible(
           flex: 2,
           child: TextFormField(
+            validator:
+                (value) => AppValidator.validateEmptyText("Username", value),
             controller: usernameController,
             textAlignVertical: TextAlignVertical.center,
             decoration: InputDecoration(
@@ -211,7 +213,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget passwordField(double width, double height) => Container(
     padding: EdgeInsets.zero,
     width: width * 0.88,
-    height: height * 0.065,
+    height: height * 0.085,
     child: Column(
       children: [
         Flexible(
@@ -232,6 +234,7 @@ class _LoginPageState extends State<LoginPage> {
         Flexible(
           flex: 2,
           child: TextFormField(
+            validator: (value) => AppValidator.validatePassword(value),
             controller: passwordController,
             textAlignVertical: TextAlignVertical.center,
             decoration: InputDecoration(
@@ -288,7 +291,7 @@ class _LoginPageState extends State<LoginPage> {
     child: Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Row( 
+        Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Checkbox(
@@ -436,26 +439,28 @@ class _LoginPageState extends State<LoginPage> {
         ),
         SizedBox(height: 8),
         RichText(
-                  text: TextSpan(
-                    style: TextStyle(
-                  fontFamily: "Poppins",
-                  color: Color.fromARGB(255, 82, 82, 82),
-                  fontSize: height * 0.0138,
-                  letterSpacing: -0.2,
-                  fontWeight: FontWeight.w400),
-                    children: [
-                      TextSpan(text: "Don't have an account? "),
-                      TextSpan(
-                        text: "Sign up",
-                        style: TextStyle(fontWeight: FontWeight.w600),
-                        recognizer: TapGestureRecognizer()
-                          ..onTap = () {
-                            Get.toNamed("/signup");
-                          },
-                      ),
-                    ],
-                  ),
-                ),
+          text: TextSpan(
+            style: TextStyle(
+              fontFamily: "Poppins",
+              color: Color.fromARGB(255, 82, 82, 82),
+              fontSize: height * 0.0138,
+              letterSpacing: -0.2,
+              fontWeight: FontWeight.w400,
+            ),
+            children: [
+              TextSpan(text: "Don't have an account? "),
+              TextSpan(
+                text: "Sign up",
+                style: TextStyle(fontWeight: FontWeight.w600),
+                recognizer:
+                    TapGestureRecognizer()
+                      ..onTap = () {
+                        Get.toNamed("/signup");
+                      },
+              ),
+            ],
+          ),
+        ),
       ],
     ),
   );
@@ -463,7 +468,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget brand(double width, double height) => Container(
     padding: EdgeInsets.zero,
     width: width * 0.88,
-    height: height * 0.3207,
+    height: height * 0.2807,
     child: Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
