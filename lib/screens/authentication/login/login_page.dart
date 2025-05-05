@@ -348,7 +348,11 @@ class _LoginPageState extends State<LoginPage> {
       borderRadius: BorderRadius.circular(100),
     ),
     child: OutlinedButton(
-      onPressed: () {},
+      onPressed: () {
+        if (_formKey.currentState!.validate()) {
+          /* INSERT CODE HERE*/
+        }
+      },
       style: OutlinedButton.styleFrom(
         side: BorderSide(color: Colors.transparent),
       ),
