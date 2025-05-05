@@ -43,3 +43,6 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+#Add Firebase Options in gitignore
+lib/firebase_options.dart

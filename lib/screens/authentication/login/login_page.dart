@@ -1,4 +1,6 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:planago/utils/constants/colors.dart';
 import 'package:simple_gradient_text/simple_gradient_text.dart';
@@ -28,6 +30,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+
     /* 
       responsive UI - for phones only
       -------------------------------
@@ -139,6 +142,7 @@ class _LoginPageState extends State<LoginPage> {
           fontSize: 22,
           fontWeight: FontWeight.w600,
           color: AppColors.secondary,
+          letterSpacing: -0.5
         ),
       ),
     ),
@@ -159,6 +163,7 @@ class _LoginPageState extends State<LoginPage> {
               style: TextStyle(
                 fontSize: height * 0.015,
                 fontWeight: FontWeight.w500,
+                letterSpacing: -0.3
               ),
               textAlign: TextAlign.left,
             ),
@@ -188,6 +193,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
               labelText: "Enter your username",
               labelStyle: TextStyle(
+                letterSpacing: -0.3,
                 fontSize: height * 0.015,
                 color: Color.fromARGB(255, 155, 155, 156),
               ),
@@ -217,6 +223,7 @@ class _LoginPageState extends State<LoginPage> {
               style: TextStyle(
                 fontSize: height * 0.015,
                 fontWeight: FontWeight.w500,
+                letterSpacing: -0.3,
               ),
               textAlign: TextAlign.left,
             ),
@@ -247,6 +254,7 @@ class _LoginPageState extends State<LoginPage> {
               labelText: "Password",
               labelStyle: TextStyle(
                 fontSize: height * 0.015,
+                letterSpacing: -0.3,
                 color: Color.fromARGB(255, 155, 155, 156),
               ),
               suffixIcon: IconButton(
@@ -280,7 +288,7 @@ class _LoginPageState extends State<LoginPage> {
     child: Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Row(
+        Row( 
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Checkbox(
@@ -302,6 +310,7 @@ class _LoginPageState extends State<LoginPage> {
             Text(
               "Remember me",
               style: TextStyle(
+                letterSpacing: -0.2,
                 fontSize: height * 0.0138,
                 color: Color.fromARGB(255, 155, 155, 156),
               ),
@@ -313,6 +322,7 @@ class _LoginPageState extends State<LoginPage> {
           child: Text(
             "Forgot password?",
             style: TextStyle(
+              letterSpacing: -0.3,
               fontSize: height * 0.0138,
               fontWeight: FontWeight.w500,
               color: AppColors.black,
@@ -342,6 +352,7 @@ class _LoginPageState extends State<LoginPage> {
       child: Text(
         "Sign in",
         style: TextStyle(
+          letterSpacing: -0.5,
           color: AppColors.mutedWhite,
           fontSize: height * 0.023,
           fontWeight: FontWeight.w600,
@@ -366,6 +377,7 @@ class _LoginPageState extends State<LoginPage> {
         Text(
           "or",
           style: TextStyle(
+            letterSpacing: -0.3,
             fontSize: height * 0.015,
             fontWeight: FontWeight.w500,
             color: Color.fromARGB(255, 42, 42, 42),
@@ -409,6 +421,7 @@ class _LoginPageState extends State<LoginPage> {
                     child: Text(
                       "Continue with Google",
                       style: TextStyle(
+                        letterSpacing: -0.5,
                         color: Color.fromARGB(255, 82, 82, 82),
                         fontSize: height * 0.0183,
                         fontWeight: FontWeight.w600,
@@ -421,33 +434,28 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
         ),
-        SizedBox(
-          height: height * 0.037,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                "Don't have an account?",
-                style: TextStyle(
+        SizedBox(height: 8),
+        RichText(
+                  text: TextSpan(
+                    style: TextStyle(
+                  fontFamily: "Poppins",
                   color: Color.fromARGB(255, 82, 82, 82),
                   fontSize: height * 0.0138,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-              TextButton(
-                onPressed: () {},
-                child: Text(
-                  "Sign up",
-                  style: TextStyle(
-                    color: Color.fromARGB(255, 82, 82, 82),
-                    fontSize: height * 0.0138,
-                    fontWeight: FontWeight.w600,
+                  letterSpacing: -0.2,
+                  fontWeight: FontWeight.w400),
+                    children: [
+                      TextSpan(text: "Don't have an account? "),
+                      TextSpan(
+                        text: "Sign up",
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () {
+                            Get.toNamed("/signup");
+                          },
+                      ),
+                    ],
                   ),
                 ),
-              ),
-            ],
-          ),
-        ),
       ],
     ),
   );
@@ -469,7 +477,7 @@ class _LoginPageState extends State<LoginPage> {
             gradientDirection: GradientDirection.ltr,
           ),
         ),
-        Spacer(flex: 1,),
+        Spacer(flex: 1),
       ],
     ),
   );
