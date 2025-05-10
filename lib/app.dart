@@ -23,7 +23,7 @@ class App extends StatelessWidget
           case "/":
           return MaterialPageRoute(builder: (context) => HomePage());
           case "/login":
-          return MaterialPageRoute(builder: (context) => LoginPage());
+          return MaterialPageRoute(builder: (context) => NavigationMenu()); // pinalitan ko muna para no need to login everytime
           case "/signup":
           return MaterialPageRoute(builder: (context) => SignUpPage1());
         }
