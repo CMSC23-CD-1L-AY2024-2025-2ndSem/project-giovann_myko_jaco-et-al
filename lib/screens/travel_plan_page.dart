@@ -1,10 +1,14 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:planago/screens/travel_overview_page.dart';
 import 'package:planago/utils/constants/colors.dart';
 
 class travelDetails {
+  final String? destImage;
   final String tripTitle;
   final String destination;
   final String month;
@@ -12,6 +16,7 @@ class travelDetails {
   final String endDate;
 
   travelDetails({
+    this.destImage,
     required this.tripTitle,
     required this.destination,
     required this.month,
@@ -28,9 +33,8 @@ class TravelPlanPage extends StatefulWidget {
 }
 
 class _TravelPlanPageState extends State<TravelPlanPage> {
-  // convert first from base64
-  // storage for profile picture of user
-  File? _imageFile;
+  // assuming profilePicture is in base64 string
+  String? profilePicture;
   String username = "Myko Jefferson";
 
   List<travelDetails> tripList = [
@@ -143,7 +147,8 @@ class _TravelPlanPageState extends State<TravelPlanPage> {
                       screenHeight,
                       tripList[index],
                     ),
-                separatorBuilder: (context, index) => SizedBox(height: screenHeight * 0.02,),
+                separatorBuilder:
+                    (context, index) => SizedBox(height: screenHeight * 0.02),
               ),
             ),
           ],
@@ -165,8 +170,8 @@ class _TravelPlanPageState extends State<TravelPlanPage> {
                 dimension: width * 0.1048, //102
                 child: ClipOval(
                   child:
-                      _imageFile != null
-                          ? Image.file(_imageFile!, fit: BoxFit.cover)
+                      profilePicture != null
+                          ? Image.memory(base64Decode(profilePicture!), fit: BoxFit.cover)
                           : Image.asset(
                             'assets/images/default_profile.png',
                           ), // temp only
@@ -226,7 +231,7 @@ class _TravelPlanPageState extends State<TravelPlanPage> {
   Widget travelListTile(double width, double height, travelDetails details) {
     return GestureDetector(
       onTap: () {
-        // GO TO TRAVEL OVERVIEW PAGE
+        Get.to(TravelOverviewPage(), arguments: [details, profilePicture]);
       },
       child: Container(
         padding: EdgeInsets.all(width * 0.03),
@@ -240,15 +245,18 @@ class _TravelPlanPageState extends State<TravelPlanPage> {
             // MAIN IMG
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: Image.asset(
-                // HARD CODED IMAGE
-                'assets/images/japan.png',
-                width: width * 0.28,
-                height: height * 0.0977,
-                fit: BoxFit.cover,
-              ),
+              child:
+                  details.destImage != null
+                      ? Image.memory(base64Decode(details.destImage!), fit: BoxFit.cover)
+                      : Image.asset(
+                        // HARD CODED IMAGE
+                        'assets/images/japan.png',
+                        width: width * 0.28,
+                        height: height * 0.0977,
+                        fit: BoxFit.cover,
+                      ),
             ),
-      
+
             // DIVIDER
             Container(
               width: width * 0.002,
@@ -264,7 +272,7 @@ class _TravelPlanPageState extends State<TravelPlanPage> {
               ),
               margin: EdgeInsets.symmetric(horizontal: width * 0.03),
             ),
-      
+
             // DETAILS
             Expanded(
               child: Column(
@@ -321,7 +329,7 @@ class _TravelPlanPageState extends State<TravelPlanPage> {
                 ],
               ),
             ),
-      
+
             // BARCODE
             Column(
               children: [
