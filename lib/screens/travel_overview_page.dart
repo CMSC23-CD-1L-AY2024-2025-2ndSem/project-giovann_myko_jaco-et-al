@@ -490,47 +490,52 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                     children: [
                       Row(
                         children: [
-                          SizedBox(
-                            child: Row(
-                              spacing: width * 0.007,
-                              children: [
-                                CircleAvatar(
-                                  radius: width * 0.03,
-                                  backgroundColor: AppColors.primary,
-                                  child: Icon(
-                                    Icons.hotel_rounded,
-                                    size: width * 0.035,
-                                    color: AppColors.mutedWhite,
+                          Flexible(
+                            flex: 1,
+                            child: SizedBox(
+                              child: Row(
+                                spacing: width * 0.007,
+                                children: [
+                                  CircleAvatar(
+                                    radius: width * 0.03,
+                                    backgroundColor: AppColors.primary,
+                                    child: Icon(
+                                      Icons.hotel_rounded,
+                                      size: width * 0.035,
+                                      color: AppColors.mutedWhite,
+                                    ),
                                   ),
-                                ),
-                                SizedBox(width: width * 0.015),
-                                Text(
-                                  details!.name,
-                                  style: TextStyle(fontSize: height * 0.0138),
-                                ),
-                              ],
+                                  SizedBox(width: width * 0.015),
+                                  Text(
+                                    details!.name,
+                                    style: TextStyle(fontSize: height * 0.0138),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                          SizedBox(width: width * 0.17),
-                          SizedBox(
-                            child: Row(
-                              spacing: width * 0.007,
-                              children: [
-                                CircleAvatar(
-                                  radius: width * 0.03,
-                                  backgroundColor: AppColors.primary,
-                                  child: Icon(
-                                    Icons.meeting_room,
-                                    size: width * 0.035,
-                                    color: AppColors.mutedWhite,
+                          Flexible(
+                            flex: 1,
+                            child: SizedBox(
+                              child: Row(
+                                spacing: width * 0.007,
+                                children: [
+                                  CircleAvatar(
+                                    radius: width * 0.03,
+                                    backgroundColor: AppColors.primary,
+                                    child: Icon(
+                                      Icons.meeting_room,
+                                      size: width * 0.035,
+                                      color: AppColors.mutedWhite,
+                                    ),
                                   ),
-                                ),
-                                SizedBox(width: width * 0.015),
-                                Text(
-                                  details!.room,
-                                  style: TextStyle(fontSize: height * 0.0138),
-                                ),
-                              ],
+                                  SizedBox(width: width * 0.015),
+                                  Text(
+                                    details!.room,
+                                    style: TextStyle(fontSize: height * 0.0138),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ],
