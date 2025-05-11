@@ -1,4 +1,7 @@
+import 'dart:async';
 import 'dart:convert';
+import 'package:country_picker/country_picker.dart' as picker;
+import 'package:countries_utils/countries_utils.dart' as utils;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
@@ -332,7 +335,7 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 10),
+                  SizedBox(height: context.height * 0.006),
                   ListTile(
                     contentPadding: EdgeInsets.symmetric(
                       horizontal: context.width * 0.027,
@@ -590,6 +593,315 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
     );
   }
 
+  void showAddFlight(
+    BuildContext context,
+    void Function(FlightDetails) onSave,
+  ) {
+    final TextEditingController airlineController = TextEditingController();
+
+    TimeOfDay? fromTime;
+    TimeOfDay? toTime;
+    String selectedClass = "Economy";
+    picker.Country? fromCountry;
+    picker.Country? toCountry;
+    String? fromAlpha3;
+    String? toAlpha3;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: context.width * 0.06,
+                vertical: context.height * 0.04,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: airlineController,
+                    cursorColor: AppColors.black,
+                    cursorHeight: context.height * 0.02,
+                    decoration: InputDecoration(
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: AppColors.black),
+                      ),
+                      labelStyle: TextStyle(
+                        fontSize: context.height * 0.015,
+                        fontWeight: FontWeight.w400,
+                        color: AppColors.black,
+                      ),
+                      labelText: 'Airline Name',
+                      prefixIcon: Icon(Icons.flight, color: AppColors.black),
+                    ),
+                  ),
+                  SizedBox(height: context.height * 0.006),
+                  DropdownButtonFormField<String>(
+                    value: selectedClass,
+                    items:
+                        ["First", "Business", "Economy"]
+                            .map(
+                              (e) => DropdownMenuItem(value: e, child: Text(e)),
+                            )
+                            .toList(),
+                    onChanged: (value) {
+                      if (value != null) {
+                        setState(() => selectedClass = value);
+                      }
+                    },
+                    decoration: InputDecoration(
+                      labelText: "Class",
+                      prefixIcon: Icon(Icons.airline_seat_recline_extra),
+                    ),
+                  ),
+                  SizedBox(height: context.height * 0.006),
+                  ListTile(
+                    leading: Icon(Icons.flight_takeoff, color: AppColors.black),
+                    title: Text(
+                      fromCountry?.name ?? 'Select Departure Country',
+                    ),
+                    onTap: () {
+                      picker.showCountryPicker(
+                        context: context,
+                        showPhoneCode: false,
+                        onSelect: (country) {
+                          setState(() {
+                            fromCountry = country;
+                            fromAlpha3 =
+                                utils.Countries.byCode(
+                                  country.countryCode,
+                                ).alpha3Code;
+                          });
+                        },
+                      );
+                    },
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.flight_land, color: AppColors.black),
+                    title: Text(toCountry?.name ?? 'Select Arrival Country'),
+                    onTap: () {
+                      picker.showCountryPicker(
+                        context: context,
+                        showPhoneCode: false,
+                        onSelect: (country) {
+                          setState(() {
+                            toCountry = country;
+                            toAlpha3 =
+                                utils.Countries.byCode(
+                                  country.countryCode,
+                                ).alpha3Code;
+                          });
+                        },
+                      );
+                    },
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.access_time, color: AppColors.black),
+                    title: Text(
+                      fromTime != null
+                          ? 'From Time: ${fromTime!.format(context)}'
+                          : 'Select Departure Time',
+                    ),
+                    onTap: () async {
+                      final picked = await showTimePicker(
+                        context: context,
+                        initialTime: TimeOfDay.now(),
+                      );
+                      if (picked != null) {
+                        setState(() => fromTime = picked);
+                      }
+                    },
+                  ),
+                  ListTile(
+                    leading: Icon(
+                      Icons.access_time_filled,
+                      color: AppColors.black,
+                    ),
+                    title: Text(
+                      toTime != null
+                          ? 'To Time: ${toTime!.format(context)}'
+                          : 'Select Arrival Time',
+                    ),
+                    onTap: () async {
+                      final picked = await showTimePicker(
+                        context: context,
+                        initialTime: TimeOfDay.now(),
+                      );
+                      if (picked != null) {
+                        setState(() => toTime = picked);
+                      }
+                    },
+                  ),
+                  SizedBox(height: context.height * 0.006),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                    ),
+                    onPressed: () {
+                      if (airlineController.text.isNotEmpty &&
+                          fromAlpha3 != null &&
+                          toAlpha3 != null &&
+                          fromTime != null &&
+                          toTime != null) {
+                        final details = FlightDetails(
+                          airlineName: airlineController.text,
+                          travelClass: selectedClass,
+                          destFrom: fromAlpha3!,
+                          destFromTime: fromTime!.format(context),
+                          destTo: toAlpha3!,
+                          destToTime: toTime!.format(context),
+                        );
+                        Navigator.pop(context);
+                        onSave(details);
+                      } else {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text(
+                                "Missing Fields",
+                                style: TextStyle(
+                                  fontFamily: "Cal Sans",
+                                  fontSize: context.height * 0.03002,
+                                ),
+                              ),
+                              content: Text(
+                                "Please complete all fields to save flight details.",
+                                style: TextStyle(
+                                  fontSize: context.height * 0.015,
+                                  fontWeight: FontWeight.w400,
+                                  color: AppColors.black,
+                                ),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: Text(
+                                    "Close",
+                                    style: TextStyle(
+                                      fontSize: context.height * 0.015,
+                                      fontWeight: FontWeight.w400,
+                                      color: AppColors.black,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      }
+                    },
+                    child: Text(
+                      'Save',
+                      style: TextStyle(color: AppColors.mutedWhite),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  bool hasFlightDetails = false;
+  FlightDetails? flightDetails;
+
+  // ref: https://www.youtube.com/watch?v=N8sBC_eK7Z4&ab_channel=Flutter
+  Future<picker.Country?> pickCountry() async {
+    final completer = Completer<picker.Country?>();
+
+    picker.showCountryPicker(
+      context: context,
+      showPhoneCode: false,
+      onSelect: (picker.Country country) {
+        completer.complete(country);
+      },
+    );
+
+    return completer.future;
+  }
+
+  Widget buildFlightCard(double width, double height) {
+    return Container(
+      padding: EdgeInsets.all(width * 0.03),
+      decoration: BoxDecoration(
+        color: AppColors.primary,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  flightDetails!.airlineName,
+                  style: TextStyle(
+                    fontSize: height * 0.0183,
+                    color: AppColors.mutedWhite,
+                  ),
+                ),
+                SizedBox(height: height * 0.005),
+                Text('FROM:', style: TextStyle(color: AppColors.mutedWhite)),
+                Text(
+                  flightDetails?.destFrom ?? '',
+                  style: TextStyle(
+                    fontSize: height * 0.026,
+                    fontFamily: "Cal Sans",
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.mutedWhite,
+                  ),
+                ),
+                Text(
+                  flightDetails!.destFromTime,
+                  style: TextStyle(color: AppColors.mutedWhite),
+                ),
+              ],
+            ),
+          ),
+          Icon(Icons.arrow_forward, color: AppColors.mutedWhite),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  flightDetails!.travelClass,
+                  style: TextStyle(
+                    fontSize: height * 0.0183,
+                    color: AppColors.mutedWhite,
+                  ),
+                ),
+                SizedBox(height: height * 0.005),
+                Text('TO:', style: TextStyle(color: AppColors.mutedWhite)),
+                Text(
+                  flightDetails?.destTo ?? '',
+                  style: TextStyle(
+                    fontSize: height * 0.026,
+                    fontFamily: "Cal Sans",
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.mutedWhite,
+                  ),
+                ),
+                Text(
+                  flightDetails!.destToTime,
+                  style: TextStyle(color: AppColors.mutedWhite),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget flightTile(double width, double height) {
     return GestureDetector(
       child: SizedBox(
@@ -613,24 +925,42 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                 ),
               ),
             ),
-            Divider(height: height * 0.0036, thickness: height * 0.0009),
-            ListTile(
-              contentPadding: EdgeInsets.only(
-                left: width * 0.012,
-                top: height * 0.01,
-              ),
-              minTileHeight: height * 0.03,
-              minVerticalPadding: 0,
-              leading: Icon(Icons.add, color: Color.fromRGBO(155, 155, 156, 1)),
-              title: Text(
-                "Add your flight details",
-                style: TextStyle(
-                  fontSize: height * 0.015,
-                  fontWeight: FontWeight.w400,
+            if (hasFlightDetails) ...[
+              Padding(padding: EdgeInsets.only(top: height * 0.01)),
+              buildFlightCard(width, height),
+            ] else ...[
+              Divider(height: height * 0.0036, thickness: height * 0.0009),
+              ListTile(
+                contentPadding: EdgeInsets.only(
+                  left: width * 0.012,
+                  top: height * 0.01,
+                ),
+                minTileHeight: height * 0.03,
+                minVerticalPadding: 0,
+                leading: Icon(
+                  Icons.add,
                   color: Color.fromRGBO(155, 155, 156, 1),
                 ),
+                title: Text(
+                  "Add your flight details",
+                  style: TextStyle(
+                    fontSize: height * 0.015,
+                    fontWeight: FontWeight.w400,
+                    color: Color.fromRGBO(155, 155, 156, 1),
+                  ),
+                ),
+                onTap: () async {
+                  showAddFlight(context, (newFlightDetails) {
+                    setState(() {
+                      flightDetails = newFlightDetails;
+                      if (flightDetails!.airlineName.isNotEmpty) {
+                        hasFlightDetails = true;
+                      }
+                    });
+                  });
+                },
               ),
-            ),
+            ],
           ],
         ),
       ),
