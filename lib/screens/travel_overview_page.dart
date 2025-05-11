@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:intl/intl.dart';
 import 'package:planago/screens/travel_plan_page.dart';
 import 'package:planago/utils/constants/colors.dart';
 
@@ -94,11 +95,7 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                   travelDetails,
                   profilePicture,
                 ),
-                accommodationTile(
-                  screenWidth,
-                  screenHeight,
-                  accommodationDetails,
-                ),
+                accommodationTile(context, screenWidth, screenHeight),
                 flightTile(screenWidth, screenHeight),
                 notesTile(screenWidth, screenHeight),
                 checklistTile(screenWidth, screenHeight),
@@ -270,12 +267,199 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
     );
   }
 
-  Widget accommodationTile(
-    double width,
-    double height,
-    AccommodationDetails details,
+  void showAddAccommodation(
+    BuildContext context,
+    void Function(AccommodationDetails) onSave,
   ) {
+    final TextEditingController nameController = TextEditingController();
+    final TextEditingController roomController = TextEditingController();
+    DateTimeRange? selectedDateRange;
+
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: context.width * 0.06,
+                vertical: context.height * 0.04,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: nameController,
+                    cursorColor: AppColors.black,
+                    cursorHeight: context.height * 0.02,
+                    decoration: InputDecoration(
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(
+                          color: AppColors.black,
+                        ), // color when focused
+                      ),
+                      labelStyle: TextStyle(
+                        fontSize: context.height * 0.015,
+                        fontWeight: FontWeight.w400,
+                        color: AppColors.black,
+                      ),
+                      labelText: 'Hotel Name',
+                      prefixIcon: Icon(Icons.hotel, color: AppColors.black),
+                    ),
+                  ),
+                  TextField(
+                    controller: roomController,
+                    cursorColor: AppColors.black,
+                    cursorHeight: context.height * 0.02,
+                    decoration: InputDecoration(
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(
+                          color: AppColors.black,
+                        ), // color when focused
+                      ),
+                      labelStyle: TextStyle(
+                        fontSize: context.height * 0.015,
+                        fontWeight: FontWeight.w400,
+                        color: AppColors.black,
+                      ),
+                      labelText: 'Room Number',
+                      prefixIcon: Icon(
+                        Icons.meeting_room,
+                        color: AppColors.black,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  ListTile(
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: context.width * 0.027,
+                    ),
+                    leading: Icon(Icons.date_range, color: AppColors.black),
+                    title: Text(
+                      selectedDateRange == null
+                          ? 'Select Date Range'
+                          : '${DateFormat.MMMd().format(selectedDateRange!.start)} - ${DateFormat.MMMd().format(selectedDateRange!.end)}',
+                      style: TextStyle(
+                        fontSize: context.height * 0.015,
+                        fontWeight: FontWeight.w400,
+                        color: AppColors.black,
+                      ),
+                    ),
+                    onTap: () async {
+                      final picked = await showDateRangePicker(
+                        context: context,
+
+                        // wala pala tracker for what year ang travel plan
+                        // for now, set ko muna for 1 year yung selection range
+                        firstDate: DateTime.now(),
+                        lastDate: DateTime.now().add(Duration(days: 365)),
+
+                        // di ko na naedit colors for range picker
+                        // di ko mahanap properties
+                      );
+                      if (picked != null) {
+                        setState(() => selectedDateRange = picked);
+                      }
+                    },
+                  ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                    ),
+                    onPressed: () {
+                      if (nameController.text.isNotEmpty &&
+                          roomController.text.isNotEmpty &&
+                          selectedDateRange != null) {
+                        final month = DateFormat.MMMM().format(
+                          selectedDateRange!.start,
+                        );
+                        final start = DateFormat.d().format(
+                          selectedDateRange!.start,
+                        );
+                        final end = DateFormat.d().format(
+                          selectedDateRange!.end,
+                        );
+                        final details = AccommodationDetails(
+                          name: nameController.text,
+                          room: roomController.text,
+                          month: month,
+                          startDate: start,
+                          endDate: end,
+                        );
+                        Navigator.pop(context);
+                        onSave(details);
+                      } else {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text(
+                                "Missing Fields",
+                                style: TextStyle(
+                                  fontFamily: "Cal Sans",
+                                  fontSize: context.height * 0.03002,
+                                ),
+                              ),
+                              content: Text(
+                                "Please fill out all fields and select a date range.",
+                                style: TextStyle(
+                                  fontSize: context.height * 0.015,
+                                  fontWeight: FontWeight.w400,
+                                  color: AppColors.black,
+                                ),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: Text(
+                                    "Close",
+                                    style: TextStyle(
+                                      fontSize: context.height * 0.015,
+                                      fontWeight: FontWeight.w400,
+                                      color: AppColors.black,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      }
+                    },
+                    child: Text(
+                      'Save',
+                      style: TextStyle(color: AppColors.mutedWhite),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  AccommodationDetails? details;
+  bool hasAccommodationDetails = false;
+
+  Widget accommodationTile(BuildContext context, double width, double height) {
+    // TEMP HOLDER
+
     return GestureDetector(
+      onTap: () {
+        showAddAccommodation(context, (newDetails) {
+          setState(() {
+            details = newDetails;
+            if (details!.name.isNotEmpty) {
+              hasAccommodationDetails = true;
+            }
+          });
+        });
+      },
       child: SizedBox(
         width: width * 0.88,
         child: Column(
@@ -298,23 +482,103 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
               ),
             ),
             Divider(height: height * 0.0036, thickness: height * 0.0009),
-            ListTile(
-              contentPadding: EdgeInsets.only(
-                left: width * 0.012,
-                top: height * 0.01,
-              ),
-              minTileHeight: height * 0.03,
-              minVerticalPadding: 0,
-              leading: Icon(Icons.add, color: Color.fromRGBO(155, 155, 156, 1)),
-              title: Text(
-                "Add your accommodation details",
-                style: TextStyle(
-                  fontSize: height * 0.015,
-                  fontWeight: FontWeight.w400,
-                  color: Color.fromRGBO(155, 155, 156, 1),
+            (hasAccommodationDetails && details != null)
+                ? Padding(
+                  padding: EdgeInsets.only(top: height * 0.01),
+                  child: Column(
+                    spacing: height * 0.008,
+                    children: [
+                      Row(
+                        children: [
+                          SizedBox(
+                            child: Row(
+                              spacing: width * 0.007,
+                              children: [
+                                CircleAvatar(
+                                  radius: width * 0.03,
+                                  backgroundColor: AppColors.primary,
+                                  child: Icon(
+                                    Icons.hotel_rounded,
+                                    size: width * 0.035,
+                                    color: AppColors.mutedWhite,
+                                  ),
+                                ),
+                                SizedBox(width: width * 0.015),
+                                Text(
+                                  details!.name,
+                                  style: TextStyle(fontSize: height * 0.0138),
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(width: width * 0.17),
+                          SizedBox(
+                            child: Row(
+                              spacing: width * 0.007,
+                              children: [
+                                CircleAvatar(
+                                  radius: width * 0.03,
+                                  backgroundColor: AppColors.primary,
+                                  child: Icon(
+                                    Icons.meeting_room,
+                                    size: width * 0.035,
+                                    color: AppColors.mutedWhite,
+                                  ),
+                                ),
+                                SizedBox(width: width * 0.015),
+                                Text(
+                                  details!.room,
+                                  style: TextStyle(fontSize: height * 0.0138),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        child: Row(
+                          spacing: width * 0.007,
+                          children: [
+                            CircleAvatar(
+                              radius: width * 0.03,
+                              backgroundColor: AppColors.primary,
+                              child: Icon(
+                                Icons.date_range,
+                                size: width * 0.035,
+                                color: AppColors.mutedWhite,
+                              ),
+                            ),
+                            SizedBox(width: width * 0.015),
+                            Text(
+                              "${details!.month} ${details!.startDate} - ${details!.month} ${details!.endDate}",
+                              style: TextStyle(fontSize: height * 0.0138),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+                : ListTile(
+                  contentPadding: EdgeInsets.only(
+                    left: width * 0.012,
+                    top: height * 0.01,
+                  ),
+                  minTileHeight: height * 0.03,
+                  minVerticalPadding: 0,
+                  leading: Icon(
+                    Icons.add,
+                    color: Color.fromRGBO(155, 155, 156, 1),
+                  ),
+                  title: Text(
+                    "Add your accommodation details",
+                    style: TextStyle(
+                      fontSize: height * 0.015,
+                      fontWeight: FontWeight.w400,
+                      color: Color.fromRGBO(155, 155, 156, 1),
+                    ),
+                  ),
                 ),
-              ),
-            ),
           ],
         ),
       ),
