@@ -66,15 +66,6 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
   final TravelDetails travelDetails = Get.arguments[0] as TravelDetails;
   final String? profilePicture = Get.arguments[1] as String?;
 
-  // TEMP DETAILS
-  AccommodationDetails accommodationDetails = AccommodationDetails(
-    name: "Tribelli Hotel",
-    room: "Room A104",
-    month: "May",
-    startDate: "12",
-    endDate: "14",
-  );
-
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -321,7 +312,7 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                       focusedBorder: UnderlineInputBorder(
                         borderSide: BorderSide(
                           color: AppColors.black,
-                        ), // color when focused
+                        ),
                       ),
                       labelStyle: TextStyle(
                         fontSize: context.height * 0.015,
@@ -450,8 +441,6 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
   bool hasAccommodationDetails = false;
 
   Widget accommodationTile(BuildContext context, double width, double height) {
-    // TEMP HOLDER
-
     return GestureDetector(
       onTap: () {
         showAddAccommodation(context, (newDetails) {
