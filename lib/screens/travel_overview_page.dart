@@ -80,21 +80,30 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
       // TEMP APPBAR
       appBar: AppBar(),
       body: SingleChildScrollView(
-        child: Container(
-          margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
-          child: Column(
-            spacing: screenHeight * 0.03,
-            children: [
-              header(screenWidth, screenHeight, travelDetails, profilePicture),
-              accommodationTile(
-                screenWidth,
-                screenHeight,
-                accommodationDetails,
-              ),
-              flightTile(screenWidth, screenHeight),
-              notesTile(screenWidth, screenHeight),
-              checklistTile(screenWidth, screenHeight),
-            ],
+        child: GestureDetector(
+          behavior: HitTestBehavior.translucent,
+          onTap: FocusScope.of(context).unfocus,
+          child: Container(
+            margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
+            child: Column(
+              spacing: screenHeight * 0.03,
+              children: [
+                header(
+                  screenWidth,
+                  screenHeight,
+                  travelDetails,
+                  profilePicture,
+                ),
+                accommodationTile(
+                  screenWidth,
+                  screenHeight,
+                  accommodationDetails,
+                ),
+                flightTile(screenWidth, screenHeight),
+                notesTile(screenWidth, screenHeight),
+                checklistTile(screenWidth, screenHeight),
+              ],
+            ),
           ),
         ),
       ),
@@ -288,10 +297,7 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                 ),
               ),
             ),
-            Divider(
-              height: height * 0.0036,
-              thickness: height * 0.0009,
-            ),
+            Divider(height: height * 0.0036, thickness: height * 0.0009),
             ListTile(
               contentPadding: EdgeInsets.only(
                 left: width * 0.012,
@@ -338,10 +344,7 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                 ),
               ),
             ),
-            Divider(
-              height: height * 0.0036,
-              thickness: height * 0.0009,
-            ),
+            Divider(height: height * 0.0036, thickness: height * 0.0009),
             ListTile(
               contentPadding: EdgeInsets.only(
                 left: width * 0.012,
@@ -365,52 +368,84 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
     );
   }
 
+  // USE AS PLACEHOLDER
+  TextEditingController notesController = TextEditingController();
+
+  @override
+  void dispose() {
+    notesController.dispose();
+    super.dispose();
+  }
+
   Widget notesTile(double width, double height) {
-    return GestureDetector(
-      child: SizedBox(
-        width: width * 0.88,
-        child: Column(
-          children: [
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              minTileHeight: height * 0.03,
-              minVerticalPadding: 0,
-              leading: Icon(
-                Icons.notes_rounded,
-                color: AppColors.black,
-                size: width * 0.08,
-              ),
-              title: Text(
-                "Notes",
-                style: TextStyle(
-                  fontFamily: "Cal Sans",
-                  fontSize: height * 0.03002,
-                ),
+    return SizedBox(
+      width: width * 0.88,
+      child: Column(
+        children: [
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            minTileHeight: height * 0.03,
+            minVerticalPadding: 0,
+            leading: Icon(
+              Icons.notes_rounded,
+              color: AppColors.black,
+              size: width * 0.08,
+            ),
+            title: Text(
+              "Notes",
+              style: TextStyle(
+                fontFamily: "Cal Sans",
+                fontSize: height * 0.03002,
               ),
             ),
-            Divider(
-              height: height * 0.0036,
-              thickness: height * 0.0009,
+          ),
+          Divider(height: height * 0.0036, thickness: height * 0.0009),
+          TextField(
+            controller: notesController,
+            cursorColor: AppColors.black,
+            maxLines: null,
+            cursorHeight: height * 0.02,
+            style: TextStyle(
+              fontSize: height * 0.015,
+              fontWeight: FontWeight.w400,
+              color: AppColors.black,
             ),
-            ListTile(
+            decoration: InputDecoration(
               contentPadding: EdgeInsets.only(
-                left: width * 0.012,
+                left: width * 0.02,
+                right: width * 0.02,
                 top: height * 0.01,
               ),
-              minTileHeight: height * 0.03,
-              minVerticalPadding: 0,
-              leading: Icon(Icons.add, color: Color.fromRGBO(155, 155, 156, 1)),
-              title: Text(
-                "Enter your notes here!",
-                style: TextStyle(
-                  fontSize: height * 0.015,
-                  fontWeight: FontWeight.w400,
-                  color: Color.fromRGBO(155, 155, 156, 1),
-                ),
+              border: InputBorder.none,
+              hintStyle: TextStyle(
+                fontSize: height * 0.015,
+                fontWeight: FontWeight.w400,
+                color: Color.fromRGBO(155, 155, 156, 1),
               ),
+              hintText: "Enter your notes here!",
             ),
-          ],
-        ),
+          ),
+          // ListTile(
+          //   contentPadding: EdgeInsets.only(
+          //     left: width * 0.012,
+          //     top: height * 0.01,
+          //   ),
+          //   minTileHeight: height * 0.03,
+          //   minVerticalPadding: 0,
+          //   leading: Icon(
+          //     Icons.add,
+          //     color: Color.fromRGBO(155, 155, 156, 1),
+          //   ),
+          //   title: Text(
+          //     "Enter your notes here!",
+          //     style: TextStyle(
+          //       fontSize: height * 0.015,
+          //       fontWeight: FontWeight.w400,
+          //       color: Color.fromRGBO(155, 155, 156, 1),
+          //     ),
+          //   ),
+          // ),
+        ],
       ),
     );
   }
@@ -457,10 +492,7 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                 ),
               ),
             ),
-            Divider(
-              height: height * 0.0036,
-              thickness: height * 0.0009,
-            ),
+            Divider(height: height * 0.0036, thickness: height * 0.0009),
             Padding(padding: EdgeInsets.symmetric(vertical: height * 0.005)),
             if (isChecklist) ...[
               ListView.builder(
@@ -523,15 +555,12 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
               // Add new empty item row
               TextButton.icon(
                 onPressed: addChecklistItems,
-                icon: Icon(Icons.add, size: 18, color: AppColors.black,),
+                icon: Icon(Icons.add, size: 18, color: AppColors.black),
                 label: Text(
                   "Add item",
                   style: TextStyle(fontSize: height * 0.015),
                 ),
-                style: TextButton.styleFrom(
-                  foregroundColor: AppColors.black,
-                  padding: EdgeInsets.only(left: width * 0.012),
-                ),
+                style: TextButton.styleFrom(foregroundColor: AppColors.black),
               ),
             ] else
               ListTile(
