@@ -3,9 +3,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:planago/controllers/authentication_controller.dart';
 import 'package:planago/controllers/user_controller.dart';
-import 'package:planago/screens/edit_profile_page.dart';
-import 'package:planago/screens/profile_detail_page.dart';
+import 'package:planago/screens/profile/edit_profile_page.dart';
+import 'package:planago/screens/profile/profile_detail_page.dart';
 import 'package:planago/utils/constants/colors.dart';
 
 // Temporary model
@@ -68,6 +69,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 headButtons(screenWidth, screenHeight),
                 profilePicture(screenWidth, screenHeight),
                 editProfile(screenWidth, screenHeight),
+                signOutButton(screenHeight, screenHeight),
                 profileInfo(screenWidth, screenHeight)
               ],
             ),
@@ -267,10 +269,43 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  //Sign out button
+  Widget signOutButton(double width, double height) 
+  {
+    return SizedBox(
+      width: width * 0.44,
+      height: height * 0.0218,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: 
+        [
+          Icon(Iconsax.logout, color: AppColors.primary, size: height * 0.0195),
+          TextButton(
+            style: TextButton.styleFrom(padding: EdgeInsets.zero),
+            onPressed: () async {
+              await AuthenticationController.instance.signOut();
+              await AuthenticationController.instance.screenRedirect();
+              print("User logged out successfully");
+            },
+            child: Text(
+              "Sign Out",
+              style: TextStyle(
+                fontFamily: "Cal Sans",
+                color: AppColors.primary,
+                fontSize: height * 0.015,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget editProfile(double width, double height) 
   {
     return SizedBox(
-      width: width * 0.88,
+      width: width * 0.44,
       height: height * 0.0218,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,

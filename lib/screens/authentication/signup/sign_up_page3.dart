@@ -1,7 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:planago/components/app_bar.dart';
+import 'package:planago/components/app_bar_return.dart';
 import 'package:planago/controllers/signup_controller.dart';
 import 'package:planago/models/user_model.dart';
 import 'package:planago/navigation_menu.dart';

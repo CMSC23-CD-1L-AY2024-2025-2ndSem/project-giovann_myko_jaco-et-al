@@ -3,7 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:planago/components/app_bar.dart';
+import 'package:planago/components/app_bar_return.dart';
 import 'package:planago/components/custom_app_bar.dart';
 import 'package:planago/controllers/signup_controller.dart';
 import 'package:planago/screens/authentication/login/login_page.dart';

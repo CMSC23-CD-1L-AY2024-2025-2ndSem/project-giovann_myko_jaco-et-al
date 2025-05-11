@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:planago/utils/constants/colors.dart'; // Assuming you have an AppColors class
-import 'package:planago/screens/profile_page.dart'; // Assuming ProfileInfo is from this file
+import 'package:planago/screens/profile/profile_page.dart'; // Assuming ProfileInfo is from this file
 
 class ProfileDetailPage extends StatefulWidget 
 {
@@ -41,7 +41,6 @@ class _ProfileDetailPageState extends State<ProfileDetailPage>
   {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
-
     return Scaffold(
       appBar: AppBar(
         title: Text(

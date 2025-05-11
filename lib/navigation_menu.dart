@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:planago/screens/profile_page.dart';
+import 'package:planago/components/custom_app_bar.dart';
+import 'package:planago/screens/profile/profile_page.dart';
 import 'package:planago/utils/constants/colors.dart';
 
 class NavigationMenu extends StatelessWidget 
@@ -14,6 +15,7 @@ class NavigationMenu extends StatelessWidget
     final controller = Get.put(NavigationController());
 
     return Scaffold(
+      
       bottomNavigationBar: Obx(
         () => NavigationBar(
           height: 80,
@@ -28,7 +30,12 @@ class NavigationMenu extends StatelessWidget
           ],
         ),
       ),
-      body: Obx(() => controller.screens[controller.selectedIndex.value]),
+      body: Obx(() => Column(
+        children: [
+          CustomAppBar(),
+          controller.screens[controller.selectedIndex.value]
+        ],
+      )),
     );
   }
 }
