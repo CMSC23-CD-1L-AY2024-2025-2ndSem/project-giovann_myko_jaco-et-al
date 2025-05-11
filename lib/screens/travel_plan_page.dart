@@ -1,21 +1,19 @@
 import 'dart:convert';
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:planago/screens/travel_overview_page.dart';
 import 'package:planago/utils/constants/colors.dart';
 
-class travelDetails {
-  final String? destImage;
-  final String tripTitle;
-  final String destination;
-  final String month;
-  final String startDate;
-  final String endDate;
+class TravelDetails {
+  String? destImage;
+  String tripTitle;
+  String destination;
+  String month;
+  String startDate;
+  String endDate;
 
-  travelDetails({
+  TravelDetails({
     this.destImage,
     required this.tripTitle,
     required this.destination,
@@ -37,22 +35,22 @@ class _TravelPlanPageState extends State<TravelPlanPage> {
   String? profilePicture;
   String username = "Myko Jefferson";
 
-  List<travelDetails> tripList = [
-    travelDetails(
+  List<TravelDetails> tripList = [
+    TravelDetails(
       tripTitle: "Japan",
       destination: "Kyoto",
       month: "May",
       startDate: "12",
       endDate: "15",
     ),
-    travelDetails(
+    TravelDetails(
       tripTitle: "Japan",
       destination: "Osaka",
       month: "June",
       startDate: "16",
       endDate: "19",
     ),
-    travelDetails(
+    TravelDetails(
       tripTitle: "Japan",
       destination: "Tokyo",
       month: "September",
@@ -171,7 +169,10 @@ class _TravelPlanPageState extends State<TravelPlanPage> {
                 child: ClipOval(
                   child:
                       profilePicture != null
-                          ? Image.memory(base64Decode(profilePicture!), fit: BoxFit.cover)
+                          ? Image.memory(
+                            base64Decode(profilePicture!),
+                            fit: BoxFit.cover,
+                          )
                           : Image.asset(
                             'assets/images/default_profile.png',
                           ), // temp only
@@ -228,7 +229,7 @@ class _TravelPlanPageState extends State<TravelPlanPage> {
     );
   }
 
-  Widget travelListTile(double width, double height, travelDetails details) {
+  Widget travelListTile(double width, double height, TravelDetails details) {
     return GestureDetector(
       onTap: () {
         Get.to(TravelOverviewPage(), arguments: [details, profilePicture]);
@@ -247,7 +248,10 @@ class _TravelPlanPageState extends State<TravelPlanPage> {
               borderRadius: BorderRadius.circular(12),
               child:
                   details.destImage != null
-                      ? Image.memory(base64Decode(details.destImage!), fit: BoxFit.cover)
+                      ? Image.memory(
+                        base64Decode(details.destImage!),
+                        fit: BoxFit.cover,
+                      )
                       : Image.asset(
                         // HARD CODED IMAGE
                         'assets/images/japan.png',
