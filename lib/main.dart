@@ -3,10 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:planago/app.dart';
 import 'package:planago/controllers/authentication_controller.dart';
-import 'package:planago/controllers/login_controller.dart';
-import 'package:planago/controllers/signup_controller.dart';
+import 'package:planago/controllers/firestore/user_database.dart';
+import 'package:planago/controllers/user_controller.dart';
 import 'package:planago/firebase_options.dart';
-import 'package:planago/provider/auth_provider.dart';
 import 'package:provider/provider.dart';
 
   Future<void> main() async {
@@ -14,15 +13,8 @@ import 'package:provider/provider.dart';
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
-  Get.put<SignupController>(SignupController());
+  Get.put<UserDatabase>(UserDatabase());
   Get.put<AuthenticationController>(AuthenticationController());
-  Get.put<LoginController>(LoginController());
-  runApp(MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (context) => UserAuthProvider()),
-      ],
-      child: App(),
-    ),
-  );
+  Get.put<UserController>(UserController());
+  runApp(App());
 }

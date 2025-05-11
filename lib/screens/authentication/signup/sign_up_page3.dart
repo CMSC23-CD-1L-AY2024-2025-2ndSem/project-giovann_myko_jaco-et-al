@@ -5,6 +5,7 @@ import 'package:planago/components/app_bar.dart';
 import 'package:planago/controllers/signup_controller.dart';
 import 'package:planago/models/user_model.dart';
 import 'package:planago/navigation_menu.dart';
+import 'package:planago/screens/authentication/login/login_page.dart';
 import 'package:planago/utils/constants/colors.dart';
 import 'package:simple_gradient_text/simple_gradient_text.dart';
 
@@ -239,7 +240,7 @@ class SignUpPage3 extends StatelessWidget {
                           recognizer:
                               TapGestureRecognizer()
                                 ..onTap = () {
-                                  Get.toNamed("/login");
+                                  Get.offAll(() => LoginPage());
                                 },
                         ),
                       ],

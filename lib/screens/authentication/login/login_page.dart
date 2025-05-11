@@ -3,40 +3,28 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:planago/controllers/login_controller.dart';
-import 'package:planago/navigation_menu.dart';
-import 'package:planago/provider/auth_provider.dart';
+import 'package:planago/screens/authentication/signup/sign_up_page1.dart';
 import 'package:planago/utils/constants/colors.dart';
-import 'package:provider/provider.dart';
+import 'package:planago/utils/helper/validator.dart';
 import 'package:simple_gradient_text/simple_gradient_text.dart';
 
-class LoginPage extends StatefulWidget 
-{
+class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> 
-{
-
-  final controller = LoginController.instance;
-    final _formKey = GlobalKey<FormState>();
-
-  // Temporary variables habang wala pa data model + database
-  bool rememberMe = false;
-  bool isPasswordObscured = false;
-  bool showSignInErrorMessage = false;
+class _LoginPageState extends State<LoginPage> {
+  final controller = Get.put(LoginController());
 
   @override
-  void dispose() 
-  {
+  void dispose() {
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-
     /* 
       responsive UI - for phones only
       -------------------------------
@@ -115,37 +103,166 @@ class _LoginPageState extends State<LoginPage>
     */
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-    
 
-    return Obx(()=> Scaffold(
-      backgroundColor: AppColors.mutedWhite,
-      body: SingleChildScrollView(
-        child: Container(
-          padding: EdgeInsets.only(
-            left: screenWidth * 0.06,
-            right: screenWidth * 0.06,
-          ),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              spacing: screenHeight * 0.0183,
-              children: [
-                loginText(screenWidth, screenHeight),
-                usernameField(screenWidth, screenHeight),
-                passwordField(screenWidth, screenHeight),
-                loginOptions(screenWidth, screenHeight),
-                signIn(screenWidth, screenHeight),
-                showSignInErrorMessage ? signInErrorMessage : Container(),
-                divider(screenWidth, screenHeight),
-                googleSignIn(screenWidth, screenHeight),
-                brand(screenWidth, screenHeight),
-              ],
+    return Obx(
+      () => Scaffold(
+        backgroundColor: AppColors.mutedWhite,
+        body: SingleChildScrollView(
+          child: Container(
+            padding: EdgeInsets.only(
+              left: screenWidth * 0.06,
+              right: screenWidth * 0.06,
+            ),
+            child: Form(
+              key: controller.formKey,
+              autovalidateMode: AutovalidateMode.onUnfocus,
+              onChanged: controller.checkFormFilled,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                spacing: screenHeight * 0.0183,
+                children: [
+                  loginText(screenWidth, screenHeight),
+                  //Username Field
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    spacing: 1,
+                    children: [
+                      Text(
+                        "Username",
+                        style: TextStyle(
+                          fontSize: screenHeight * 0.015,
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: -0.3,
+                        ),
+                        textAlign: TextAlign.left,
+                      ),
+                      TextFormField(
+                        validator:
+                            (value) => AppValidator.validateEmptyText(
+                              "Username",
+                              value,
+                            ),
+                        controller: controller.username,
+                        textAlignVertical: TextAlignVertical.center,
+                        decoration: InputDecoration(
+                          contentPadding: EdgeInsets.symmetric(vertical: 4),
+                          filled: true,
+                          fillColor: Color.fromARGB(255, 245, 247, 251),
+                          border: OutlineInputBorder(
+                            borderSide: BorderSide.none,
+                            borderRadius: BorderRadius.circular(100),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide.none,
+                            borderRadius: BorderRadius.circular(100),
+                          ),
+                          prefixIcon: Icon(
+                            Iconsax.user,
+                            size: screenHeight * 0.02,
+                            color: Color.fromARGB(255, 155, 155, 156),
+                          ),
+                          labelText: "Enter your username",
+                          labelStyle: TextStyle(
+                            letterSpacing: -0.3,
+                            fontSize: screenHeight * 0.015,
+                            color: Color.fromARGB(255, 155, 155, 156),
+                          ),
+                          floatingLabelBehavior: FloatingLabelBehavior.never,
+                          errorStyle: TextStyle(
+                            color: AppColors.secondary,
+                            letterSpacing: -0.3,
+                          ),
+                        ),
+                        style: TextStyle(fontSize: screenHeight * 0.015),
+                        cursorHeight: screenHeight * 0.02,
+                        cursorColor: Color.fromARGB(255, 155, 155, 156),
+                      ),
+                    ],
+                  ),
+
+                  //Password Field
+                  Column(
+                    spacing: 1,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Password",
+                        style: TextStyle(
+                          fontSize: screenHeight * 0.015,
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: -0.3,
+                        ),
+                        textAlign: TextAlign.left,
+                      ),
+                      TextFormField(
+                        controller: controller.password,
+                        validator:
+                            (value) => AppValidator.validatePassword(value),
+                        textAlignVertical: TextAlignVertical.center,
+                        decoration: InputDecoration(
+                          contentPadding: EdgeInsets.symmetric(vertical: 4),
+                          filled: true,
+                          fillColor: Color.fromARGB(255, 245, 247, 251),
+                          border: OutlineInputBorder(
+                            borderSide: BorderSide.none,
+                            borderRadius: BorderRadius.circular(100),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide.none,
+                            borderRadius: BorderRadius.circular(100),
+                          ),
+                          prefixIcon: Icon(
+                            Iconsax.lock,
+                            size: screenHeight * 0.02,
+                            color: Color.fromARGB(255, 155, 155, 156),
+                          ),
+                          labelText: "Enter your password",
+                          labelStyle: TextStyle(
+                            fontSize: screenHeight * 0.015,
+                            letterSpacing: -0.3,
+                            color: Color.fromARGB(255, 155, 155, 156),
+                          ),
+                          suffixIcon: IconButton(
+                            onPressed: () {
+                              controller.isPassObscured.value =
+                                  !controller.isPassObscured.value;
+                            },
+                            icon: Icon(
+                              controller.isPassObscured.value
+                                  ? Iconsax.eye
+                                  : Iconsax.eye_slash,
+                              size: screenHeight * 0.02,
+                              color: Color.fromARGB(255, 155, 155, 156),
+                            ),
+                          ),
+                          floatingLabelBehavior: FloatingLabelBehavior.never,
+                          errorStyle: TextStyle(
+                            color: AppColors.secondary,
+                            letterSpacing: -0.3,
+                          ),
+                        ),
+                        obscureText: controller.isPassObscured.value,
+                        style: TextStyle(fontSize: screenHeight * 0.015),
+                        cursorHeight: screenHeight * 0.02,
+                        cursorColor: Color.fromARGB(255, 155, 155, 156),
+                      ),
+                    ],
+                  ),
+                  loginOptions(screenWidth, screenHeight),
+                  signIn(screenWidth, screenHeight),
+                  controller.showErrorMessage.value
+                      ? signInErrorMessage(controller.errorMessage.value)
+                      : Container(),
+                  divider(screenWidth, screenHeight),
+                  googleSignIn(screenWidth, screenHeight),
+                  brand(screenWidth, screenHeight),
+                ],
+              ),
             ),
           ),
         ),
       ),
-    ));
+    );
   }
 
   Widget loginText(double width, double height) => Container(
@@ -159,150 +276,15 @@ class _LoginPageState extends State<LoginPage>
           fontSize: 22,
           fontWeight: FontWeight.w600,
           color: AppColors.secondary,
-          letterSpacing: -0.5
+          letterSpacing: -0.5,
         ),
       ),
     ),
   );
 
-  Widget get signInErrorMessage => const Padding(
+  Widget signInErrorMessage(String text) => Padding(
     padding: EdgeInsets.only(bottom: 30),
-    child: Text(
-      "Invalid email or password",
-      style: TextStyle(color: Colors.red),
-    ),
-  );
-
-  Widget usernameField(double width, double height) => Container(
-    padding: EdgeInsets.zero,
-    width: width * 0.88,
-    height: height * 0.065,
-    child: Column(
-      children: 
-      [
-        Flexible(
-          flex: 1,
-          child: SizedBox(
-            width: width * 0.88,
-            child: Text(
-              "Username",
-              style: TextStyle(
-                fontSize: height * 0.015,
-                fontWeight: FontWeight.w500,
-                letterSpacing: -0.3
-              ),
-              textAlign: TextAlign.left,
-            ),
-          ),
-        ),
-        Flexible(
-          flex: 2,
-          child: TextFormField(
-            controller: controller.username,
-            textAlignVertical: TextAlignVertical.center,
-            decoration: InputDecoration(
-              contentPadding: EdgeInsets.symmetric(vertical: 4),
-              filled: true,
-              fillColor: Color.fromARGB(255, 245, 247, 251),
-              border: OutlineInputBorder(
-                borderSide: BorderSide.none,
-                borderRadius: BorderRadius.circular(100),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide.none,
-                borderRadius: BorderRadius.circular(100),
-              ),
-              prefixIcon: Icon(
-                Iconsax.user,
-                size: height * 0.02,
-                color: Color.fromARGB(255, 155, 155, 156),
-              ),
-              labelText: "Enter your username",
-              labelStyle: TextStyle(
-                letterSpacing: -0.3,
-                fontSize: height * 0.015,
-                color: Color.fromARGB(255, 155, 155, 156),
-              ),
-              floatingLabelBehavior: FloatingLabelBehavior.never,
-            ),
-            style: TextStyle(fontSize: height * 0.015),
-            cursorHeight: height * 0.02,
-            cursorColor: Color.fromARGB(255, 155, 155, 156),
-          ),
-        ),
-      ],
-    ),
-  );
-
-  Widget passwordField(double width, double height) => Container(
-    padding: EdgeInsets.zero,
-    width: width * 0.88,
-    height: height * 0.065,
-    child: Column(
-      children: [
-        Flexible(
-          flex: 1,
-          child: SizedBox(
-            width: width * 0.88,
-            child: Text(
-              "Password",
-              style: TextStyle(
-                fontSize: height * 0.015,
-                fontWeight: FontWeight.w500,
-                letterSpacing: -0.3,
-              ),
-              textAlign: TextAlign.left,
-            ),
-          ),
-        ),
-        Flexible(
-          flex: 2,
-          child: TextFormField(
-            controller: controller.password,
-            textAlignVertical: TextAlignVertical.center,
-            decoration: InputDecoration(
-              contentPadding: EdgeInsets.symmetric(vertical: 4),
-              filled: true,
-              fillColor: Color.fromARGB(255, 245, 247, 251),
-              border: OutlineInputBorder(
-                borderSide: BorderSide.none,
-                borderRadius: BorderRadius.circular(100),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide.none,
-                borderRadius: BorderRadius.circular(100),
-              ),
-              prefixIcon: Icon(
-                Iconsax.lock,
-                size: height * 0.02,
-                color: Color.fromARGB(255, 155, 155, 156),
-              ),
-              labelText: "Password",
-              labelStyle: TextStyle(
-                fontSize: height * 0.015,
-                letterSpacing: -0.3,
-                color: Color.fromARGB(255, 155, 155, 156),
-              ),
-              suffixIcon: IconButton(
-                onPressed: () {
-                controller.isPassObscured.value = !controller.isPassObscured.value;  
-                },
-                icon: Icon(
-                  controller.isPassObscured.value ? Iconsax.eye : Iconsax.eye_slash,
-                  size: height * 0.02,
-                  color: Color.fromARGB(255, 155, 155, 156),
-                ),
-              ),
-              floatingLabelBehavior: FloatingLabelBehavior.never,
-            ),
-            obscureText: controller.isPassObscured.value,
-            style: TextStyle(fontSize: height * 0.015),
-            cursorHeight: height * 0.02,
-            cursorColor: Color.fromARGB(255, 155, 155, 156),
-          ),
-        ),
-      ],
-    ),
+    child: Text(text, style: TextStyle(color: Colors.red)),
   );
 
   Widget loginOptions(double width, double height) => Container(
@@ -312,11 +294,11 @@ class _LoginPageState extends State<LoginPage>
     child: Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Row( 
+        Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Checkbox(
-              value: rememberMe,
+              value: controller.rememberme.value,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(5),
               ),
@@ -325,13 +307,10 @@ class _LoginPageState extends State<LoginPage>
                 width: 1.5,
               ),
               activeColor: AppColors.primary,
-              onChanged: (value) 
-              {
-                setState(() 
-                {
-                  rememberMe = value!;
-                });
-              },
+              onChanged:
+                  (value) =>
+                      controller.rememberme.value =
+                          !controller.rememberme.value,
             ),
             Text(
               "Remember me",
@@ -363,37 +342,30 @@ class _LoginPageState extends State<LoginPage>
     width: width * 0.88,
     height: height * 0.0527,
     decoration: BoxDecoration(
-      gradient: LinearGradient(
-        colors: [AppColors.primary, AppColors.secondary],
-        begin: Alignment.centerLeft,
-        end: Alignment.centerRight,
-      ),
+      gradient:
+          controller.isValid.value
+              ? LinearGradient(
+                colors: [AppColors.primary, AppColors.secondary],
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+              )
+              : LinearGradient(
+                colors: [
+                  Color.fromARGB(255, 160, 160, 160),
+                  Color.fromARGB(255, 160, 160, 160),
+                ],
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+              ),
       borderRadius: BorderRadius.circular(100),
     ),
     child: OutlinedButton(
       onPressed: () async {
-      if (_formKey.currentState!.validate()) {
-        _formKey.currentState!.save();
-        String? message = await context.read<UserAuthProvider>()
-            .authService
-            .signIn(controller.username.text, controller.password.text);
-            print(controller.username.text);
-            print( controller.password.text);
-            print(message);
-        setState(() {
-          if (message.isNotEmpty) {
-            setState(() {
-              showSignInErrorMessage = true;  
-            }); 
-          } else {
-            setState(() {
-              Get.to(NavigationMenu());
-              showSignInErrorMessage = false; 
-            });
-          }
-        });
-      }
-    },
+        if (controller.formKey.currentState!.validate()) {
+          controller.formKey.currentState!.save();
+          controller.login();
+        }
+      },
       style: OutlinedButton.styleFrom(
         side: BorderSide(color: Colors.transparent),
       ),
@@ -484,26 +456,28 @@ class _LoginPageState extends State<LoginPage>
         ),
         SizedBox(height: 8),
         RichText(
-                  text: TextSpan(
-                    style: TextStyle(
-                  fontFamily: "Poppins",
-                  color: Color.fromARGB(255, 82, 82, 82),
-                  fontSize: height * 0.0138,
-                  letterSpacing: -0.2,
-                  fontWeight: FontWeight.w400),
-                    children: [
-                      TextSpan(text: "Don't have an account? "),
-                      TextSpan(
-                        text: "Sign up",
-                        style: TextStyle(fontWeight: FontWeight.w600),
-                        recognizer: TapGestureRecognizer()
-                          ..onTap = () {
-                            Get.toNamed("/signup");
-                          },
-                      ),
-                    ],
-                  ),
-                ),
+          text: TextSpan(
+            style: TextStyle(
+              fontFamily: "Poppins",
+              color: Color.fromARGB(255, 82, 82, 82),
+              fontSize: height * 0.0138,
+              letterSpacing: -0.2,
+              fontWeight: FontWeight.w400,
+            ),
+            children: [
+              TextSpan(text: "Don't have an account? "),
+              TextSpan(
+                text: "Sign up",
+                style: TextStyle(fontWeight: FontWeight.w600),
+                recognizer:
+                    TapGestureRecognizer()
+                      ..onTap = () {
+                        Get.offAll(() => SignUpPage1());
+                      },
+              ),
+            ],
+          ),
+        ),
       ],
     ),
   );

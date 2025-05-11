@@ -55,10 +55,23 @@ class UserModel {
     if(document.data() != null){
       final data = document.data()!;
       return UserModel(uid: document.id, 
-      username: data["Username"], email: data["Email"], interests: data["Interests"], travelStyle: data["TravelStyle"], firstName: data["FirstName"], lastName: data["LastName"], phoneNumber: data["phoneNumber"]);
+      username: data["Username"], email: data["Email"], interests: List<String>.from(data["Interests"] ?? []), travelStyle: List<String>.from(data["TravelStyle"] ?? []), firstName: data["FirstName"], lastName: data["LastName"], phoneNumber: data["PhoneNumber"]);
     }
     throw StateError("Data can't be fetch");
   }
 
-  
+
+  //Empty User Model
+  static UserModel empty() {
+    return UserModel(
+      uid: '',
+      username: '',
+      email: '',
+      interests: [],
+      travelStyle: [],
+      firstName: '',
+      lastName: '',
+      phoneNumber: ''
+    );
+  }
 }

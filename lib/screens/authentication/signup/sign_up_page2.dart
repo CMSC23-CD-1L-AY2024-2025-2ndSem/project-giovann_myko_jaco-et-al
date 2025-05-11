@@ -6,6 +6,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:planago/components/app_bar.dart';
 import 'package:planago/components/custom_app_bar.dart';
 import 'package:planago/controllers/signup_controller.dart';
+import 'package:planago/screens/authentication/login/login_page.dart';
 import 'package:planago/screens/authentication/signup/sign_up_page3.dart';
 import 'package:planago/utils/constants/colors.dart';
 import 'package:planago/utils/helper/validator.dart';
@@ -18,9 +19,8 @@ class SignUpPage2 extends StatelessWidget {
     final screenHeight = Get.height;
     final screenWidth = Get.width;
 
-    GlobalKey<FormState> _formKey = GlobalKey<FormState>();
     final controller = SignupController.instance;
-    return Scaffold(
+    return Obx(() => Scaffold(
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -58,7 +58,10 @@ class SignUpPage2 extends StatelessWidget {
               ),
               //Form
               Form(
-                key: _formKey,
+                key: controller.signUp2key,
+                onChanged: () {
+                  controller.checkForm2Filled();
+                },
                 autovalidateMode: AutovalidateMode.onUnfocus,
                 child: Column(
                   children: [
@@ -209,6 +212,7 @@ class SignUpPage2 extends StatelessWidget {
                             textAlign: TextAlign.start,
                             textAlignVertical: TextAlignVertical.center,
                             decoration: InputDecoration(
+                              errorText: controller.emailError.value.isEmpty ? null : controller.emailError.value,
                               contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 5),
                               filled: true,
                               fillColor: Color.fromARGB(255, 245, 247, 251),
@@ -247,7 +251,7 @@ class SignUpPage2 extends StatelessWidget {
                     width: screenWidth * 0.88,
                     height: screenHeight * 0.0527,
                     decoration: BoxDecoration(
-                      gradient: (controller.isValid.value) ? LinearGradient(
+                      gradient: controller.isForm2Valid.value ? LinearGradient(
                         colors: [AppColors.primary, AppColors.secondary],
                         begin: Alignment.centerLeft,
                         end: Alignment.centerRight,
@@ -259,10 +263,12 @@ class SignUpPage2 extends StatelessWidget {
                       borderRadius: BorderRadius.circular(100),
                     ),
                     child: OutlinedButton(
-                      onPressed: controller.isValid.value ? 
-                      (){
-                        if(_formKey.currentState!.validate()){
-                          Get.to(()=> SignUpPage3());
+                      onPressed: controller.isForm2Valid.value ? 
+                      () async{
+                        if(await controller.isEmailAvailable(controller.email.text.trim())){
+                          Get.to(() => SignUpPage3());
+                        }else{
+                          controller.emailError.value = "Email already taken";
                         }
                       } : null,
                       style: OutlinedButton.styleFrom(
@@ -300,7 +306,7 @@ class SignUpPage2 extends StatelessWidget {
                           recognizer:
                               TapGestureRecognizer()
                                 ..onTap = () {
-                                  Get.toNamed("/login");
+                                  Get.offAll(() => LoginPage());
                                 },
                         ),
                       ],
@@ -314,7 +320,7 @@ class SignUpPage2 extends StatelessWidget {
           ),
         ),
       ),
-    );
+    )) ;
   }
 
   Widget brand(double width, double height) => Container(

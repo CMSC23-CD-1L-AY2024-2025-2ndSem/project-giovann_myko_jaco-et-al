@@ -13,15 +13,13 @@ import 'package:simple_gradient_text/simple_gradient_text.dart';
 
 class SignUpPage1 extends StatelessWidget {
   SignUpPage1({super.key});
-  
+
   final controller = Get.put(SignupController());
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  
   @override
   Widget build(BuildContext context) {
-    // final screenWidth = Get.width;
-    // final screenHeight = Get.height;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = Get.width;
+    final screenHeight = Get.height;
 
     return Obx(
       () => Scaffold(
@@ -30,8 +28,9 @@ class SignUpPage1 extends StatelessWidget {
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
             child: Form(
+              onChanged: controller.checkFormFilled,
               autovalidateMode: AutovalidateMode.onUnfocus,
-              key: _formKey,
+              key: controller.signUp1key,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 spacing: screenHeight * 0.0183,
@@ -60,6 +59,7 @@ class SignUpPage1 extends StatelessWidget {
                         controller: controller.username,
                         textAlignVertical: TextAlignVertical.center,
                         decoration: InputDecoration(
+                          errorText: controller.usernameError.value.isEmpty ? null : controller.usernameError.value,
                           contentPadding: EdgeInsets.symmetric(vertical: 4),
                           filled: true,
                           fillColor: Color.fromARGB(255, 245, 247, 251),
@@ -254,10 +254,12 @@ class SignUpPage1 extends StatelessWidget {
                       ),
                       TextFormField(
                         controller: controller.phoneNumber,
+  
                         validator:
                             (value) => AppValidator.validatePhoneNumber(value),
                         textAlignVertical: TextAlignVertical.center,
                         decoration: InputDecoration(
+                          errorText: controller.phoneNumberError.value.isEmpty ? null : controller.phoneNumberError.value,
                           contentPadding: EdgeInsets.symmetric(vertical: 4),
                           filled: true,
                           fillColor: Color.fromARGB(255, 245, 247, 251),
@@ -298,24 +300,45 @@ class SignUpPage1 extends StatelessWidget {
                     width: screenWidth * 0.88,
                     height: screenHeight * 0.0527,
                     decoration: BoxDecoration(
-                      gradient: (controller.isValid.value && _formKey.currentState!.validate()) ? LinearGradient(
-                        colors: [AppColors.primary, AppColors.secondary],
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
-                      ) : LinearGradient(
-                        colors: [Color.fromARGB(255, 160, 160, 160), Color.fromARGB(255, 160, 160, 160)],
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
-                      ),
+                      gradient:
+                          controller.isValid.value
+                              ? LinearGradient(
+                                colors: [
+                                  AppColors.primary,
+                                  AppColors.secondary,
+                                ],
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                              )
+                              : LinearGradient(
+                                colors: [
+                                  Color.fromARGB(255, 160, 160, 160),
+                                  Color.fromARGB(255, 160, 160, 160),
+                                ],
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                              ),
                       borderRadius: BorderRadius.circular(100),
                     ),
                     child: OutlinedButton(
-                      onPressed: controller.isValid.value ? 
-                      (){
-                        if(_formKey.currentState!.validate()){
-                          Get.to(() => SignUpPage2());
-                        }
-                      } : null,
+                      onPressed:
+                          controller.isValid.value
+                              ? () async {
+                                if (!await controller.isUsernameAvailable(controller.username.text)) {
+                                  controller.usernameError.value =
+                                      "Username already taken";
+                                }
+
+                                if (!await controller.isPhoneNumberAvailable(controller.phoneNumber.text)) {
+                                  controller.phoneNumberError.value =
+                                      "Phone number already taken";
+                                }
+
+                                if(await controller.isPhoneNumberAvailable(controller.phoneNumber.text) && await controller.isUsernameAvailable(controller.username.text)){
+                                  Get.to(() => SignUpPage2());
+                                }
+                              }
+                              : null,
                       style: OutlinedButton.styleFrom(
                         side: BorderSide(color: Colors.transparent),
                       ),
@@ -350,7 +373,7 @@ class SignUpPage1 extends StatelessWidget {
                           recognizer:
                               TapGestureRecognizer()
                                 ..onTap = () {
-                                  Get.toNamed("/login");
+                                  Get.offAll(() => LoginPage());
                                 },
                         ),
                       ],
@@ -405,6 +428,7 @@ class SignUpPage1 extends StatelessWidget {
           activeColor: AppColors.primary,
           onChanged: (value) {
             controller.privacyPolicy.value = !controller.privacyPolicy.value;
+            controller.checkFormFilled();
           },
         ),
         Flexible(

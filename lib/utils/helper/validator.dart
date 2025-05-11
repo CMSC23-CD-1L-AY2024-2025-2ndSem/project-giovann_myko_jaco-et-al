@@ -1,3 +1,5 @@
+import 'package:planago/controllers/firestore/user_database.dart';
+
 class AppValidator {
 
   static String? validateEmptyText(String fieldName, String ? value) {
@@ -12,16 +14,26 @@ class AppValidator {
     if (value == null || value.isEmpty) {
       return 'Email is required.';
     }
-
     // Regular expression for email validation
     final emailRegExp = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-
     if (!emailRegExp.hasMatch(value)) {
       return 'Invalid email address.';
     }
-
     return null;
   }
+
+  
+  static Future<String?> validateUsername(String? value) async {
+    if (value == null || value.isEmpty) {
+      return 'Username is required.';
+    }
+
+    if(await UserDatabase.instance.isUsernameTaken(value)){
+      return 'Username already taken.';
+    }
+    return null;
+  }
+
 
   static String? validatePassword(String? value) {
     if (value == null || value.isEmpty) {

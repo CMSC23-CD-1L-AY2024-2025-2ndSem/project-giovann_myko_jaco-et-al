@@ -1,16 +1,22 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
+import 'package:planago/controllers/firestore/user_database.dart';
+import 'package:planago/models/user_model.dart';
+import 'package:planago/navigation_menu.dart';
+import 'package:planago/screens/authentication/login/login_page.dart';
+import 'package:planago/utils/helper/exceptions.dart';
+import 'package:planago/utils/helper/validator.dart';
 
 class AuthenticationController extends GetxController{
   static AuthenticationController get instance => Get.find();
 
   //variables
+  final errorMessage = ''.obs;
   final _auth = FirebaseAuth.instance;
-
-  Stream<User?> getUserStream(){
-    return _auth.authStateChanges();
-  }
+  
+  //User Getter
+  User? get authUser => _auth.currentUser;
 
   Future<UserCredential> registerWithEmailAndPassword(String email, String password) async {
     try{
@@ -20,4 +26,53 @@ class AuthenticationController extends GetxController{
     }
   }
 
+  Future<UserCredential?> signIn(String userCredentials, String password) async {
+  try {
+    print("User credentials: $userCredentials");
+    String email;
+    if (AppValidator.validateEmail(userCredentials) == null) {
+      // Checks if the user entered an email
+      email = userCredentials;
+    } else {
+      print("User credentials is not an email");
+      // It's not a valid email, treat as username
+      final matchedEmail = await UserDatabase.instance.getEmailFromUsername(userCredentials);
+      print("Matched email: $matchedEmail");
+      if (matchedEmail == null) {
+        errorMessage.value = "Username not found";
+        return null;
+      }
+      email = matchedEmail;
+    }
+    return await _auth.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+  } on FirebaseAuthException catch (e) {
+    print("Error: ${AppAuthExceptions(e.code).message}");
+    errorMessage.value = AppAuthExceptions(e.code).message;
+    return null;
+  }
+}
+
+  Future<void> signOut() async {
+    try{
+      await _auth.signOut();
+    } on FirebaseAuthException catch (e) {
+      throw "Error: ${e}";
+    }
+  }
+
+  Future<void> screenRedirect() async {
+    final user = _auth.currentUser;
+    print("User: $user");
+    if (user != null) {
+      // User is signed in, redirect to home screen
+      Get.offAll(() => NavigationMenu());
+    } else {
+      // User is not signed in, redirect to login screen
+      // Implement checking of logged user credentials in local storage here,
+      Get.offAll(() => LoginPage());
+    }
+  }
 }

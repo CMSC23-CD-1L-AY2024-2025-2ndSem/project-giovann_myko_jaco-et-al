@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:planago/controllers/user_controller.dart';
 import 'package:planago/screens/edit_profile_page.dart';
 import 'package:planago/screens/profile_detail_page.dart';
 import 'package:planago/utils/constants/colors.dart';
@@ -19,27 +20,31 @@ class ProfileInfo
 
 class ProfilePage extends StatefulWidget 
 {
-  const ProfilePage({super.key});
+  ProfilePage({super.key});
 
+  
   @override
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
 class _ProfilePageState extends State<ProfilePage> {
   File? _imageFile;
-
+  final controller = UserController.instance;
   // Temporary variables habang wala pa data model + database
   bool isPrivate = false;
-  String fullName = 'Lorem Ipsum';
-  String username = '@loremlorem23';
 
-  final List<ProfileInfo> profileItems = 
-  [
-    ProfileInfo(icon: Icons.phone, title: 'Phone', subtitle: '09289956730'),
-    ProfileInfo(icon: Icons.email, title: 'Email', subtitle: 'arnoche1@up.edu.ph'),
-    ProfileInfo(icon: Icons.favorite, title: 'Interests', subtitle: 'food, art, music'),
-    ProfileInfo(icon: Icons.flight_takeoff, title: 'Travel Styles', subtitle: 'theme-based, for-nearby'),
-  ];
+  late List<ProfileInfo> profileItems;
+
+  @override
+  void initState() {
+    super.initState();
+    profileItems = [
+      ProfileInfo(icon: Icons.phone, title: 'Phone', subtitle: controller.user.value.phoneNumber),
+      ProfileInfo(icon: Icons.email, title: 'Email', subtitle: controller.user.value.email),
+      ProfileInfo(icon: Icons.favorite, title: 'Interests', subtitle: controller.user.value.interests.isNotEmpty ? controller.user.value.interests.join(', ') : 'No Interests'),
+      ProfileInfo(icon: Icons.flight_takeoff, title: 'Travel Styles', subtitle: controller.user.value.travelStyle.isNotEmpty ? controller.user.value.travelStyle.join(', ') : 'No Travel Styles'),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) 
@@ -242,7 +247,7 @@ class _ProfilePageState extends State<ProfilePage> {
           // spacing between profile pic and texts
           SizedBox(width: width * 0.88, height: height * 0.01),
           Text(
-            fullName,
+            "${controller.user.value.firstName} ${controller.user.value.lastName}",
             style: TextStyle(
               color: AppColors.black,
               fontSize: height * 0.0183,
@@ -250,7 +255,7 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
           ),
           Text(
-            username,
+            controller.user.value.username,
             style: TextStyle(
               color: Color.fromARGB(255, 82, 82, 82),
               fontSize: height * 0.0105, //temporarily 105

@@ -1,18 +1,23 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
+import 'package:planago/controllers/firestore/user_database.dart';
 import 'package:planago/models/user_model.dart';
 
-class UserController extends GetxController {
+class UserController extends GetxController{ 
   static UserController get instance => Get.find();
 
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  final userRepo = UserDatabase.instance;
+  Rx<UserModel> user =  UserModel.empty().obs;
+  
 
-  //Function for saving user data
-  Future <void> saveUserRecord(UserModel user) async{
-    try{
-      await _db.collection("Users").doc(user.uid).set(user.toJson());
-    } on FirebaseException catch (e){
-      throw "Error: ${e}";
+  Future<void> fetchUserData() async {
+    try {
+      final fetchedUser = await userRepo.getUserData();
+      user(fetchedUser);
+      print("User fetched: ${user.value.username}");
+    } catch (e) {
+      print("Error fetching user data: $e");
+      print("Error fetching user data: $e");
+      user(UserModel.empty());
     }
   }
 }
