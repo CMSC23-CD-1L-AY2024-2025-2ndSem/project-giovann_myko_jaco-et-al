@@ -230,52 +230,9 @@ class ItineraryController extends GetxController
     destinations.value = allDestinations;
   }
   
-  //applies to inn or hotels only
-  void checkInDestination(String id) 
+  void updateDestination(int destinationId) 
   {
-    final dayDestinations = List<Destination>.from(destinations[selectedDayIndex.value]);
-    final index = dayDestinations.indexWhere((destination) => destination.id == id);
-    
-    if (index != -1) 
-    {
-      final destination = dayDestinations[index];
-      dayDestinations[index] = Destination(
-        id: destination.id,
-        name: destination.name,
-        description: destination.description,
-        time: destination.time,
-        type: destination.type,
-        isCheckedIn: true,
-        isCheckedOut: destination.isCheckedOut,
-      );
-      
-      final allDestinations = List<List<Destination>>.from(destinations);
-      allDestinations[selectedDayIndex.value] = dayDestinations;
-      destinations.value = allDestinations;
-    }
+    print('Updated destination $destinationId');
   }
-  
-  void checkOutDestination(String id) 
-  {
-    final dayDestinations = List<Destination>.from(destinations[selectedDayIndex.value]);
-    final index = dayDestinations.indexWhere((destination) => destination.id == id);
-    
-    if (index != -1) 
-    {
-      final destination = dayDestinations[index];
-      dayDestinations[index] = Destination(
-        id: destination.id,
-        name: destination.name,
-        description: destination.description,
-        time: destination.time,
-        type: destination.type,
-        isCheckedIn: destination.isCheckedIn,
-        isCheckedOut: true,
-      );
-      
-      final allDestinations = List<List<Destination>>.from(destinations);
-      allDestinations[selectedDayIndex.value] = dayDestinations;
-      destinations.value = allDestinations;
-    }
-  }
+
 }

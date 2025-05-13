@@ -62,8 +62,6 @@ class Destination
   final String description;
   final String time;
   final String type;
-  final bool isCheckedIn;
-  final bool isCheckedOut;
 
   Destination(
   {
@@ -72,7 +70,5 @@ class Destination
     required this.description,
     required this.time,
     required this.type,
-    this.isCheckedIn = false,
-    this.isCheckedOut = false,
   });
 }

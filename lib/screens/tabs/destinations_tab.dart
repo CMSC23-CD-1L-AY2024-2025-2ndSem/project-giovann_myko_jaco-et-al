@@ -70,7 +70,7 @@ class DestinationsTab extends StatelessWidget
             padding: const EdgeInsets.symmetric(vertical: 16.0),
             child: ElevatedButton.icon(
               onPressed: _showAddDestinationDialog,
-              icon: Icon(Icons.add),
+              icon: Icon(Icons.add, color: AppColors.mutedWhite),
               label: Text('Add a Place'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
@@ -215,16 +215,19 @@ class DestinationsTab extends StatelessWidget
       children: [
         // Timeline
         Column(
-          children: [
+          children: 
+          [
             Container(
               width: 2,
               height: 20,
               color: isFirst ? Colors.transparent : AppColors.primary,
             ),
+
             CircleAvatar(
               radius: 10,
               backgroundColor: AppColors.primary,
             ),
+            
             Container(
               width: 2,
               height: destination.type.toLowerCase().contains('hotel') ? 80 : 60,
@@ -238,9 +241,11 @@ class DestinationsTab extends StatelessWidget
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+            children: 
+            [
               Row(
-                children: [
+                children: 
+                [
                   Text(
                     'Destination',
                     style: TextStyle(
@@ -258,7 +263,8 @@ class DestinationsTab extends StatelessWidget
                 ),
               ),
               Row(
-                children: [
+                children: 
+                [
                   Icon(Icons.access_time, size: 14, color: Colors.grey),
                   SizedBox(width: 4),
                   Text(
@@ -289,67 +295,32 @@ class DestinationsTab extends StatelessWidget
                 ],
               ),
 
-              // Check-in/Check-out buttons for hotels
-              if (destination.type.toLowerCase().contains('hotel'))
-                Padding(
-                  padding: const EdgeInsets.only(top: 8.0),
-                  child: Row(
-                    children: 
-                    [
-                      if (!destination.isCheckedIn)
-                        ElevatedButton(
-                          onPressed: () => controller.checkInDestination(destination.id),
-                          child: Text('check-in'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary.withOpacity(0.2),
-                            foregroundColor: AppColors.primary,
-                            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            textStyle: TextStyle(fontSize: 12),
-                          ),
-                        ),
-                      if (destination.isCheckedIn && !destination.isCheckedOut)
-                        ElevatedButton(
-                          onPressed: () => controller.checkOutDestination(destination.id),
-                          child: Text('check-out'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary.withOpacity(0.2),
-                            foregroundColor: AppColors.primary,
-                            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            textStyle: TextStyle(fontSize: 12),
-                          ),
-                        ),
-                      if (destination.isCheckedIn)
-                        Padding(
-                          padding: const EdgeInsets.only(left: 8.0),
-                          child: Text(
-                            'checked in',
-                            style: TextStyle(
-                              color: Colors.green,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ),
-                      if (destination.isCheckedOut)
-                        Padding(
-                          padding: const EdgeInsets.only(left: 8.0),
-                          child: Text(
-                            'checked out',
-                            style: TextStyle(
-                              color: Colors.red,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ),
-                    ],
+              Row(
+                children: 
+                [
+                  Icon(
+                    Icons.location_on,
+                    size: 14,
+                    color: Colors.grey,
                   ),
-                ),
+                  SizedBox(width: 4),
+                  Text(
+                    destination.name,
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
         ),
         
         // Actions
         Row(
-          children: [
+          children: 
+          [
             IconButton(
               icon: Icon(Icons.edit, size: 18),
               onPressed: () => _showEditDestinationDialog(destination),
@@ -368,7 +339,7 @@ class DestinationsTab extends StatelessWidget
   {
     controller.destinationNameController.clear();
     controller.destinationDescriptionController.clear();
-    controller.activityTimeController.clear();
+    controller.destinationTimeController.clear();
     controller.destinationTypeController.clear();
 
     Get.dialog(
@@ -381,11 +352,11 @@ class DestinationsTab extends StatelessWidget
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+              children: 
+              [
                 Text('Add a Place', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                SizedBox(height: 16),
 
-                // Name
+                SizedBox(height: 16),
                 TextFormField(
                   controller: controller.destinationNameController,
                   decoration: InputDecoration(
@@ -394,9 +365,8 @@ class DestinationsTab extends StatelessWidget
                   ),
                   validator: (value) => value == null || value.isEmpty ? 'Please add a destination name!' : null,
                 ),
-                SizedBox(height: 12),
 
-                // Description
+                SizedBox(height: 12),
                 TextFormField(
                   controller: controller.destinationDescriptionController,
                   decoration: InputDecoration(
@@ -405,11 +375,10 @@ class DestinationsTab extends StatelessWidget
                   ),
                   validator: (value) => value == null || value.isEmpty ? 'Please add a description!' : null,
                 ),
-                SizedBox(height: 12),
 
-                // Time (read-only)
+                SizedBox(height: 12),
                 TextFormField(
-                  controller: controller.activityTimeController,
+                  controller: controller.destinationTimeController,
                   readOnly: true,
                   onTap: () async 
                   {
@@ -419,7 +388,7 @@ class DestinationsTab extends StatelessWidget
                     );
                     if (pickedTime != null) 
                     {
-                      controller.activityTimeController.text = pickedTime.format(Get.context!);
+                      controller.destinationTimeController.text = pickedTime.format(Get.context!);
                     }
                   },
                   decoration: InputDecoration(
@@ -457,7 +426,12 @@ class DestinationsTab extends StatelessWidget
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    TextButton(onPressed: () => Get.back(), child: Text('Cancel')),
+                    TextButton(onPressed: () => Get.back(),
+                      child: Text(
+                      'Cancel',
+                      style: TextStyle(color: AppColors.secondary),
+                      ),
+                    ),
                     SizedBox(width: 8),
                     ElevatedButton(
                       onPressed: () {
@@ -468,7 +442,10 @@ class DestinationsTab extends StatelessWidget
                         }
                       },
                       style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
-                      child: Text('Add'),
+                      child: Text(
+                      'Add',
+                      style: TextStyle(color: AppColors.mutedWhite),
+                      ),
                     ),
                   ],
                 ),
@@ -488,110 +465,124 @@ class DestinationsTab extends StatelessWidget
     controller.destinationDescriptionController.text = destination.description;
     controller.destinationTimeController.text = destination.time;
     controller.destinationTypeController.text = destination.type;
-    
+
+    controller.formKey.currentState?.reset();  // Resetting the form state
+
+    // Open dialog
     Get.dialog(
       Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Edit Destination',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+          child: Form(
+            key: controller.formKey,  // Form key for validation
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Edit Destination',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
-              ),
-              SizedBox(height: 16),
-              TextField(
-                controller: controller.destinationNameController,
-                decoration: InputDecoration(
-                  labelText: 'Name',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              SizedBox(height: 12),
-              TextField(
-                controller: controller.destinationDescriptionController,
-                decoration: InputDecoration(
-                  labelText: 'Description',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              SizedBox(height: 12),
-              TextField(
-                controller: controller.activityTimeController,
-                readOnly: true,
-                onTap: () async 
-                {
-                  TimeOfDay? pickedTime = await showTimePicker(
-                    context: Get.context!,
-                    initialTime: TimeOfDay.now(),
-                  );
-                  if (pickedTime != null) {
-                    final formattedTime = pickedTime.format(Get.context!);
-                    controller.activityTimeController.text = formattedTime;
-                  }
-                },
-                decoration: InputDecoration(
-                  labelText: 'Time',
-                  border: OutlineInputBorder(),
-                  suffixIcon: Icon(Icons.access_time),
-                ),
-              ),
-            SizedBox(height: 12),
-            DropdownButtonFormField<String>(
-              value: controller.destinationTypeController.text.isNotEmpty
-                  ? controller.destinationTypeController.text
-                  : null,
-              decoration: InputDecoration(
-                labelText: 'Type',
-                border: OutlineInputBorder(),
-              ),
-              items: [
-                'Restaurant',
-                'Hotel',
-                'Tourist Spot',
-                'Others',
-              ].map((type) {
-                return DropdownMenuItem<String>(
-                  value: type,
-                  child: Text(type),
-                );
-              }).toList(),
-              onChanged: (value) {
-                if (value != null) {
-                  controller.destinationTypeController.text = value;
-                }
-              },
-            ),              SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: () => Get.back(),
-                    child: Text('Cancel'),
+
+                SizedBox(height: 16),
+                TextFormField(
+                  controller: controller.destinationNameController,
+                  decoration: InputDecoration(
+                    labelText: 'Destination Name',
+                    border: OutlineInputBorder(),
                   ),
-                  SizedBox(width: 8),
-                  ElevatedButton(
-                    onPressed: () {
-                      controller.deleteDestination(destination.id);
-                      controller.addDestination();
-                      Get.back();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
+                  validator: (value) => value == null || value.isEmpty ? 'Please add a destination name!' : null,
+                ),
+
+                SizedBox(height: 12),
+                TextFormField(
+                  controller: controller.destinationDescriptionController,
+                  decoration: InputDecoration(
+                    labelText: 'Description',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) => value == null || value.isEmpty ? 'Please add a description!' : null,
+                ),
+
+                SizedBox(height: 12),
+                TextFormField(
+                  controller: controller.destinationTimeController,
+                  readOnly: true,
+                  onTap: () async 
+                  {
+                    TimeOfDay? pickedTime = await showTimePicker(
+                      context: Get.context!,
+                      initialTime: TimeOfDay.now(),
+                    );
+                    if (pickedTime != null) 
+                    {
+                      controller.destinationTimeController.text = pickedTime.format(Get.context!);
+                    }
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'Time',
+                    border: OutlineInputBorder(),
+                    suffixIcon: Icon(Icons.access_time),
+                  ),
+                  validator: (value) => value == null || value.isEmpty ? 'Please set a time!' : null,
+                ),
+
+                SizedBox(height: 12),
+                DropdownButtonFormField<String>(
+                  value: controller.destinationTypeController.text.isNotEmpty
+                      ? controller.destinationTypeController.text
+                      : null,
+                  decoration: InputDecoration(
+                    labelText: 'Type',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: ['Restaurant', 'Hotel', 'Tourist Spot', 'Others'].map((type) 
+                  {
+                    return DropdownMenuItem<String>(
+                      value: type,
+                      child: Text(type),
+                    );
+                  }).toList(),
+                  onChanged: (value) 
+                  {
+                    controller.destinationTypeController.text = value ?? '';
+                  },
+                  validator: (value) => value == null || value.isEmpty ? 'Please set a destination type!' : null,
+                ),
+
+                SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: 
+                  [
+                    TextButton(onPressed: () => Get.back(),
+                      child: Text(
+                      'Cancel',
+                      style: TextStyle(color: AppColors.secondary),
+                      ),
                     ),
-                    child: Text('Update'),
-                  ),
-                ],
-              ),
-            ],
+                    SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: () 
+                      {
+                        if (controller.formKey.currentState!.validate()) 
+                        {
+                          int destinationId = int.tryParse(destination.id) ?? 0;
+                          controller.updateDestination(destinationId);
+                          Get.back();
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+                      child: Text(
+                        'Update',
+                        style: TextStyle(color: AppColors.mutedWhite),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
