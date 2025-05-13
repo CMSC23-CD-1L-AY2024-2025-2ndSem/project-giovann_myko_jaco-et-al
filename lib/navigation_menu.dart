@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:planago/components/custom_app_bar.dart';
 import 'package:planago/screens/profile/profile_page.dart';
+import 'package:planago/screens/travel_plan_page.dart';
 import 'package:planago/utils/constants/colors.dart';
 
 class NavigationMenu extends StatelessWidget 
@@ -47,7 +48,7 @@ class NavigationController extends GetxController
   final screens = 
   [
     Container(color: AppColors.primary),
-    Container(color: AppColors.secondary),
+    TravelPlanPage(),
     ProfilePage(),
   ];
 }

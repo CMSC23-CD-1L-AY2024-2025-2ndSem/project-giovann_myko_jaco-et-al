@@ -26,6 +26,9 @@ dependencies:
   provider: ^6.1.5
   image_picker: ^1.1.2
   lottie: ^3.3.1
+  country_picker: ^2.0.27
+  countries_utils: ^1.0.1
+  intl: ^0.20.2
 
 #--------------- end of packages -------------#
 dev_dependencies:
