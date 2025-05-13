@@ -215,7 +215,7 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                     ),
                     SizedBox(width: width * 0.008),
                     Text(
-                      "Itenerary",
+                      "Itinerary",
                       style: TextStyle(
                         fontSize: height * 0.0128,
                         color: AppColors.mutedWhite,
