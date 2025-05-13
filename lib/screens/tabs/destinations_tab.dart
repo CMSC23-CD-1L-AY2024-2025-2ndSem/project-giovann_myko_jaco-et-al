@@ -337,6 +337,8 @@ class DestinationsTab extends StatelessWidget
   
   void _showAddDestinationDialog() 
   {
+    final _formKey = GlobalKey<FormState>();
+
     controller.destinationNameController.clear();
     controller.destinationDescriptionController.clear();
     controller.destinationTimeController.clear();
@@ -348,7 +350,7 @@ class DestinationsTab extends StatelessWidget
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Form(
-            key: controller.formKey,
+            key: _formKey,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -435,7 +437,7 @@ class DestinationsTab extends StatelessWidget
                     SizedBox(width: 8),
                     ElevatedButton(
                       onPressed: () {
-                        if (controller.formKey.currentState!.validate()) 
+                        if (_formKey.currentState!.validate()) 
                         {
                           controller.addDestination();
                           Get.back();
@@ -460,13 +462,14 @@ class DestinationsTab extends StatelessWidget
   
   void _showEditDestinationDialog(Destination destination) 
   {
+    final _formKey = GlobalKey<FormState>();
     // Set controllers with existing values
     controller.destinationNameController.text = destination.name;
     controller.destinationDescriptionController.text = destination.description;
     controller.destinationTimeController.text = destination.time;
     controller.destinationTypeController.text = destination.type;
 
-    controller.formKey.currentState?.reset();  // Resetting the form state
+    _formKey.currentState?.reset();  // Resetting the form state
 
     // Open dialog
     Get.dialog(
@@ -475,7 +478,7 @@ class DestinationsTab extends StatelessWidget
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Form(
-            key: controller.formKey,  // Form key for validation
+            key: _formKey,  // Form key for validation
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -566,10 +569,10 @@ class DestinationsTab extends StatelessWidget
                     ElevatedButton(
                       onPressed: () 
                       {
-                        if (controller.formKey.currentState!.validate()) 
+                        if (_formKey.currentState!.validate()) 
                         {
-                          int destinationId = int.tryParse(destination.id) ?? 0;
-                          controller.updateDestination(destinationId as String);
+                          controller.deleteDestination(destination.id);
+                          controller.addDestination();
                           Get.back();
                         }
                       },

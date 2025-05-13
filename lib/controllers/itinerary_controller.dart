@@ -229,41 +229,4 @@ class ItineraryController extends GetxController
     allDestinations[selectedDayIndex.value] = dayDestinations;
     destinations.value = allDestinations;
   }
-  
-  void updateDestination(String destinationId) 
-  {
-    final dayDestinations = List<Destination>.from(destinations[selectedDayIndex.value]);
-    final index = dayDestinations.indexWhere((destination) => destination.id == destinationId);
-
-    if (index != -1) 
-    {
-      final updatedDestination = Destination(
-        id: destinationId,
-        name: destinationNameController.text,
-        description: destinationDescriptionController.text,
-        time: destinationTimeController.text,
-        type: destinationTypeController.text,
-      );
-
-      dayDestinations[index] = updatedDestination;
-
-      final allDestinations = List<List<Destination>>.from(destinations);
-      allDestinations[selectedDayIndex.value] = dayDestinations;
-      destinations.value = allDestinations;
-
-      // Clear text controllers (optional)
-      destinationNameController.clear();
-      destinationDescriptionController.clear();
-      destinationTimeController.clear();
-      destinationTypeController.clear();
-
-      Get.snackbar('Success', 'Destination updated successfully');
-    } 
-    
-    else 
-    {
-      Get.snackbar('Error', 'Destination not found');
-    }
-  }
-
 }
