@@ -569,7 +569,7 @@ class DestinationsTab extends StatelessWidget
                         if (controller.formKey.currentState!.validate()) 
                         {
                           int destinationId = int.tryParse(destination.id) ?? 0;
-                          controller.updateDestination(destinationId);
+                          controller.updateDestination(destinationId as String);
                           Get.back();
                         }
                       },
