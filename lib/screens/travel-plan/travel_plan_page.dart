@@ -2,7 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:planago/screens/travel_overview_page.dart';
+import 'package:planago/components/custom_app_bar.dart';
+import 'package:planago/screens/travel-plan/travel_overview_page.dart';
 import 'package:planago/utils/constants/colors.dart';
 
 class TravelDetails {
@@ -69,6 +70,7 @@ class _TravelPlanPageState extends State<TravelPlanPage> {
         width: screenWidth * 0.88,
         height: screenHeight * 0.065,
         child: OutlinedButton(
+          //Implement creating a travel plan here
           onPressed: () {},
           style: OutlinedButton.styleFrom(
             backgroundColor: Color.fromRGBO(227, 247, 255, 1),
@@ -117,7 +119,7 @@ class _TravelPlanPageState extends State<TravelPlanPage> {
         ),
         child: Column(
           children: [
-            header(screenWidth, screenHeight),
+            CustomAppBar(),
             // PADDING
             SizedBox(width: screenWidth * 0.88, height: screenHeight * 0.025),
             // TRAVEL PLANS TEXT

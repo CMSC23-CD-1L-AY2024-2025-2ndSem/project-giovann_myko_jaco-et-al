@@ -3,52 +3,70 @@ import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:planago/components/custom_app_bar.dart';
 import 'package:planago/screens/profile/profile_page.dart';
-import 'package:planago/screens/travel_plan_page.dart';
+import 'package:planago/screens/travel-plan/travel_plan_page.dart';
 import 'package:planago/utils/constants/colors.dart';
 
-class NavigationMenu extends StatelessWidget 
-{
+class NavigationMenu extends StatelessWidget {
   const NavigationMenu({super.key});
 
   @override
-  Widget build(BuildContext context) 
-  {
+  Widget build(BuildContext context) {
     final controller = Get.put(NavigationController());
-
+    final width = Get.width;
+    final height = Get.height;
     return Scaffold(
-      
-      bottomNavigationBar: Obx(
-        () => NavigationBar(
-          height: 80,
-          elevation: 0,
-          selectedIndex: controller.selectedIndex.value,
-          onDestinationSelected:
-              (index) => controller.selectedIndex.value = index,
-          destinations: [
-            NavigationDestination(icon: Icon(Iconsax.people), label: "People"),
-            NavigationDestination(icon: Icon(Iconsax.home), label: "Home"),
-            NavigationDestination(icon: Icon(Iconsax.user), label: "Profile"),
-          ],
+      bottomNavigationBar: Theme(
+        data: Theme.of(context).copyWith(
+          splashColor: Colors.transparent, // Removes tap splash
+          highlightColor: Colors.transparent, // Removes highlight on press
+          hoverColor: Colors.transparent, // (Optional) for desktop/web
+        ),
+        child: Obx(
+          () => BottomNavigationBar(
+            elevation: 0,
+            iconSize: width * 0.085,
+            backgroundColor: AppColors.mutedWhite,
+            currentIndex: controller.selectedIndex.value,
+            selectedItemColor: AppColors.primary,
+            unselectedItemColor: AppColors.gray,
+            showUnselectedLabels: false,
+            showSelectedLabels: false,
+            enableFeedback: false,
+            selectedIconTheme: IconThemeData(
+              color: AppColors.primary,
+              size: width * 0.095,
+            ),
+            type: BottomNavigationBarType.fixed,
+            onTap: (index) {
+              controller.selectedIndex.value = index;
+            },
+            items: [
+              BottomNavigationBarItem(
+                icon: Icon(Icons.people_rounded),
+                label: 'People',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.luggage_rounded),
+                label: 'Travel Plan',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.person_rounded),
+                label: 'Profile',
+              ),
+            ],
+          ),
         ),
       ),
-      body: Obx(() => Column(
-        children: [
-          CustomAppBar(),
-          controller.screens[controller.selectedIndex.value]
-        ],
-      )),
+      body: Obx(() => controller.screens[controller.selectedIndex.value]),
     );
   }
 }
 
-class NavigationController extends GetxController 
-{
-  final selectedIndex = 0.obs;
-
-  final screens = 
-  [
+class NavigationController extends GetxController {
+  final selectedIndex = 1.obs;
+  final screens = [
     Container(color: AppColors.primary),
-    TravelPlanPage(),
+    const TravelPlanPage(),
     ProfilePage(),
   ];
 }
