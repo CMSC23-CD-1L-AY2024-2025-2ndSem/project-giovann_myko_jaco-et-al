@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
+import 'package:planago/components/travel_app_bar.dart';
+import 'package:planago/models/travel_plan_model.dart';
 import 'package:planago/screens/travel-plan/travel_plan_page.dart';
 import 'package:planago/utils/constants/colors.dart';
 
@@ -56,15 +58,15 @@ class Checklist {
 }
 
 class TravelOverviewPage extends StatefulWidget {
-  const TravelOverviewPage({super.key});
+  final TravelPlan plan;
+  const TravelOverviewPage({super.key, required this.plan});
 
   @override
   State<TravelOverviewPage> createState() => _TravelOverviewPageState();
 }
 
 class _TravelOverviewPageState extends State<TravelOverviewPage> {
-  final TravelDetails travelDetails = Get.arguments[0] as TravelDetails;
-  final String? profilePicture = Get.arguments[1] as String?;
+  final String? profilePicture = null;
 
   @override
   Widget build(BuildContext context) {
@@ -73,38 +75,45 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
 
     return Scaffold(
       // TEMP APPBAR
-      appBar: AppBar(),
-      body: SingleChildScrollView(
+      body: SafeArea(
+        top: false,
+        child: SingleChildScrollView(
         child: GestureDetector(
           behavior: HitTestBehavior.translucent,
           onTap: FocusScope.of(context).unfocus,
-          child: Container(
-            margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
-            child: Column(
-              spacing: screenHeight * 0.03,
-              children: [
-                header(
-                  screenWidth,
-                  screenHeight,
-                  travelDetails,
-                  profilePicture,
+          child: Column(
+            children: [
+              TravelAppBar(),
+              SizedBox(height: screenHeight * 0.02),
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
+                child: Column(
+                  spacing: screenHeight * 0.03,
+                  children: [
+                    header(
+                screenWidth,
+                screenHeight,
+                widget.plan,
+                profilePicture,
+              ),
+              accommodationTile(context, screenWidth, screenHeight),
+              flightTile(screenWidth, screenHeight),
+              notesTile(screenWidth, screenHeight),
+              checklistTile(screenWidth, screenHeight),
+                  ],
                 ),
-                accommodationTile(context, screenWidth, screenHeight),
-                flightTile(screenWidth, screenHeight),
-                notesTile(screenWidth, screenHeight),
-                checklistTile(screenWidth, screenHeight),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
-      ),
+      )),
     );
   }
 
   Widget header(
     double width,
     double height,
-    TravelDetails details,
+    TravelPlan plan,
     String? pfp,
   ) {
     return Row(
@@ -114,7 +123,7 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Trip to ${details.tripTitle}",
+              plan.tripTitle,
               style: TextStyle(
                 fontSize: height * 0.03702,
                 fontFamily: "Cal Sans",
@@ -127,7 +136,7 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                 Icon(Icons.location_on, size: height * 0.017177),
                 SizedBox(width: width * 0.008),
                 Text(
-                  details.destination,
+                  plan.destination,
                   style: TextStyle(fontSize: height * 0.0138),
                 ),
               ],
@@ -138,7 +147,7 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                 Icon(Icons.calendar_today, size: height * 0.017177),
                 SizedBox(width: width * 0.008),
                 Text(
-                  '${details.month} ${details.startDate} - ${details.endDate}',
+                  '${DateFormat.MMMd().format(plan.startDate!)} - ${DateFormat.MMMd().format(plan.endDate!)}',
                   style: TextStyle(fontSize: height * 0.0138),
                 ),
               ],
@@ -332,10 +341,7 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                       horizontal: context.width * 0.027,
                     ),
                     leading: Icon(Icons.date_range, color: AppColors.black),
-                    title: Text(
-                      selectedDateRange == null
-                          ? 'Select Date Range'
-                          : '${DateFormat.MMMd().format(selectedDateRange!.start)} - ${DateFormat.MMMd().format(selectedDateRange!.end)}',
+                    title: Text('${DateFormat.MMMd().format(selectedDateRange!.start)} - ${DateFormat.MMMd().format(selectedDateRange!.end)}',
                       style: TextStyle(
                         fontSize: context.height * 0.015,
                         fontWeight: FontWeight.w400,

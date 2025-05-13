@@ -8,4 +8,7 @@ class AppImages
 
   //Animations
   static const String docerAnimation = "assets/animations/LoadingAnimation.json";
+
+  //Background Images Here
+  static const String mountains = "assets/images/mountains.jpg";
 }

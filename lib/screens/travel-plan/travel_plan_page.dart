@@ -2,7 +2,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:intl/intl.dart';
 import 'package:planago/components/custom_app_bar.dart';
+import 'package:planago/controllers/firestore/travel_plan_database.dart';
+import 'package:planago/models/travel_plan_model.dart';
+import 'package:planago/screens/travel-plan/create_travel_plan_page.dart';
 import 'package:planago/screens/travel-plan/travel_overview_page.dart';
 import 'package:planago/utils/constants/colors.dart';
 
@@ -71,7 +75,9 @@ class _TravelPlanPageState extends State<TravelPlanPage> {
         height: screenHeight * 0.065,
         child: OutlinedButton(
           //Implement creating a travel plan here
-          onPressed: () {},
+          onPressed: () {
+            Get.to(() => CreatePlanPage());
+          },
           style: OutlinedButton.styleFrom(
             backgroundColor: Color.fromRGBO(227, 247, 255, 1),
             side: BorderSide(color: Colors.transparent),
@@ -138,14 +144,15 @@ class _TravelPlanPageState extends State<TravelPlanPage> {
             ),
             // PADDING
             SizedBox(width: screenWidth * 0.88, height: screenHeight * 0.02),
+            TravelPlanDatabase.instance.plans.isEmpty ? Center(child: Text("You haven’t planned any trips yet  :<", style: TextStyle(fontSize: Get.width * 0.05, color: AppColors.mutedBlack, letterSpacing: -0.3),)) :
             Expanded(
               child: ListView.separated(
-                itemCount: tripList.length,
+                itemCount: TravelPlanDatabase.instance.plans.length,
                 itemBuilder:
                     (context, index) => travelListTile(
                       screenWidth,
                       screenHeight,
-                      tripList[index],
+                      TravelPlanDatabase.instance.plans[index],
                     ),
                 separatorBuilder:
                     (context, index) => SizedBox(height: screenHeight * 0.02),
@@ -170,7 +177,7 @@ class _TravelPlanPageState extends State<TravelPlanPage> {
                 dimension: width * 0.1048, //102
                 child: ClipOval(
                   child:
-                      profilePicture != null
+                      profilePicture != null && profilePicture!.isNotEmpty
                           ? Image.memory(
                             base64Decode(profilePicture!),
                             fit: BoxFit.cover,
@@ -231,10 +238,10 @@ class _TravelPlanPageState extends State<TravelPlanPage> {
     );
   }
 
-  Widget travelListTile(double width, double height, TravelDetails details) {
+  Widget travelListTile(double width, double height, TravelPlan plan) {
     return GestureDetector(
       onTap: () {
-        Get.to(TravelOverviewPage(), arguments: [details, profilePicture]);
+        Get.to(TravelOverviewPage(plan: plan,), arguments: [profilePicture]);
       },
       child: Container(
         padding: EdgeInsets.all(width * 0.03),
@@ -249,9 +256,9 @@ class _TravelPlanPageState extends State<TravelPlanPage> {
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child:
-                  details.destImage != null
+                  (plan.destImage != null && plan.destImage!.isNotEmpty)
                       ? Image.memory(
-                        base64Decode(details.destImage!),
+                        base64Decode(plan.destImage!),
                         fit: BoxFit.cover,
                       )
                       : Image.asset(
@@ -285,7 +292,7 @@ class _TravelPlanPageState extends State<TravelPlanPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    details.tripTitle,
+                    plan.tripTitle,
                     style: TextStyle(
                       fontSize: height * 0.0222,
                       fontFamily: "Cal Sans",
@@ -298,7 +305,7 @@ class _TravelPlanPageState extends State<TravelPlanPage> {
                       Icon(Icons.location_on, size: height * 0.017177),
                       SizedBox(width: width * 0.008),
                       Text(
-                        details.destination,
+                        plan.destination,
                         style: TextStyle(fontSize: height * 0.0138),
                       ),
                     ],
@@ -309,7 +316,7 @@ class _TravelPlanPageState extends State<TravelPlanPage> {
                       Icon(Icons.calendar_today, size: height * 0.017177),
                       SizedBox(width: width * 0.008),
                       Text(
-                        '${details.month} ${details.startDate} - ${details.endDate}',
+                        '${DateFormat.MMMd().format(plan.startDate!)} - ${DateFormat.MMMd().format(plan.endDate!)}',
                         style: TextStyle(fontSize: height * 0.0138),
                       ),
                     ],

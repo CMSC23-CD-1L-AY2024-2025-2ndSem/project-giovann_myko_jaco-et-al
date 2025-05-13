@@ -1,145 +1,117 @@
-import 'package:planago/screens/travel-plan/travel_overview_page.dart';
+import 'package:planago/models/acommodation_details_model.dart';
+import 'package:planago/models/flight_details_model.dart';
 
 class TravelPlan {
+  String creator;
   String? destImage;
   String tripTitle;
   String destination;
-  String month;
-  String startDate;
-  String endDate;
+  DateTime? startDate;
+  DateTime? endDate;
   AccommodationDetails? accomodation;
   FlightDetails? flight;
   List<Checklist>? checklist = [];
+  List? people = []; //list of uids
   String? notes;
 
   TravelPlan({
     this.destImage,
+    required this.creator,
     required this.tripTitle,
     required this.destination,
-    required this.month,
     required this.startDate,
     required this.endDate,
     this.accomodation,
     this.flight,
     this.notes,
     this.checklist,
+    this.people, 
   });
+
+  static TravelPlan empty() => TravelPlan(
+    creator: '',
+    destImage: null,
+    tripTitle: '',
+    destination: '',
+    startDate: null,
+    endDate: null,
+    accomodation: AccommodationDetails.empty(),
+    flight: FlightDetails.empty(),
+    checklist: [],
+    notes: '',
+  );
 
   factory TravelPlan.fromJson(Map<String, dynamic> json) {
     return TravelPlan(
-      destImage: json['destImage'],
-      tripTitle: json['tripTitle'],
-      destination: json['destination'],
-      month: json['month'],
-      startDate: json['startDate'],
-      endDate: json['endDate'],
-      accomodation: json['accomodation'] != null
-          ? AccommodationDetails.fromJson(json['accomodation'])
-          : null,
-      flight: json['flight'] != null
-          ? FlightDetails.fromJson(json['flight'])
-          : null,
-      checklist: json['checklist'] != null
-          ? List<Checklist>.from(json['checklist'].map((item) => Checklist.fromJson(item)))
-          : [],
-      notes: json['notes'],
+      creator: json['creator'] ?? "",
+      destImage: json['destImage'] ?? "",
+      tripTitle: json['tripTitle'] ?? "",
+      destination: json['destination'] ?? "",
+      startDate: json['startDate'] != null ? DateTime.tryParse(json["startDate"]) : null,
+      endDate: json['endDate'] != null ? DateTime.tryParse(json["endDate"]) : null,
+      accomodation: 
+          json['accomodation'] != null
+              ? AccommodationDetails.fromJson(json['accomodation'])
+              : null,
+      flight:
+          json['flight'] != null
+              ? FlightDetails.fromJson(json['flight'])
+              : null,
+      checklist:
+          json['checklist'] != null
+              ? List<Checklist>.from(
+                json['checklist'].map((item) => Checklist.fromJson(item)),
+              )
+              : [],
+      notes: json['notes'] ?? "",
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
+      'creator' : creator,
       'destImage': destImage,
       'tripTitle': tripTitle,
       'destination': destination,
-      'month': month,
-      'startDate': startDate,
-      'endDate': endDate,
+      'startDate': startDate?.toIso8601String(),
+      'endDate': endDate?.toIso8601String(),
       'accomodation': accomodation?.toJson(),
       'flight': flight?.toJson(),
-      'checklist': checklist!.map((item) => item.toJson()).toList(),
+      'checklist': checklist?.map((item) => item.toJson()).toList() ?? [],
       'notes': notes,
+      'people': people
     };
   }
-}
 
-
-class AccommodationDetails {
-  String name;
-  String room;
-  String month;
-  String startDate;
-  String endDate;
-
-  AccommodationDetails({
-    required this.name,
-    required this.room,
-    required this.month,
-    required this.startDate,
-    required this.endDate,
-  });
-
-  factory AccommodationDetails.fromJson(Map<String, dynamic> json) {
-    return AccommodationDetails(
-      name: json['name'],
-      room: json['room'],
-      month: json['month'],
-      startDate: json['startDate'],
-      endDate: json['endDate'],
+  TravelPlan copyWith({
+    String? creator,
+    String? destImage,
+    String? tripTitle,
+    String? destination,
+    String? month,
+    DateTime? startDate,
+    DateTime? endDate,
+    AccommodationDetails? accomodation,
+    FlightDetails? flight,
+    List<Checklist>? checklist,
+    String? notes,
+    List? people,
+  }) {
+    return TravelPlan(
+      creator: creator ?? this.creator,
+      destImage: destImage ?? this.destImage,
+      tripTitle: tripTitle ?? this.tripTitle,
+      destination: destination ?? this.destination,
+      startDate: startDate ?? this.startDate,
+      endDate: endDate ?? this.endDate,
+      accomodation: accomodation ?? this.accomodation,
+      flight: flight ?? this.flight,
+      checklist: checklist ?? this.checklist,
+      notes: notes ?? this.notes,
+      people: people ?? this.people
     );
   }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'room': room,
-      'month': month,
-      'startDate': startDate,
-      'endDate': endDate,
-    };
-  }
 }
-
-
-class FlightDetails {
-  String airlineName;
-  String travelClass;
-  String destFrom;
-  String destFromTime;
-  String destTo;
-  String destToTime;
-
-  FlightDetails({
-    required this.airlineName,
-    this.travelClass = "Economy",
-    required this.destFrom,
-    required this.destFromTime,
-    required this.destTo,
-    required this.destToTime,
-  });
-
-  factory FlightDetails.fromJson(Map<String, dynamic> json) {
-    return FlightDetails(
-      airlineName: json['airlineName'],
-      travelClass: json['travelClass'] ?? 'Economy',
-      destFrom: json['destFrom'],
-      destFromTime: json['destFromTime'],
-      destTo: json['destTo'],
-      destToTime: json['destToTime'],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'airlineName': airlineName,
-      'travelClass': travelClass,
-      'destFrom': destFrom,
-      'destFromTime': destFromTime,
-      'destTo': destTo,
-      'destToTime': destToTime,
-    };
-  }
-}
-
 
 class Checklist {
   bool isChecked;
@@ -155,9 +127,6 @@ class Checklist {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'isChecked': isChecked,
-      'title': title,
-    };
+    return {'isChecked': isChecked, 'title': title};
   }
 }
