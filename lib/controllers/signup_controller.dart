@@ -4,7 +4,8 @@ import 'package:planago/controllers/authentication_controller.dart';
 import 'package:planago/controllers/user_controller.dart';
 import 'package:planago/models/user_model.dart';
 
-class SignupController extends GetxController{
+class SignupController extends GetxController
+{
   static SignupController get instance => Get.find();
 
   
@@ -27,7 +28,8 @@ class SignupController extends GetxController{
 
 
   @override
-  void onInit() {
+  void onInit() 
+  {
     super.onInit();
     username.addListener(checkFormFilled);
     password.addListener(checkFormFilled);
@@ -36,7 +38,8 @@ class SignupController extends GetxController{
     ever(privacyPolicy, (_) => checkFormFilled());
   }
 
- void checkFormFilled() {
+ void checkFormFilled() 
+ {
     isValid.value =
         username.text.isNotEmpty &&
         password.text.isNotEmpty &&
@@ -46,8 +49,10 @@ class SignupController extends GetxController{
   }
 
 
-  Future<void> signUp() async {
-    try{
+  Future<void> signUp() async 
+  {
+    try
+    {
       //Register User in Firebase Authentication
       final userCredential = await AuthenticationController.instance.registerWithEmailAndPassword(email.text.trim(), password.text.trim());
 
@@ -56,7 +61,10 @@ class SignupController extends GetxController{
       email: email.text.trim(), interests: interests, travelStyle: travelStyles, firstName: firstName.text.trim(), lastName: lastName.text.trim(), phoneNumber: phoneNumber.text.trim());
       final userController = Get.put(UserController());
       userController.saveUserRecord(newUser);
-    }catch (e){
+    }
+    
+    catch (e)
+    {
       throw "Error: ${e}";
     }
   }

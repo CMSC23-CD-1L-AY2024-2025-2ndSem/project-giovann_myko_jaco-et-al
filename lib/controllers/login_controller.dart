@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class LoginController extends GetxController{
+class LoginController extends GetxController
+{
   static LoginController get instance => Get.find();
 
   //Variables
@@ -11,13 +12,15 @@ class LoginController extends GetxController{
   final isValid = false.obs;
 
   @override
-  void onInit() {
+  void onInit() 
+  {
     super.onInit();
     username.addListener(checkFormFilled);
     password.addListener(checkFormFilled);
   }
 
-  void checkFormFilled() {
+  void checkFormFilled() 
+  {
     isValid.value =
         username.text.isNotEmpty && password.text.isNotEmpty;
   }

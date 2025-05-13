@@ -5,7 +5,8 @@ import 'package:iconsax/iconsax.dart';
 import 'package:planago/screens/travel_overview_page.dart';
 import 'package:planago/utils/constants/colors.dart';
 
-class TravelDetails {
+class TravelDetails 
+{
   String? destImage;
   String tripTitle;
   String destination;
@@ -13,7 +14,8 @@ class TravelDetails {
   String startDate;
   String endDate;
 
-  TravelDetails({
+  TravelDetails(
+  {
     this.destImage,
     required this.tripTitle,
     required this.destination,
@@ -23,14 +25,16 @@ class TravelDetails {
   });
 }
 
-class TravelPlanPage extends StatefulWidget {
+class TravelPlanPage extends StatefulWidget 
+{
   const TravelPlanPage({super.key});
 
   @override
   State<TravelPlanPage> createState() => _TravelPlanPageState();
 }
 
-class _TravelPlanPageState extends State<TravelPlanPage> {
+class _TravelPlanPageState extends State<TravelPlanPage> 
+{
   // assuming profilePicture is in base64 string
   String? profilePicture;
   String username = "Myko Jefferson";
@@ -60,7 +64,8 @@ class _TravelPlanPageState extends State<TravelPlanPage> {
   ];
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) 
+  {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
@@ -87,7 +92,8 @@ class _TravelPlanPageState extends State<TravelPlanPage> {
                 ),
               ),
               Stack(
-                children: [
+                children: 
+                [
                   Icon(
                     Icons.add_rounded,
                     color: AppColors.primary,
@@ -155,7 +161,8 @@ class _TravelPlanPageState extends State<TravelPlanPage> {
     );
   }
 
-  Widget header(double width, double height) {
+  Widget header(double width, double height) 
+  {
     return SizedBox(
       width: width * 0.88,
       child: Row(
@@ -183,7 +190,8 @@ class _TravelPlanPageState extends State<TravelPlanPage> {
               // TEXTS BESIDE PROFILE PICTURE
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+                children: 
+                [
                   Text(
                     "Good day!",
                     style: TextStyle(

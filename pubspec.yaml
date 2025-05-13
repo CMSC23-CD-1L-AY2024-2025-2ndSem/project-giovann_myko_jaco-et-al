@@ -28,6 +28,7 @@ dependencies:
   country_picker: ^2.0.27
   countries_utils: ^1.0.1
   intl: ^0.20.2
+  uuid: ^4.5.1
 
 #--------------- end of packages -------------#
 dev_dependencies:
