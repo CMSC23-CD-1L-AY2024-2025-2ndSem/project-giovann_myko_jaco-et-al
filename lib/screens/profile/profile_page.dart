@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:planago/controllers/authentication_controller.dart';
 import 'package:planago/controllers/user_controller.dart';
+import 'package:planago/navigation_menu.dart';
 import 'package:planago/screens/profile/edit_profile_page.dart';
 import 'package:planago/screens/profile/profile_detail_page.dart';
 import 'package:planago/utils/constants/colors.dart';
@@ -285,6 +286,7 @@ class _ProfilePageState extends State<ProfilePage> {
             onPressed: () async {
               await AuthenticationController.instance.signOut();
               await AuthenticationController.instance.screenRedirect();
+              NavigationController.instance.selectedIndex.value = 1;
               print("User logged out successfully");
             },
             child: Text(

@@ -341,7 +341,10 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                       horizontal: context.width * 0.027,
                     ),
                     leading: Icon(Icons.date_range, color: AppColors.black),
-                    title: Text('${DateFormat.MMMd().format(selectedDateRange!.start)} - ${DateFormat.MMMd().format(selectedDateRange!.end)}',
+                    title: Text(
+                      selectedDateRange == null
+                          ? 'Select Date Range'
+                          : '${DateFormat.MMMd().format(selectedDateRange!.start)} - ${DateFormat.MMMd().format(selectedDateRange!.end)}',
                       style: TextStyle(
                         fontSize: context.height * 0.015,
                         fontWeight: FontWeight.w400,

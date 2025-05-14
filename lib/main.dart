@@ -15,8 +15,8 @@ import 'package:planago/firebase_options.dart';
     options: DefaultFirebaseOptions.currentPlatform,
   );
   Get.put<AuthenticationController>(AuthenticationController());
-  Get.put<UserDatabase>(UserDatabase());
   Get.put<TravelPlanDatabase>(TravelPlanDatabase());
+  Get.put<UserDatabase>(UserDatabase());
   Get.put<UserController>(UserController());
 
   SystemChrome.setSystemUIOverlayStyle(

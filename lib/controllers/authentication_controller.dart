@@ -17,6 +17,7 @@ class AuthenticationController extends GetxController{
   
   //User Getter
   User? get authUser => _auth.currentUser;
+  // final Rxn<User> _user = Rxn<User>();
 
   Future<UserCredential> registerWithEmailAndPassword(String email, String password) async {
     try{
@@ -48,6 +49,7 @@ class AuthenticationController extends GetxController{
       email: email,
       password: password,
     );
+
   } on FirebaseAuthException catch (e) {
     print("Error: ${AppAuthExceptions(e.code).message}");
     errorMessage.value = AppAuthExceptions(e.code).message;

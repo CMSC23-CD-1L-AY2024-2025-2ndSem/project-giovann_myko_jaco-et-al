@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:planago/app.dart';
 import 'package:planago/controllers/authentication_controller.dart';
+import 'package:planago/controllers/firestore/travel_plan_database.dart';
 import 'package:planago/controllers/user_controller.dart';
 import 'package:planago/utils/constants/image_strings.dart';
 import 'package:planago/utils/loader/app_loader.dart';
@@ -54,6 +55,7 @@ class LoginController extends GetxController {
             AuthenticationController.instance.errorMessage.value;
       }else{
         await UserController.instance.fetchUserData();
+        TravelPlanDatabase.instance.listenToTravelPlans();
         await AppLoader.stopLoading();
         await AuthenticationController.instance.screenRedirect();
         print("User logged in successfully");

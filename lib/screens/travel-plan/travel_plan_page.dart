@@ -10,24 +10,6 @@ import 'package:planago/screens/travel-plan/create_travel_plan_page.dart';
 import 'package:planago/screens/travel-plan/travel_overview_page.dart';
 import 'package:planago/utils/constants/colors.dart';
 
-class TravelDetails {
-  String? destImage;
-  String tripTitle;
-  String destination;
-  String month;
-  String startDate;
-  String endDate;
-
-  TravelDetails({
-    this.destImage,
-    required this.tripTitle,
-    required this.destination,
-    required this.month,
-    required this.startDate,
-    required this.endDate,
-  });
-}
-
 class TravelPlanPage extends StatefulWidget {
   const TravelPlanPage({super.key});
 
@@ -40,36 +22,12 @@ class _TravelPlanPageState extends State<TravelPlanPage> {
   String? profilePicture;
   String username = "Myko Jefferson";
 
-  List<TravelDetails> tripList = [
-    TravelDetails(
-      tripTitle: "Japan",
-      destination: "Kyoto",
-      month: "May",
-      startDate: "12",
-      endDate: "15",
-    ),
-    TravelDetails(
-      tripTitle: "Japan",
-      destination: "Osaka",
-      month: "June",
-      startDate: "16",
-      endDate: "19",
-    ),
-    TravelDetails(
-      tripTitle: "Japan",
-      destination: "Tokyo",
-      month: "September",
-      startDate: "20",
-      endDate: "24",
-    ),
-  ];
-
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    return Scaffold(
+    return Obx(() => Scaffold(
       floatingActionButton: SizedBox(
         width: screenWidth * 0.88,
         height: screenHeight * 0.065,
@@ -161,7 +119,7 @@ class _TravelPlanPageState extends State<TravelPlanPage> {
           ],
         ),
       ),
-    );
+    ));
   }
 
   Widget header(double width, double height) {
