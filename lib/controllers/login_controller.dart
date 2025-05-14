@@ -21,14 +21,22 @@ class LoginController extends GetxController {
   final errorMessage = ''.obs;
 
   @override
-  void onInit() {
+  void onInit() 
+  {
     super.onInit();
     username.addListener(checkFormFilled);
     password.addListener(checkFormFilled);
   }
 
+<<<<<<< HEAD
   void checkFormFilled() {
     isValid.value = formKey.currentState!.validate();
+=======
+  void checkFormFilled() 
+  {
+    isValid.value =
+        username.text.isNotEmpty && password.text.isNotEmpty;
+>>>>>>> travel-itinerary
   }
 
   void login() async {

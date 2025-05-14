@@ -30,6 +30,7 @@ dependencies:
   countries_utils: ^1.0.1
   intl: ^0.20.2
   place_picker_google: ^0.0.16
+  uuid: ^4.5.1
 
 #--------------- end of packages -------------#
 dev_dependencies:

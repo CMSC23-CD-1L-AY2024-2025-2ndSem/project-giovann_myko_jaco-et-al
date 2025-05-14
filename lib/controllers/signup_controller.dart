@@ -7,7 +7,8 @@ import 'package:planago/models/user_model.dart';
 import 'package:planago/utils/constants/image_strings.dart';
 import 'package:planago/utils/loader/app_loader.dart';
 
-class SignupController extends GetxController{
+class SignupController extends GetxController
+{
   static SignupController get instance => Get.find();
 
   final signUp1key = GlobalKey<FormState>();
@@ -67,10 +68,17 @@ class SignupController extends GetxController{
       UserController.instance.user(newUser);
       final userController = Get.put(UserDatabase());
       userController.saveUserRecord(newUser);
+<<<<<<< HEAD
 
       await AppLoader.stopLoading();
       await AuthenticationController.instance.screenRedirect();
     }catch (e){
+=======
+    }
+    
+    catch (e)
+    {
+>>>>>>> travel-itinerary
       throw "Error: ${e}";
     }
   }

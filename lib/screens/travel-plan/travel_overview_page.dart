@@ -10,6 +10,7 @@ import 'package:planago/components/travel_app_bar.dart';
 import 'package:planago/models/travel_plan_model.dart';
 import 'package:planago/screens/travel-plan/travel_plan_page.dart';
 import 'package:planago/utils/constants/colors.dart';
+import 'itinerary_screen.dart';
 
 /* 
   TEMP CLASS MODELS, idk kung paano pa isusulat sa database
@@ -208,7 +209,10 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
               width: width * 0.24119,
               height: height * 0.02715,
               child: OutlinedButton(
-                onPressed: () {},
+                onPressed: () {
+                  // Navigate directly to the itinerary screen
+                  Get.to(() => ItineraryScreen());
+                },
                 style: OutlinedButton.styleFrom(
                   padding: EdgeInsets.zero,
                   backgroundColor: AppColors.primary,
