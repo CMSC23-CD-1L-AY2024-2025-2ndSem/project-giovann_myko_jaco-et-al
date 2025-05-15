@@ -68,17 +68,10 @@ class SignupController extends GetxController
       UserController.instance.user(newUser);
       final userController = Get.put(UserDatabase());
       userController.saveUserRecord(newUser);
-<<<<<<< HEAD
 
       await AppLoader.stopLoading();
       await AuthenticationController.instance.screenRedirect();
     }catch (e){
-=======
-    }
-    
-    catch (e)
-    {
->>>>>>> travel-itinerary
       throw "Error: ${e}";
     }
   }

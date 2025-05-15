@@ -28,15 +28,8 @@ class LoginController extends GetxController {
     password.addListener(checkFormFilled);
   }
 
-<<<<<<< HEAD
   void checkFormFilled() {
     isValid.value = formKey.currentState!.validate();
-=======
-  void checkFormFilled() 
-  {
-    isValid.value =
-        username.text.isNotEmpty && password.text.isNotEmpty;
->>>>>>> travel-itinerary
   }
 
   void login() async {
