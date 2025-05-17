@@ -45,7 +45,7 @@ class _FindPeoplePageState extends State<FindPeoplePage> {
         body: Container(
           padding: EdgeInsets.symmetric(
             horizontal: screenWidth * 0.06,
-            vertical: screenHeight * 0.06,
+            vertical: screenHeight * 0.031,
           ),
           child: Column(
             children: [
@@ -55,6 +55,7 @@ class _FindPeoplePageState extends State<FindPeoplePage> {
                     similarUsers.isNotEmpty
                         ? Expanded(
                           child: ListView.builder(
+                            padding: EdgeInsets.only(top: screenHeight * 0.015),
                             itemCount: similarUsers.length,
                             itemBuilder: (context, index) {
                               return Obx(
@@ -85,7 +86,11 @@ class _FindPeoplePageState extends State<FindPeoplePage> {
     setState(() {});
   }
 
-  Widget searchBar(double screenWidth, double screenHeight, BuildContext context) {
+  Widget searchBar(
+    double screenWidth,
+    double screenHeight,
+    BuildContext context,
+  ) {
     return SizedBox(
       height: screenHeight * 0.05,
       child: TextField(
@@ -112,7 +117,13 @@ class _FindPeoplePageState extends State<FindPeoplePage> {
         cursorHeight: screenHeight * 0.02,
         readOnly: true,
         onTap: () {
-          showSearch(context: context, delegate: SearchUserDelegate());
+          showSearch(
+            context: context,
+            delegate: SearchUserDelegate(
+              screenHeight: screenHeight,
+              screenWidth: screenWidth,
+            ),
+          );
         },
       ),
     );
@@ -121,7 +132,7 @@ class _FindPeoplePageState extends State<FindPeoplePage> {
   // template from: https://github.com/afgprogrammer/Flutter-searchable-listview/blob/master/lib/main.dart
   userComponent(UserModel user, double screenWidth, double screenHeight) {
     return Container(
-      margin: EdgeInsets.symmetric(vertical: screenHeight * 0.007),
+      margin: EdgeInsets.symmetric(vertical: screenHeight * 0.01),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -162,7 +173,8 @@ class _FindPeoplePageState extends State<FindPeoplePage> {
             ],
           ),
           Obx(() {
-            final followed = UserController.instance.user.value.following.contains(user.username);
+            final followed = UserController.instance.user.value.following
+                .contains(user.username);
             print(UserController.instance.user.value.following);
             return GestureDetector(
               onTap: () async {

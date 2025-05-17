@@ -1,11 +1,60 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:planago/app.dart';
 import 'package:planago/controllers/user_controller.dart';
 import 'package:planago/models/user_model.dart';
 import 'package:planago/utils/constants/colors.dart';
 import 'package:planago/utils/constants/image_strings.dart';
 
 class SearchUserDelegate extends SearchDelegate {
+  final double screenHeight;
+  final double screenWidth;
+
+  SearchUserDelegate({required this.screenHeight, required this.screenWidth});
+
+  @override
+  ThemeData appBarTheme(BuildContext context) {
+    final theme = Theme.of(context);
+    return theme.copyWith(
+      textSelectionTheme: TextSelectionThemeData(
+        cursorColor: AppColors.mutedBlack,
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: AppColors.mutedPrimary,
+        contentPadding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25),
+          borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25),
+          borderSide: BorderSide(color: AppColors.primary, width: 1.5),
+        ),
+      ),
+    );
+  }
+
+  @override
+  String get searchFieldLabel => 'Search users';
+
+  @override
+  TextStyle? get searchFieldStyle =>
+      TextStyle(fontSize: screenHeight * 0.01727, color: AppColors.mutedBlack);
+
+  // @override
+  // InputDecorationTheme? get searchFieldDecorationTheme {
+  //   return InputDecorationTheme(
+  //     filled: true,
+  //     fillColor: AppColors.mutedPrimary,
+  //     border: OutlineInputBorder(
+  //       borderRadius: BorderRadius.circular(25),
+  //       borderSide: BorderSide.none,
+  //     ),
+  //     contentPadding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
+  //   );
+  // }
+
   @override
   List<Widget>? buildActions(BuildContext context) {
     return [
@@ -66,6 +115,7 @@ class SearchUserDelegate extends SearchDelegate {
         return Center(child: Text("No users found"));
       }
       return ListView.builder(
+        padding: EdgeInsets.only(top: screenHeight * 0.013),
         itemCount: results.length,
         itemBuilder: (context, index) {
           final user = results[index];
@@ -78,7 +128,10 @@ class SearchUserDelegate extends SearchDelegate {
   // same with find people page w/o follow button
   userComponent(UserModel user, double screenWidth, double screenHeight) {
     return Container(
-      margin: EdgeInsets.symmetric(vertical: screenHeight * 0.007, horizontal: screenWidth * 0.06),
+      margin: EdgeInsets.symmetric(
+        vertical: screenHeight * 0.01,
+        horizontal: screenWidth * 0.06,
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -119,7 +172,7 @@ class SearchUserDelegate extends SearchDelegate {
             ],
           ),
           // removed button (animated container)
-          // 
+          //
         ],
       ),
     );
