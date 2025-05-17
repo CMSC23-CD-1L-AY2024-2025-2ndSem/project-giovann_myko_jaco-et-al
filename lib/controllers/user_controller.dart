@@ -35,7 +35,10 @@ class UserController extends GetxController{
   Future<void> followUser(UserModel otherUser) async {
     try {
       await userRepo.followUser(otherUser.username);
-      await fetchUserData(); // para mag refresh
+      // para mag refresh
+      await fetchUserData();
+      await fetchSimilarUsers();
+      //
     } catch (e) {
       print("Follow failed: $e");
     }
@@ -44,7 +47,10 @@ class UserController extends GetxController{
   Future<void> unfollowUser(UserModel otherUser) async {
     try {
       await userRepo.unfollowUser(otherUser.username);
-      await fetchUserData(); // para mag refresh
+      // para mag refresh
+      await fetchUserData();
+      await fetchSimilarUsers();
+      //
     } catch (e) {
       print("Unfollow failed: $e");
     }

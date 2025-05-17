@@ -144,7 +144,7 @@ class UserDatabase extends GetxController {
     }
   }
 
-  //Follow
+  //Follow - create operation
   Future<void> followUser(String targetUsername) async {
     try {
       final uid = AuthenticationController.instance.authUser?.uid;
@@ -153,14 +153,14 @@ class UserDatabase extends GetxController {
       final userRef = _db.collection("Users").doc(uid);
 
       await userRef.update({
-        "following": FieldValue.arrayUnion([targetUsername]),
+        "Following": FieldValue.arrayUnion([targetUsername]),
       });
     } on FirebaseException catch (e) {
       throw Exception("Error following user: ${e.message}");
     }
   }
 
-  //Unfollow
+  //Unfollow - delete operation
   Future<void> unfollowUser(String targetUsername) async {
     try {
       final uid = AuthenticationController.instance.authUser?.uid;
@@ -169,7 +169,7 @@ class UserDatabase extends GetxController {
       final userRef = _db.collection("Users").doc(uid);
 
       await userRef.update({
-        "following": FieldValue.arrayRemove([targetUsername]),
+        "Following": FieldValue.arrayRemove([targetUsername]),
       });
     } on FirebaseException catch (e) {
       throw Exception("Error unfollowing user: ${e.message}");

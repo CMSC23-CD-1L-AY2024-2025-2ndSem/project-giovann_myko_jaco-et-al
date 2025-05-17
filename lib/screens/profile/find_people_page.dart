@@ -28,8 +28,7 @@ class _FindPeoplePageState extends State<FindPeoplePage> {
 
   Future<void> _loadData() async {
     await UserController.instance.fetchUserData();
-    await UserController.instance
-        .fetchSimilarUsers();
+    await UserController.instance.fetchSimilarUsers();
   }
 
   @override
@@ -57,10 +56,12 @@ class _FindPeoplePageState extends State<FindPeoplePage> {
                           child: ListView.builder(
                             itemCount: similarUsers.length,
                             itemBuilder: (context, index) {
-                              return userComponent(
-                                similarUsers[index],
-                                screenWidth,
-                                screenHeight,
+                              return Obx(
+                                () => userComponent(
+                                  similarUsers[index],
+                                  screenWidth,
+                                  screenHeight,
+                                ),
                               );
                             },
                           ),
@@ -113,28 +114,17 @@ class _FindPeoplePageState extends State<FindPeoplePage> {
     );
   }
 
-  bool isFollowedByMe(UserModel otherUser) {
-    final following = UserController.instance.user.value.following;
-    if (following.contains(otherUser.username)) {
-      return true;
-    }
-
-    return false;
-  }
-
   // template from: https://github.com/afgprogrammer/Flutter-searchable-listview/blob/master/lib/main.dart
   userComponent(UserModel user, double screenWidth, double screenHeight) {
-    final followed = isFollowedByMe(user);
-
     return Container(
-      padding: EdgeInsets.symmetric(vertical: screenHeight * 0.03),
+      margin: EdgeInsets.symmetric(vertical: screenHeight * 0.007),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
             children: [
               SizedBox.square(
-                dimension: screenHeight * 0.076,
+                dimension: screenHeight * 0.056,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(25),
                   child: Image.asset(
@@ -143,55 +133,69 @@ class _FindPeoplePageState extends State<FindPeoplePage> {
                   ),
                 ),
               ),
-              SizedBox(width: screenWidth * 0.01),
+              SizedBox(width: screenWidth * 0.015),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     "${user.firstName} ${user.lastName}",
                     style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w500,
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w600,
+                      fontSize: screenHeight * 0.015,
                     ),
                   ),
-                  SizedBox(height: 5),
                   Text(
                     "@${user.username}",
-                    style: TextStyle(color: Colors.grey[500]),
+                    style: TextStyle(
+                      color: AppColors.gray,
+                      fontWeight: FontWeight.normal,
+                      fontSize: screenHeight * 0.0138,
+                    ),
                   ),
                 ],
               ),
             ],
           ),
-          GestureDetector(
-            onTap: () async {
-              if (followed) {
-                await UserController.instance.unfollowUser(user);
-              } else {
-                await UserController.instance.followUser(user);
-              }
-            },
-            child: AnimatedContainer(
-              height: 35,
-              width: 110,
-              duration: Duration(milliseconds: 300),
-              decoration: BoxDecoration(
-                color: followed ? Colors.blue[700] : Color(0xffffff),
-                borderRadius: BorderRadius.circular(5),
-                border: Border.all(
-                  color: followed ? Colors.transparent : Colors.grey.shade700,
+          Obx(() {
+            final followed = UserController.instance.user.value.following.contains(user.username);
+            print(UserController.instance.user.value.following);
+            return GestureDetector(
+              onTap: () async {
+                if (followed) {
+                  await UserController.instance.unfollowUser(user);
+                  print("Unfollow");
+                } else {
+                  await UserController.instance.followUser(user);
+                  print("Follow");
+                }
+              },
+              child: AnimatedContainer(
+                height: screenHeight * 0.036,
+                width: screenWidth * 0.23,
+                duration: Duration(milliseconds: 300),
+                decoration: BoxDecoration(
+                  color: followed ? AppColors.primary : AppColors.mutedPrimary,
+                  borderRadius: BorderRadius.circular(5),
+                  border: Border.all(
+                    color:
+                        followed ? Colors.transparent : AppColors.mutedPrimary,
+                  ),
                 ),
-              ),
-              child: Center(
-                child: Text(
-                  followed ? 'Unfollow' : 'Follow',
-                  style: TextStyle(
-                    color: followed ? Colors.white : Colors.white,
+                child: Center(
+                  child: Text(
+                    followed ? 'Following' : 'Follow',
+                    style: TextStyle(
+                      color:
+                          followed
+                              ? AppColors.mutedWhite
+                              : AppColors.mutedBlack,
+                    ),
                   ),
                 ),
               ),
-            ),
-          ),
+            );
+          }),
         ],
       ),
     );
