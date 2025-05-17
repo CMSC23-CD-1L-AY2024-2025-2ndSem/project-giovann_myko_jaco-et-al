@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/state_manager.dart';
+import 'package:planago/components/search_user_delegate.dart';
 import 'package:planago/controllers/user_controller.dart';
 import 'package:planago/models/user_model.dart';
 import 'package:planago/utils/constants/colors.dart';
@@ -48,7 +49,7 @@ class _FindPeoplePageState extends State<FindPeoplePage> {
           ),
           child: Column(
             children: [
-              searchBar(screenWidth, screenHeight),
+              searchBar(screenWidth, screenHeight, context),
               Container(
                 child:
                     similarUsers.isNotEmpty
@@ -84,7 +85,7 @@ class _FindPeoplePageState extends State<FindPeoplePage> {
     setState(() {});
   }
 
-  Widget searchBar(double screenWidth, double screenHeight) {
+  Widget searchBar(double screenWidth, double screenHeight, BuildContext context) {
     return SizedBox(
       height: screenHeight * 0.05,
       child: TextField(
@@ -109,7 +110,10 @@ class _FindPeoplePageState extends State<FindPeoplePage> {
         ),
         cursorColor: AppColors.mutedBlack,
         cursorHeight: screenHeight * 0.02,
-        onChanged: (value) => onSearch(value),
+        readOnly: true,
+        onTap: () {
+          showSearch(context: context, delegate: SearchUserDelegate());
+        },
       ),
     );
   }

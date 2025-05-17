@@ -1,13 +1,16 @@
+import 'dart:async';
+
 import 'package:get/get.dart';
 import 'package:planago/controllers/firestore/user_database.dart';
 import 'package:planago/models/user_model.dart';
+import 'package:planago/utils/helper/debounce.dart';
 
-class UserController extends GetxController{ 
+class UserController extends GetxController {
   static UserController get instance => Get.find();
 
   final userRepo = UserDatabase.instance;
-  Rx<UserModel> user =  UserModel.empty().obs;
-  
+  Rx<UserModel> user = UserModel.empty().obs;
+
   Future<void> fetchUserData() async {
     try {
       final fetchedUser = await userRepo.getUserData();
@@ -56,4 +59,24 @@ class UserController extends GetxController{
     }
   }
 
+  final RxList<UserModel> searchResults = <UserModel>[].obs;
+  final Debouncer _debouncer = Debouncer(milliseconds: 300);
+
+  @override
+  void onClose() {
+    _debouncer.dispose();
+    super.onClose();
+  }
+
+  void onSearchChanged(String query) {
+    _debouncer.run(() async {
+      if (query.isEmpty) {
+        searchResults.clear();
+      } else {
+        final searchedUsers = await userRepo.getUsersByQuery(query);
+        searchResults.assignAll(searchedUsers);
+        print("Users found!");
+      }
+    });
+  }
 }

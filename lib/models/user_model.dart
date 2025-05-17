@@ -76,13 +76,13 @@ class UserModel {
       final data = document.data()!;
       return UserModel(
         uid: document.id,
-        username: data["Username"],
-        email: data["Email"],
+        username: data["Username"] ?? "",
+        email: data["Email"] ?? "",
         interests: List<String>.from(data["Interests"] ?? []),
         travelStyle: List<String>.from(data["TravelStyle"] ?? []),
-        firstName: data["FirstName"],
-        lastName: data["LastName"],
-        phoneNumber: data["PhoneNumber"],
+        firstName: data["FirstName"] ?? "",
+        lastName: data["LastName"] ?? "",
+        phoneNumber: data["PhoneNumber"] ?? "",
         following: List<String>.from(data["Following"] ?? []),
         followers: data["Followers"] ?? 0,
       );

@@ -183,6 +183,29 @@ class UserDatabase extends GetxController {
     }
   }
 
+  //Search
+  Future<List<UserModel>> getUsersByQuery(String query) async {
+    try {
+      final lowerQuery = query.toLowerCase();
+      final users = await _db.collection("Users").get();
+      final filteredUsers =
+          users.docs.map((doc) => UserModel.fromSnapshot(doc)).where((user) {
+            if (user.email ==
+                AuthenticationController.instance.authUser?.email) {
+              return false;
+            }
+            final fullName = '${user.firstName} ${user.lastName}'.toLowerCase();
+            final username = user.username.toLowerCase();
+            return fullName.contains(lowerQuery) ||
+                username.contains(lowerQuery);
+          }).toList();
+
+      return filteredUsers;
+    } on FirebaseException catch (e) {
+      throw Exception("Firebase error [${e.code}]: ${e.message}");
+    }
+  }
+
   //Function for updating user data
   Future<void> updateUserData(UserModel user) async {
     try {
