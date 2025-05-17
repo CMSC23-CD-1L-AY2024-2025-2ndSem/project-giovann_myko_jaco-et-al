@@ -16,7 +16,6 @@ class TravelPlanDatabase extends GetxController {
   /// Call this after login
   void listenToTravelPlans() {
     _subscription?.cancel(); // Cancel old listener if it exists
-
     final currentUser = AuthenticationController.instance.authUser;
     if (currentUser == null) {
       plans.value = [];
@@ -42,8 +41,12 @@ class TravelPlanDatabase extends GetxController {
               })
               .whereType<TravelPlan>()
               .toList();
-      plans.value = userPlans;
-    });
+    plans.value = userPlans;
+  },
+  onError: (error, stackTrace) {
+    print('🔥 Error fetching travel plans: $error');
+  },
+  );
   }
 
   Future<TravelPlan> addTravelPlan(TravelPlan plan) async {
@@ -53,10 +56,18 @@ class TravelPlanDatabase extends GetxController {
     return plan.copyWith(id: doc.id);
   }
 
-  //Function for updating data on a travel plan
+  //Function for updating data on a travel plan except list items
   Future<void> updateTravelPlan(TravelPlan plan) async {
     await _db.collection('TravelPlans').doc(plan.id).update(plan.toJson());
   }
+
+  Future<void> addChecklistItem(TravelPlan plan, Checklist newItem) async {
+  final updatedChecklist = [...?plan.checklist, newItem];
+  final updatedPlan = plan.copyWith(checklist: updatedChecklist);
+  await updateTravelPlan(updatedPlan);
+}
+
+  
 
   @override
   void onClose() {

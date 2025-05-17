@@ -7,8 +7,10 @@ import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:planago/components/travel_app_bar.dart';
+import 'package:planago/controllers/firestore/travel_plan_database.dart';
+import 'package:planago/models/acommodation_details_model.dart';
+import 'package:planago/models/flight_details_model.dart';
 import 'package:planago/models/travel_plan_model.dart';
-import 'package:planago/screens/travel-plan/travel_plan_page.dart';
 import 'package:planago/utils/constants/colors.dart';
 import 'itinerary_screen.dart';
 
@@ -17,46 +19,7 @@ import 'itinerary_screen.dart';
   so gawa muna ako temporary models
 */
 
-class AccommodationDetails {
-  String name;
-  String room;
-  String month;
-  String startDate;
-  String endDate;
-
-  AccommodationDetails({
-    required this.name,
-    required this.room,
-    required this.month,
-    required this.startDate,
-    required this.endDate,
-  });
-}
-
-class FlightDetails {
-  String airlineName;
-  String travelClass;
-  String destFrom;
-  String destFromTime;
-  String destTo;
-  String destToTime;
-
-  FlightDetails({
-    required this.airlineName,
-    this.travelClass = "Economy",
-    required this.destFrom,
-    required this.destFromTime,
-    required this.destTo,
-    required this.destToTime,
-  });
-}
-
-class Checklist {
-  bool isChecked;
-  String title;
-
-  Checklist({this.isChecked = false, this.title = ""});
-}
+// Remove duplicate AccommodationDetails class definition; use the one from the model instead.
 
 class TravelOverviewPage extends StatefulWidget {
   final TravelPlan plan;
@@ -79,44 +42,40 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
       body: SafeArea(
         top: false,
         child: SingleChildScrollView(
-        child: GestureDetector(
-          behavior: HitTestBehavior.translucent,
-          onTap: FocusScope.of(context).unfocus,
-          child: Column(
-            children: [
-              TravelAppBar(),
-              SizedBox(height: screenHeight * 0.02),
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
-                child: Column(
-                  spacing: screenHeight * 0.03,
-                  children: [
-                    header(
-                screenWidth,
-                screenHeight,
-                widget.plan,
-                profilePicture,
-              ),
-              accommodationTile(context, screenWidth, screenHeight),
-              flightTile(screenWidth, screenHeight),
-              notesTile(screenWidth, screenHeight),
-              checklistTile(screenWidth, screenHeight),
-                  ],
+          child: GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTap: FocusScope.of(context).unfocus,
+            child: Column(
+              children: [
+                TravelAppBar(),
+                SizedBox(height: screenHeight * 0.02),
+                Container(
+                  margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
+                  child: Column(
+                    spacing: screenHeight * 0.03,
+                    children: [
+                      header(
+                        screenWidth,
+                        screenHeight,
+                        widget.plan,
+                        profilePicture,
+                      ),
+                      accommodationTile(context, screenWidth, screenHeight, widget.plan),
+                      flightTile(screenWidth, screenHeight),
+                      notesTile(screenWidth, screenHeight),
+                      checklistTile(screenWidth, screenHeight),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-      )),
+      ),
     );
   }
 
-  Widget header(
-    double width,
-    double height,
-    TravelPlan plan,
-    String? pfp,
-  ) {
+  Widget header(double width, double height, TravelPlan plan, String? pfp) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -136,10 +95,7 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
               children: [
                 Icon(Icons.location_on, size: height * 0.017177),
                 SizedBox(width: width * 0.008),
-                Text(
-                  plan.id!,
-                  style: TextStyle(fontSize: height * 0.0138),
-                ),
+                Text(plan.id!, style: TextStyle(fontSize: height * 0.0138)),
               ],
             ),
             SizedBox(height: height * 0.0014),
@@ -276,11 +232,22 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
 
   void showAddAccommodation(
     BuildContext context,
-    void Function(AccommodationDetails) onSave,
-  ) {
+    void Function(AccommodationDetails?) onSave, {
+    AccommodationDetails? initialDetails,
+  }) {
     final TextEditingController nameController = TextEditingController();
     final TextEditingController roomController = TextEditingController();
     DateTimeRange? selectedDateRange;
+
+    if (initialDetails != null) {
+      nameController.text = initialDetails.name;
+      roomController.text = initialDetails.room;
+
+      selectedDateRange = DateTimeRange(
+        start: initialDetails.startDate!,
+        end: initialDetails.endDate!,
+      );
+    }
 
     showModalBottomSheet(
       context: context,
@@ -323,9 +290,7 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                     cursorHeight: context.height * 0.02,
                     decoration: InputDecoration(
                       focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(
-                          color: AppColors.black,
-                        ),
+                        borderSide: BorderSide(color: AppColors.black),
                       ),
                       labelStyle: TextStyle(
                         fontSize: context.height * 0.015,
@@ -357,6 +322,7 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                     ),
                     onTap: () async {
                       final picked = await showDateRangePicker(
+                        initialDateRange: selectedDateRange,
                         context: context,
 
                         // wala pala tracker for what year ang travel plan
@@ -380,21 +346,11 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                       if (nameController.text.isNotEmpty &&
                           roomController.text.isNotEmpty &&
                           selectedDateRange != null) {
-                        final month = DateFormat.MMMM().format(
-                          selectedDateRange!.start,
-                        );
-                        final start = DateFormat.d().format(
-                          selectedDateRange!.start,
-                        );
-                        final end = DateFormat.d().format(
-                          selectedDateRange!.end,
-                        );
                         final details = AccommodationDetails(
                           name: nameController.text,
                           room: roomController.text,
-                          month: month,
-                          startDate: start,
-                          endDate: end,
+                          startDate: selectedDateRange!.start,
+                          endDate: selectedDateRange!.end,
                         );
                         Navigator.pop(context);
                         onSave(details);
@@ -450,20 +406,14 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
     );
   }
 
-  AccommodationDetails? details;
-  bool hasAccommodationDetails = false;
-
-  Widget accommodationTile(BuildContext context, double width, double height) {
+  Widget accommodationTile(BuildContext context, double width, double height, TravelPlan? plan) {
     return GestureDetector(
       onTap: () {
-        showAddAccommodation(context, (newDetails) {
-          setState(() {
-            details = newDetails;
-            if (details!.name.isNotEmpty) {
-              hasAccommodationDetails = true;
-            }
-          });
-        });
+        showAddAccommodation(context, (newDetails) async {
+          plan?.accomodation = newDetails;
+          await TravelPlanDatabase.instance.updateTravelPlan(widget.plan);
+        },
+        initialDetails: plan?.accomodation);
       },
       child: SizedBox(
         width: width * 0.88,
@@ -487,7 +437,7 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
               ),
             ),
             Divider(height: height * 0.0036, thickness: height * 0.0009),
-            (hasAccommodationDetails && details != null)
+            (plan?.accomodation != null)
                 ? Padding(
                   padding: EdgeInsets.only(top: height * 0.01),
                   child: Column(
@@ -512,7 +462,7 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                                   ),
                                   SizedBox(width: width * 0.015),
                                   Text(
-                                    details!.name,
+                                    plan!.accomodation!.name,
                                     style: TextStyle(fontSize: height * 0.0138),
                                   ),
                                 ],
@@ -536,7 +486,7 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                                   ),
                                   SizedBox(width: width * 0.015),
                                   Text(
-                                    details!.room,
+                                    plan.accomodation!.room,
                                     style: TextStyle(fontSize: height * 0.0138),
                                   ),
                                 ],
@@ -560,7 +510,7 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                             ),
                             SizedBox(width: width * 0.015),
                             Text(
-                              "${details!.month} ${details!.startDate} - ${details!.month} ${details!.endDate}",
+                              "${DateFormat('MMM d').format(plan.accomodation!.startDate!)} - ${DateFormat('MMM d').format(plan.accomodation!.endDate!)} ",
                               style: TextStyle(fontSize: height * 0.0138),
                             ),
                           ],
@@ -598,6 +548,7 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
   void showAddFlight(
     BuildContext context,
     void Function(FlightDetails) onSave,
+    FlightDetails? initialDetails
   ) {
     final TextEditingController airlineController = TextEditingController();
 
@@ -608,6 +559,15 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
     picker.Country? toCountry;
     String? fromAlpha3;
     String? toAlpha3;
+
+    if(initialDetails != null){
+      airlineController.text = initialDetails.airlineName;
+      fromTime = initialDetails.destFromTime;
+      toTime = initialDetails.destToTime;
+      selectedClass = initialDetails.travelClass;
+      fromAlpha3 = initialDetails.destFrom;
+      toAlpha3 = initialDetails.destTo;
+    }
 
     showModalBottomSheet(
       context: context,
@@ -755,9 +715,9 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                           airlineName: airlineController.text,
                           travelClass: selectedClass,
                           destFrom: fromAlpha3!,
-                          destFromTime: fromTime!.format(context),
+                          destFromTime: fromTime!,
                           destTo: toAlpha3!,
-                          destToTime: toTime!.format(context),
+                          destToTime: toTime!,
                         );
                         Navigator.pop(context);
                         onSave(details);
@@ -863,7 +823,7 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                   ),
                 ),
                 Text(
-                  flightDetails!.destFromTime,
+                  flightDetails!.destFromTime as String,
                   style: TextStyle(color: AppColors.mutedWhite),
                 ),
               ],
@@ -893,7 +853,7 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                   ),
                 ),
                 Text(
-                  flightDetails!.destToTime,
+                  flightDetails!.destToTime!.format(context),
                   style: TextStyle(color: AppColors.mutedWhite),
                 ),
               ],
@@ -954,12 +914,11 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                 onTap: () async {
                   showAddFlight(context, (newFlightDetails) {
                     setState(() {
-                      flightDetails = newFlightDetails;
-                      if (flightDetails!.airlineName.isNotEmpty) {
+                      if (widget.plan.flight != null) {
                         hasFlightDetails = true;
                       }
                     });
-                  });
+                  }, widget.plan.flight);
                 },
               ),
             ],
