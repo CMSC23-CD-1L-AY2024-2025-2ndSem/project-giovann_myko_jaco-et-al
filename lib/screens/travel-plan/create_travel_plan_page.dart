@@ -252,7 +252,6 @@ class _CreatePlanPageState extends State<CreatePlanPage> {
                       child: OutlinedButton(
                       onPressed: () async {
                         if(!controller.validateInputs()) return;
-
                         await controller.createPlan();
                         //Navigate to created Travel Plan
                         Get.to(TravelOverviewPage(plan: controller.plan.value));
