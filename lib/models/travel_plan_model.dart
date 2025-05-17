@@ -2,6 +2,7 @@ import 'package:planago/models/acommodation_details_model.dart';
 import 'package:planago/models/flight_details_model.dart';
 
 class TravelPlan {
+  String? id;
   String creator;
   String? destImage;
   String tripTitle;
@@ -11,10 +12,11 @@ class TravelPlan {
   AccommodationDetails? accomodation;
   FlightDetails? flight;
   List<Checklist>? checklist = [];
-  List? people = []; //list of uids
+  List? people = [];
   String? notes;
 
   TravelPlan({
+    this.id,
     this.destImage,
     required this.creator,
     required this.tripTitle,
@@ -28,7 +30,9 @@ class TravelPlan {
     this.people, 
   });
 
+  // Update empty factory too
   static TravelPlan empty() => TravelPlan(
+    id: null,
     creator: '',
     destImage: null,
     tripTitle: '',
@@ -39,37 +43,37 @@ class TravelPlan {
     flight: FlightDetails.empty(),
     checklist: [],
     notes: '',
+    people: [],
   );
 
-  factory TravelPlan.fromJson(Map<String, dynamic> json) {
+  factory TravelPlan.fromJson(Map<String, dynamic> json, {String? id}) {
     return TravelPlan(
+      id: id,
       creator: json['creator'] ?? "",
       destImage: json['destImage'] ?? "",
       tripTitle: json['tripTitle'] ?? "",
       destination: json['destination'] ?? "",
       startDate: json['startDate'] != null ? DateTime.tryParse(json["startDate"]) : null,
       endDate: json['endDate'] != null ? DateTime.tryParse(json["endDate"]) : null,
-      accomodation: 
-          json['accomodation'] != null
-              ? AccommodationDetails.fromJson(json['accomodation'])
-              : null,
-      flight:
-          json['flight'] != null
-              ? FlightDetails.fromJson(json['flight'])
-              : null,
-      checklist:
-          json['checklist'] != null
-              ? List<Checklist>.from(
-                json['checklist'].map((item) => Checklist.fromJson(item)),
-              )
-              : [],
+      accomodation: json['accomodation'] != null
+          ? AccommodationDetails.fromJson(json['accomodation'])
+          : null,
+      flight: json['flight'] != null
+          ? FlightDetails.fromJson(json['flight'])
+          : null,
+      checklist: json['checklist'] != null
+          ? List<Checklist>.from(
+              json['checklist'].map((item) => Checklist.fromJson(item)),
+            )
+          : [],
       notes: json['notes'] ?? "",
+      people: json['people'] ?? [],
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'creator' : creator,
+      'creator': creator,
       'destImage': destImage,
       'tripTitle': tripTitle,
       'destination': destination,
@@ -84,11 +88,11 @@ class TravelPlan {
   }
 
   TravelPlan copyWith({
+    String? id,
     String? creator,
     String? destImage,
     String? tripTitle,
     String? destination,
-    String? month,
     DateTime? startDate,
     DateTime? endDate,
     AccommodationDetails? accomodation,
@@ -98,6 +102,7 @@ class TravelPlan {
     List? people,
   }) {
     return TravelPlan(
+      id: id ?? this.id,
       creator: creator ?? this.creator,
       destImage: destImage ?? this.destImage,
       tripTitle: tripTitle ?? this.tripTitle,
@@ -108,7 +113,7 @@ class TravelPlan {
       flight: flight ?? this.flight,
       checklist: checklist ?? this.checklist,
       notes: notes ?? this.notes,
-      people: people ?? this.people
+      people: people ?? this.people,
     );
   }
 }

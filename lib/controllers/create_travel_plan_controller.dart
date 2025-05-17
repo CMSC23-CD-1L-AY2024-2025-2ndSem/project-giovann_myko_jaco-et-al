@@ -24,8 +24,8 @@ class CreateTravelPlanController extends GetxController{
 }
 
   Future<void> createPlan() async { 
-      final newPlan = TravelPlan(creator: AuthenticationController.instance.authUser!.uid, tripTitle: tripName.text.trim(), destination: location.text.trim(), startDate: selectedDateRange.value!.start, endDate: selectedDateRange.value!.end);
-      await TravelPlanDatabase.instance.addTravelPlan(newPlan);
+      var newPlan = TravelPlan(creator: AuthenticationController.instance.authUser!.uid, tripTitle: tripName.text.trim(), destination: location.text.trim(), startDate: selectedDateRange.value!.start, endDate: selectedDateRange.value!.end);
+      newPlan = await TravelPlanDatabase.instance.addTravelPlan(newPlan);
       plan.value = newPlan;
   }
 }

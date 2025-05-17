@@ -137,7 +137,7 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                 Icon(Icons.location_on, size: height * 0.017177),
                 SizedBox(width: width * 0.008),
                 Text(
-                  plan.destination,
+                  plan.id!,
                   style: TextStyle(fontSize: height * 0.0138),
                 ),
               ],

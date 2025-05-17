@@ -119,6 +119,7 @@ class _TravelPlanPageState extends State<TravelPlanPage>
                     (context, index) => SizedBox(height: screenHeight * 0.02),
               ),
             ),
+            SizedBox(height: screenHeight * 0.09) //spacer
           ],
         ),
       ),

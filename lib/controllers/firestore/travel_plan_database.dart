@@ -32,22 +32,30 @@ class TravelPlanDatabase extends GetxController {
           snapshot.docs
               .map((doc) {
                 final data = doc.data();
-                final plan = TravelPlan.fromJson(data);
+                final plan = TravelPlan.fromJson(
+                  data,
+                  id: doc.id,
+                );
                 final isCreator = plan.creator == userId;
                 final isInvited = plan.people?.contains(userId) ?? false;
                 return (isCreator || isInvited) ? plan : null;
               })
               .whereType<TravelPlan>()
               .toList();
-
       plans.value = userPlans;
     });
   }
 
-  Future<void> addTravelPlan(TravelPlan plan) async {
-    await FirebaseFirestore.instance
+  Future<TravelPlan> addTravelPlan(TravelPlan plan) async {
+    final doc = await _db
         .collection('TravelPlans')
         .add(plan.toJson());
+    return plan.copyWith(id: doc.id);
+  }
+
+  //Function for updating data on a travel plan
+  Future<void> updateTravelPlan(TravelPlan plan) async {
+    await _db.collection('TravelPlans').doc(plan.id).update(plan.toJson());
   }
 
   @override
