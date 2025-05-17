@@ -8,6 +8,8 @@ import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:planago/components/travel_app_bar.dart';
 import 'package:planago/models/travel_plan_model.dart';
+import 'package:planago/screens/travel-plan/notification_settings_screen.dart';
+import 'package:planago/screens/travel-plan/qr_code_screen.dart';
 import 'package:planago/screens/travel-plan/travel_plan_page.dart';
 import 'package:planago/utils/constants/colors.dart';
 import 'itinerary_screen.dart';
@@ -176,7 +178,10 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                     width: width * 0.16519,
                     height: height * 0.02715,
                     child: OutlinedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        // Navigate to QR code screen
+                        Get.to(() => QRCodeScreen(plan: plan));
+                      },
                       style: OutlinedButton.styleFrom(
                         padding: EdgeInsets.zero,
                         backgroundColor: AppColors.primary,
@@ -259,6 +264,40 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                     SizedBox(width: width * 0.008),
                     Text(
                       "Tripmates",
+                      style: TextStyle(
+                        fontSize: height * 0.0128,
+                        color: AppColors.mutedWhite,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            SizedBox(
+              width: width * 0.24119,
+              height: height * 0.02715,
+              child: OutlinedButton(
+                onPressed: () {
+                  // Navigate to notification settings
+                  Get.to(() => NotificationSettingsScreen(plan: plan));
+                },
+                style: OutlinedButton.styleFrom(
+                  padding: EdgeInsets.zero,
+                  backgroundColor: AppColors.primary,
+                  side: BorderSide(color: Colors.transparent),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.notifications_active_outlined,
+                      color: AppColors.mutedWhite,
+                      size: width * 0.035,
+                    ),
+                    SizedBox(width: width * 0.008),
+                    Text(
+                      "Remind",
                       style: TextStyle(
                         fontSize: height * 0.0128,
                         color: AppColors.mutedWhite,
