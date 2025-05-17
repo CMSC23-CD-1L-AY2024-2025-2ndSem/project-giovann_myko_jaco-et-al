@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:planago/app.dart';
 import 'package:planago/controllers/user_controller.dart';
 import 'package:planago/models/user_model.dart';
+import 'package:planago/screens/profile/view_user_page.dart';
 import 'package:planago/utils/constants/colors.dart';
 import 'package:planago/utils/constants/image_strings.dart';
 
@@ -127,53 +128,57 @@ class SearchUserDelegate extends SearchDelegate {
 
   // same with find people page w/o follow button
   userComponent(UserModel user, double screenWidth, double screenHeight) {
-    return Container(
-      margin: EdgeInsets.symmetric(
-        vertical: screenHeight * 0.01,
-        horizontal: screenWidth * 0.06,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              SizedBox.square(
-                dimension: screenHeight * 0.056,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(25),
-                  child: Image.asset(
-                    AppImages.defaultProfile,
-                    fit: BoxFit.cover,
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => Get.to(() => ViewUserPage(viewedUser: user)),
+      child: Container(
+        margin: EdgeInsets.symmetric(
+          vertical: screenHeight * 0.01,
+          horizontal: screenWidth * 0.06,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                SizedBox.square(
+                  dimension: screenHeight * 0.056,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(25),
+                    child: Image.asset(
+                      AppImages.defaultProfile,
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(width: screenWidth * 0.015),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "${user.firstName} ${user.lastName}",
-                    style: TextStyle(
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.w600,
-                      fontSize: screenHeight * 0.015,
+                SizedBox(width: screenWidth * 0.015),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "${user.firstName} ${user.lastName}",
+                      style: TextStyle(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w600,
+                        fontSize: screenHeight * 0.015,
+                      ),
                     ),
-                  ),
-                  Text(
-                    "@${user.username}",
-                    style: TextStyle(
-                      color: AppColors.gray,
-                      fontWeight: FontWeight.normal,
-                      fontSize: screenHeight * 0.0138,
+                    Text(
+                      "@${user.username}",
+                      style: TextStyle(
+                        color: AppColors.gray,
+                        fontWeight: FontWeight.normal,
+                        fontSize: screenHeight * 0.0138,
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          // removed button (animated container)
-          //
-        ],
+                  ],
+                ),
+              ],
+            ),
+            // removed button (animated container)
+            //
+          ],
+        ),
       ),
     );
   }

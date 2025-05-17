@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:get/get.dart';
 import 'package:get/state_manager.dart';
 import 'package:planago/components/search_user_delegate.dart';
 import 'package:planago/controllers/user_controller.dart';
 import 'package:planago/models/user_model.dart';
+import 'package:planago/screens/profile/view_user_page.dart';
 import 'package:planago/utils/constants/colors.dart';
 import 'package:planago/utils/constants/image_strings.dart';
 
@@ -131,88 +133,92 @@ class _FindPeoplePageState extends State<FindPeoplePage> {
 
   // template from: https://github.com/afgprogrammer/Flutter-searchable-listview/blob/master/lib/main.dart
   userComponent(UserModel user, double screenWidth, double screenHeight) {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: screenHeight * 0.01),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              SizedBox.square(
-                dimension: screenHeight * 0.056,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(25),
-                  child: Image.asset(
-                    AppImages.defaultProfile,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-              SizedBox(width: screenWidth * 0.015),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "${user.firstName} ${user.lastName}",
-                    style: TextStyle(
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.w600,
-                      fontSize: screenHeight * 0.015,
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => Get.to(() => ViewUserPage(viewedUser: user)),
+      child: Container(
+        margin: EdgeInsets.symmetric(vertical: screenHeight * 0.01),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                SizedBox.square(
+                  dimension: screenHeight * 0.056,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(25),
+                    child: Image.asset(
+                      AppImages.defaultProfile,
+                      fit: BoxFit.cover,
                     ),
                   ),
-                  Text(
-                    "@${user.username}",
-                    style: TextStyle(
-                      color: AppColors.gray,
-                      fontWeight: FontWeight.normal,
-                      fontSize: screenHeight * 0.0138,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          Obx(() {
-            final followed = UserController.instance.user.value.following
-                .contains(user.username);
-            print(UserController.instance.user.value.following);
-            return GestureDetector(
-              onTap: () async {
-                if (followed) {
-                  await UserController.instance.unfollowUser(user);
-                  print("Unfollow");
-                } else {
-                  await UserController.instance.followUser(user);
-                  print("Follow");
-                }
-              },
-              child: AnimatedContainer(
-                height: screenHeight * 0.036,
-                width: screenWidth * 0.23,
-                duration: Duration(milliseconds: 300),
-                decoration: BoxDecoration(
-                  color: followed ? AppColors.primary : AppColors.mutedPrimary,
-                  borderRadius: BorderRadius.circular(5),
-                  border: Border.all(
-                    color:
-                        followed ? Colors.transparent : AppColors.mutedPrimary,
-                  ),
                 ),
-                child: Center(
-                  child: Text(
-                    followed ? 'Following' : 'Follow',
-                    style: TextStyle(
+                SizedBox(width: screenWidth * 0.015),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "${user.firstName} ${user.lastName}",
+                      style: TextStyle(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w600,
+                        fontSize: screenHeight * 0.015,
+                      ),
+                    ),
+                    Text(
+                      "@${user.username}",
+                      style: TextStyle(
+                        color: AppColors.gray,
+                        fontWeight: FontWeight.normal,
+                        fontSize: screenHeight * 0.0138,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            Obx(() {
+              final followed = UserController.instance.user.value.following
+                  .contains(user.username);
+              print(UserController.instance.user.value.following);
+              return GestureDetector(
+                onTap: () async {
+                  if (followed) {
+                    await UserController.instance.unfollowUser(user);
+                    print("Unfollow");
+                  } else {
+                    await UserController.instance.followUser(user);
+                    print("Follow");
+                  }
+                },
+                child: AnimatedContainer(
+                  height: screenHeight * 0.036,
+                  width: screenWidth * 0.23,
+                  duration: Duration(milliseconds: 300),
+                  decoration: BoxDecoration(
+                    color: followed ? AppColors.primary : AppColors.mutedPrimary,
+                    borderRadius: BorderRadius.circular(5),
+                    border: Border.all(
                       color:
-                          followed
-                              ? AppColors.mutedWhite
-                              : AppColors.mutedBlack,
+                          followed ? Colors.transparent : AppColors.mutedPrimary,
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      followed ? 'Following' : 'Follow',
+                      style: TextStyle(
+                        color:
+                            followed
+                                ? AppColors.mutedWhite
+                                : AppColors.mutedBlack,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            );
-          }),
-        ],
+              );
+            }),
+          ],
+        ),
       ),
     );
   }
