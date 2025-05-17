@@ -4,6 +4,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:planago/components/custom_app_bar.dart';
 import 'package:planago/controllers/firestore/travel_plan_database.dart';
 import 'package:planago/controllers/firestore/user_database.dart';
+import 'package:planago/screens/profile/find_people_page.dart';
 import 'package:planago/screens/profile/profile_page.dart';
 import 'package:planago/screens/travel-plan/travel_plan_page.dart';
 import 'package:planago/utils/constants/colors.dart';
@@ -68,7 +69,7 @@ class NavigationController extends GetxController {
   static NavigationController get instance => Get.find();
   final selectedIndex = 1.obs;
   final screens = [
-    Container(color: AppColors.primary),
+    const FindPeoplePage(),
     const TravelPlanPage(),
     ProfilePage(),
   ];
