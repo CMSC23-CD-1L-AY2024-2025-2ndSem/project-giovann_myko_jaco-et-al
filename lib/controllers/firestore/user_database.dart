@@ -108,6 +108,7 @@ class UserDatabase extends GetxController {
       List<QueryDocumentSnapshot<Map<String, dynamic>>> interestDocs = [];
       List<QueryDocumentSnapshot<Map<String, dynamic>>> travelStyleDocs = [];
 
+      // filters for matching interests
       if (interests.isNotEmpty) {
         final interestSnapshot =
             await _db
@@ -119,6 +120,7 @@ class UserDatabase extends GetxController {
         //print(interestDocs);
       }
 
+      // filters for matching travel styles
       if (travelStyles.isNotEmpty) {
         final travelStyleSnapshot =
             await _db
@@ -130,14 +132,19 @@ class UserDatabase extends GetxController {
         //print(travelStyleDocs);
       }
 
+      // combine both documentSnapshots
       final combinedDocs = [...interestDocs, ...travelStyleDocs];
+      // use maps to avoid duplicate, unlike array
       final userMap = <String, UserModel>{};
+
+      // filter out possible duplicates
       for (final doc in combinedDocs) {
         if (doc.id != AuthenticationController.instance.authUser?.uid) {
           userMap[doc.id] = UserModel.fromSnapshot(doc);
         }
       }
 
+      // return only values as array
       return userMap.values.toList();
     } on FirebaseException catch (e) {
       throw Exception("Firebase error [${e.code}]: ${e.message}");
