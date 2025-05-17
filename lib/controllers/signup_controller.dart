@@ -64,7 +64,7 @@ class SignupController extends GetxController
 
       //Save Authenticated user date in Firebase Firestore
       final newUser = UserModel(uid: userCredential.user!.uid, username: username.text.trim(), 
-      email: email.text.trim(), interests: interests, travelStyle: travelStyles, firstName: firstName.text.trim(), lastName: lastName.text.trim(), phoneNumber: phoneNumber.text.trim());
+      email: email.text.trim(), interests: interests, travelStyle: travelStyles, firstName: firstName.text.trim(), lastName: lastName.text.trim(), phoneNumber: phoneNumber.text.trim(), following: []);
       UserController.instance.user(newUser);
       final userController = Get.put(UserDatabase());
       userController.saveUserRecord(newUser);
