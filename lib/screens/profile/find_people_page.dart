@@ -124,6 +124,7 @@ class _FindPeoplePageState extends State<FindPeoplePage> {
             delegate: SearchUserDelegate(
               screenHeight: screenHeight,
               screenWidth: screenWidth,
+              isSearchOnly: true,
             ),
           );
         },
