@@ -8,7 +8,7 @@ class NotificationSettingsScreen extends StatefulWidget
 {
   final TravelPlan plan;
   
-  const NotificationSettingsScreen({Key? key, required this.plan}) : super(key: key);
+  const NotificationSettingsScreen({super.key, required this.plan});
 
   @override
   State<NotificationSettingsScreen> createState() => _NotificationSettingsScreenState();
@@ -17,7 +17,7 @@ class NotificationSettingsScreen extends StatefulWidget
 class _NotificationSettingsScreenState extends State<NotificationSettingsScreen> 
 {
   final NotificationService _notificationService = NotificationService();
-  int _selectedDays = 7; // Default: 7 days before trip
+  int _selectedDays = 7; // Default: 7 days before trip if applicable
   bool _notificationsEnabled = true;
   
   @override
@@ -31,7 +31,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
         title: Text(
           "Notification Settings",
           style: TextStyle(
-            fontFamily: "Cal Sans",
+            fontFamily: "Poppins",
             fontSize: height * 0.025,
             color: AppColors.black,
           ),
@@ -90,14 +90,14 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
             // Enable/disable notifications
             SwitchListTile(
               title: Text(
-                "Enable Notifications",
+                "Push Notifications",
                 style: TextStyle(
                   fontSize: height * 0.02,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               subtitle: Text(
-                "Receive reminders before your trip",
+                "Remind me before the trip",
                 style: TextStyle(
                   fontSize: height * 0.016,
                   color: Colors.grey,
@@ -138,6 +138,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
               SizedBox(height: height * 0.02),
               
               // Days selection
+              // TODO: Set dynamic list of days according to the set trip start date and end date
               Container(
                 padding: EdgeInsets.symmetric(horizontal: width * 0.04),
                 child: Column(
@@ -165,7 +166,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                       style: TextStyle(fontSize: height * 0.018),
                     ),
                     SizedBox(width: width * 0.02),
-                    Container(
+                    SizedBox(
                       width: width * 0.2,
                       child: TextField(
                         keyboardType: TextInputType.number,
@@ -187,6 +188,10 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                               {
                                 _selectedDays = days;
                               });
+                            }
+                            else
+                            {
+                              print("Invalid input");
                             }
                           }
                         },
@@ -249,6 +254,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
     );
   }
   
+  //List tile for days
   Widget _buildDayOption(int days, String label) 
   {
     return RadioListTile<int>(

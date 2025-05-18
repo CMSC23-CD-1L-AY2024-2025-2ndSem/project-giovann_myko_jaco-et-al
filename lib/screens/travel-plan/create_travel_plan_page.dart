@@ -6,27 +6,31 @@ import 'package:planago/screens/travel-plan/travel_overview_page.dart';
 import 'package:planago/utils/constants/colors.dart';
 import 'package:simple_gradient_text/simple_gradient_text.dart';
 
-class CreatePlanPage extends StatefulWidget {
+class CreatePlanPage extends StatefulWidget 
+{
   const CreatePlanPage({super.key});
 
   @override
   State<CreatePlanPage> createState() => _CreatePlanPageState();
 }
 
-class _CreatePlanPageState extends State<CreatePlanPage> {
+class _CreatePlanPageState extends State<CreatePlanPage> 
+{
   final controller = Get.put(CreateTravelPlanController());
   final FocusNode _focusNode = FocusNode();
   bool _isEditing = false;
   String errorText = "a";
 
   @override
-  void dispose() {
+  void dispose() 
+  {
     controller.dispose();
     _focusNode.dispose();
     super.dispose();
   }
 
-  void _requestKeyboard() {
+  void _requestKeyboard() 
+  {
     setState(() {
       _isEditing = true;
     });
@@ -36,7 +40,8 @@ class _CreatePlanPageState extends State<CreatePlanPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) 
+  {
     final width = Get.width;
     final height = Get.height;
     return Obx(() =>Scaffold(
@@ -127,7 +132,8 @@ class _CreatePlanPageState extends State<CreatePlanPage> {
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
+                            children: 
+                            [
                               RichText(
                                 text: TextSpan(
                                   style: TextStyle(
@@ -175,7 +181,8 @@ class _CreatePlanPageState extends State<CreatePlanPage> {
                         context: context,
                         firstDate: DateTime.now(),
                         lastDate: DateTime.now().add(Duration(days: 365)),
-                        builder: (context, child) {
+                        builder: (context, child) 
+                        {
                           return Theme(data: Theme.of(context).copyWith(
                             colorScheme: ColorScheme.light(
                               primary: AppColors.primary,
@@ -193,7 +200,8 @@ class _CreatePlanPageState extends State<CreatePlanPage> {
                           ), child: child!);
                         }
                       );
-                      if(picked != null) {
+                      if(picked != null) 
+                      {
                         controller.selectedDateRange.value = picked;
                       }
                       },
@@ -202,14 +210,16 @@ class _CreatePlanPageState extends State<CreatePlanPage> {
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
+                            children: 
+                            [
                               RichText(
                                 text: TextSpan(
                                   style: TextStyle(
                                     fontFamily: "Poppins",
                                     letterSpacing: -0.3,
                                   ),
-                                  children: <TextSpan>[
+                                  children: <TextSpan>
+                                  [
                                     TextSpan(
                                       text: "Dates?   ",
                                       style: TextStyle(
@@ -250,7 +260,8 @@ class _CreatePlanPageState extends State<CreatePlanPage> {
         borderRadius: BorderRadius.circular(20),
                       ),
                       child: OutlinedButton(
-                      onPressed: () async {
+                      onPressed: () async 
+                      {
                         if(!controller.validateInputs()) return;
                         await controller.createPlan();
                         //Navigate to created Travel Plan
@@ -274,7 +285,8 @@ class _CreatePlanPageState extends State<CreatePlanPage> {
 }
 
 //Custom Widget for the text input
-class FocusButtonTextInput extends StatefulWidget {
+class FocusButtonTextInput extends StatefulWidget 
+{
   final TextEditingController controller;
   final String label;
   final String placeholder;
@@ -284,32 +296,39 @@ class FocusButtonTextInput extends StatefulWidget {
   State<FocusButtonTextInput> createState() => _FocusButtonTextInputState();
 }
 
-class _FocusButtonTextInputState extends State<FocusButtonTextInput> {
+class _FocusButtonTextInputState extends State<FocusButtonTextInput> 
+{
   final FocusNode _focusNode = FocusNode();
   bool _isEditing = false;
 
   @override
-  void dispose() {
+  void dispose() 
+  {
     _focusNode.dispose();
     super.dispose();
   }
 
-  void _requestKeyboard() {
-    setState(() {
+  void _requestKeyboard() 
+  {
+    setState(() 
+    {
       _isEditing = true;
     });
-    Future.delayed(Duration(milliseconds: 100), () {
+    Future.delayed(Duration(milliseconds: 100), () 
+    {
       FocusScope.of(context).requestFocus(_focusNode);
     });
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) 
+  {
     final width = Get.width;
     final height = Get.height;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
+      children: 
+      [
         // Button-like view or TextField when editing
         _isEditing
             ? SizedBox(
@@ -325,8 +344,10 @@ class _FocusButtonTextInputState extends State<FocusButtonTextInput> {
                 ),
                 focusNode: _focusNode,
                 controller: widget.controller,
-                onSubmitted: (_) {
-                  setState(() {
+                onSubmitted: (_) 
+                {
+                  setState(() 
+                  {
                     _isEditing = false;
                   });
                 },
@@ -363,14 +384,16 @@ class _FocusButtonTextInputState extends State<FocusButtonTextInput> {
                 child:Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
+                            children: 
+                            [
                               RichText(
                                 text: TextSpan(
                                   style: TextStyle(
                                     fontFamily: "Poppins",
                                     letterSpacing: -0.3,
                                   ),
-                                  children: <TextSpan>[
+                                  children: <TextSpan>
+                                  [
                                     TextSpan(
                                       text: widget.label,
                                       style: TextStyle(

@@ -1,13 +1,14 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
-import 'package:get/get.dart';
 import 'package:planago/models/travel_plan_model.dart';
 
-class NotificationService {
+class NotificationService 
+{
   static final NotificationService _instance = NotificationService._internal();
   
-  factory NotificationService() {
+  factory NotificationService() 
+  {
     return _instance;
   }
   
@@ -16,7 +17,8 @@ class NotificationService {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = 
       FlutterLocalNotificationsPlugin();
   
-  Future<void> init() async {
+  Future<void> init() async 
+  {
     // Initialize timezone
     tz.initializeTimeZones();
     
@@ -38,7 +40,8 @@ class NotificationService {
     
     await flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
-      onDidReceiveNotificationResponse: (NotificationResponse response) {
+      onDidReceiveNotificationResponse: (NotificationResponse response) 
+      {
         // Handle notification tap
         print('Notification tapped: ${response.payload}');
       },
@@ -100,12 +103,14 @@ class NotificationService {
   }
   
   // Cancel a scheduled notification
-  Future<void> cancelNotification(int id) async {
+  Future<void> cancelNotification(int id) async 
+  {
     await flutterLocalNotificationsPlugin.cancel(id);
   }
   
   // Cancel all notifications
-  Future<void> cancelAllNotifications() async {
+  Future<void> cancelAllNotifications() async 
+  {
     await flutterLocalNotificationsPlugin.cancelAll();
   }
 }

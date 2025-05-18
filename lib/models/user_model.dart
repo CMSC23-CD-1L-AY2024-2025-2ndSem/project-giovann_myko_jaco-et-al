@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class UserModel {
+class UserModel 
+{
   //Static Lists of Interest and Travel Styles
-  static final setInterests = [
+  static final setInterests = 
+  [
     'Food',
     'Arts & Culture',
     'History & Heritage',
@@ -15,7 +17,8 @@ class UserModel {
     'Photography',
   ];
 
-  static final settravelStyles = [
+  static final settravelStyles = 
+  [
     'Backpacking',
     'Luxury Travel',
     'Eco-friendly Travel',
@@ -40,7 +43,8 @@ class UserModel {
   final List<String> following;
   final int followers;
 
-  UserModel({
+  UserModel(
+ {
     required this.uid,
     required this.username,
     required this.email,
@@ -54,8 +58,10 @@ class UserModel {
   });
 
   //Convert model to JSON structure for storing in database
-  Map<String, dynamic> toJson() {
-    return {
+  Map<String, dynamic> toJson() 
+  {
+    return 
+    {
       "FirstName": firstName,
       "LastName": lastName,
       "Username": username,
@@ -72,7 +78,8 @@ class UserModel {
   factory UserModel.fromSnapshot(
     DocumentSnapshot<Map<String, dynamic>> document,
   ) {
-    if (document.data() != null) {
+    if (document.data() != null) 
+    {
       final data = document.data()!;
       return UserModel(
         uid: document.id,
@@ -91,7 +98,8 @@ class UserModel {
   }
 
   //Empty User Model
-  static UserModel empty() {
+  static UserModel empty() 
+  {
     return UserModel(
       uid: '',
       username: '',

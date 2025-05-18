@@ -10,7 +10,7 @@ class ItineraryScreen extends StatelessWidget
 {
   final ItineraryController controller = Get.put(ItineraryController());
   
-  ItineraryScreen({Key? key}) : super(key: key);
+  ItineraryScreen({super.key});
 
   @override
   Widget build(BuildContext context) 

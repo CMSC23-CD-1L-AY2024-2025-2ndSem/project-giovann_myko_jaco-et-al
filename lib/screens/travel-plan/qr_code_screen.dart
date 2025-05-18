@@ -1,3 +1,8 @@
+/*
+  https://pub.dev/packages/image_gallery_saver  --to save qr code to gallery
+  https://pub.dev/packages/render --to capture widget as image
+  https://pub.dev/packages/qr_flutter --to generate qr code
+*/
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -10,9 +15,10 @@ import 'dart:ui' as ui;
 
 class QRCodeScreen extends StatefulWidget 
 {
+  //create final travelplan obj
   final TravelPlan plan;
 
-  const QRCodeScreen({Key? key, required this.plan}) : super(key: key);
+  const QRCodeScreen({super.key, required this.plan});
 
   @override
   State<QRCodeScreen> createState() => _QRCodeScreenState();
@@ -20,6 +26,7 @@ class QRCodeScreen extends StatefulWidget
 
 class _QRCodeScreenState extends State<QRCodeScreen> 
 {
+  //global key for qr
   final GlobalKey _qrKey = GlobalKey();
   bool _isSaving = false;
   String? _username;
@@ -34,7 +41,9 @@ class _QRCodeScreenState extends State<QRCodeScreen>
 
   String _generateQRData() 
   {
-    return "${widget.plan.id}|${widget.plan.tripTitle}|${widget.plan.destination}";
+    // Generate the data to be encoded in the QR code
+    //id; title; destination; start date (yyyy-MM-ddTHH:mm:ss.mmmuuuZ); end date (yyyy-MM-ddTHH:mm:ss.mmmuuuZ)
+    return "${widget.plan.id}|${widget.plan.tripTitle}|${widget.plan.destination}|${widget.plan.startDate?.toIso8601String()}|${widget.plan.endDate?.toIso8601String()}";
   }
 
   // Save QR code to gallery
@@ -47,8 +56,9 @@ class _QRCodeScreenState extends State<QRCodeScreen>
 
     try 
     {
+      // Capture the QR code as an image
       RenderRepaintBoundary boundary = _qrKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
-      ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+      ui.Image image = await boundary.toImage(pixelRatio: 4.0);
       ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
       
       if (byteData != null) 
@@ -56,7 +66,7 @@ class _QRCodeScreenState extends State<QRCodeScreen>
         final buffer = byteData.buffer.asUint8List();
         
         // Save to gallery
-        final result = await ImageGallerySaver.saveImage(buffer);
+        await ImageGallerySaver.saveImage(buffer);
         
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -87,6 +97,7 @@ class _QRCodeScreenState extends State<QRCodeScreen>
   }
 
   // Share with a friend by username
+  // TODO: must implement backend logic to share travel plan with existing user in the database
   void _shareWithFriend() 
   {
     if (_username == null || _username!.isEmpty) 
@@ -119,8 +130,7 @@ class _QRCodeScreenState extends State<QRCodeScreen>
                   _username = _usernameController.text;
                 });
                 Navigator.pop(context);
-                // Here you would implement the actual sharing logic
-                // This would typically involve a backend call
+                //TODO: implement sharing logic here (backend)
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('Travel plan shared with $_username'),
@@ -137,7 +147,7 @@ class _QRCodeScreenState extends State<QRCodeScreen>
     
     else 
     {
-      // Implement sharing with the already entered username
+      // Include in user model the shared travel plan via travel plan id
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Travel plan shared with $_username'),
@@ -217,9 +227,9 @@ class _QRCodeScreenState extends State<QRCodeScreen>
               
               // QR Code
               Text(
-                "Scan this QR code to share",
+                "SCAN ME",
                 style: TextStyle(
-                  fontSize: height * 0.02,
+                  fontSize: height * 0.04,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -247,6 +257,7 @@ class _QRCodeScreenState extends State<QRCodeScreen>
                     version: QrVersions.auto,
                     size: width * 0.6,
                     backgroundColor: Colors.white,
+                    // ignore: deprecated_member_use
                     foregroundColor: AppColors.primary,
                     embeddedImage: AssetImage('assets/images/default_profile.png'),
                     embeddedImageStyle: QrEmbeddedImageStyle(
@@ -280,7 +291,7 @@ class _QRCodeScreenState extends State<QRCodeScreen>
                             strokeWidth: 2,
                           ),
                         )
-                      : Icon(Icons.save_alt),
+                      : Icon(Icons.save_alt, color: AppColors.mutedWhite),
                   label: Text(
                     _isSaving ? "Saving..." : "Save to Gallery",
                     style: TextStyle(fontSize: height * 0.018),
@@ -300,7 +311,7 @@ class _QRCodeScreenState extends State<QRCodeScreen>
                     child: Text(
                       "OR",
                       style: TextStyle(
-                        color: Colors.grey,
+                        color: AppColors.mutedBlack,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -312,6 +323,7 @@ class _QRCodeScreenState extends State<QRCodeScreen>
               SizedBox(height: height * 0.02),
               
               // Share by username
+              //TODO: find existing username in database and add travel plan id if not yet shared
               SizedBox(
                 width: width * 0.8,
                 height: height * 0.06,
@@ -325,9 +337,9 @@ class _QRCodeScreenState extends State<QRCodeScreen>
                       side: BorderSide(color: AppColors.primary),
                     ),
                   ),
-                  icon: Icon(Icons.person_add),
+                  icon: Icon(Icons.person_add, color: AppColors.primary),
                   label: Text(
-                    "Share with Friend by Username",
+                    "Share with a friend",
                     style: TextStyle(fontSize: height * 0.018),
                   ),
                 ),
