@@ -31,11 +31,11 @@ class FlightDetails {
       travelClass: json['travelClass'] ?? 'Economy',
       destFrom: json['destFrom'] ?? '',
       destFromTime: json['destFromTime'] != null
-          ? _timeOfDayFromString(json['destFromTime'])
+          ? timeOfDayFromString(json['destFromTime'])
           : null,
       destTo: json['destTo'] ?? '',
       destToTime: json['destToTime'] != null
-          ? _timeOfDayFromString(json['destToTime'])
+          ? timeOfDayFromString(json['destToTime'])
           : null,
     );
   }
@@ -45,19 +45,19 @@ class FlightDetails {
       'airlineName': airlineName,
       'travelClass': travelClass,
       'destFrom': destFrom,
-      'destFromTime': destFromTime != null ? _timeOfDayToString(destFromTime!) : null,
+      'destFromTime': destFromTime != null ? timeOfDayToString(destFromTime!) : null,
       'destTo': destTo,
-      'destToTime': destToTime != null ? _timeOfDayToString(destToTime!) : null,
+      'destToTime': destToTime != null ? timeOfDayToString(destToTime!) : null,
     };
   }
 
   // Converts TimeOfDay to string: "HH:mm"
-  static String _timeOfDayToString(TimeOfDay time) {
+  static String timeOfDayToString(TimeOfDay time) {
     return time.hour.toString().padLeft(2, '0') + ':' + time.minute.toString().padLeft(2, '0');
   }
 
   // Converts string: "HH:mm" to TimeOfDay
-  static TimeOfDay _timeOfDayFromString(String timeString) {
+  static TimeOfDay timeOfDayFromString(String timeString) {
     final parts = timeString.split(':');
     final hour = int.parse(parts[0]);
     final minute = int.parse(parts[1]);

@@ -205,7 +205,7 @@ class _TravelPlanPageState extends State<TravelPlanPage>
   Widget travelListTile(double width, double height, TravelPlan plan) {
     return GestureDetector(
       onTap: () {
-        Get.to(TravelOverviewPage(plan: plan,), arguments: [profilePicture]);
+        Get.to(TravelOverviewPage(plan: plan), arguments: [profilePicture]);
       },
       child: Container(
         padding: EdgeInsets.all(width * 0.03),

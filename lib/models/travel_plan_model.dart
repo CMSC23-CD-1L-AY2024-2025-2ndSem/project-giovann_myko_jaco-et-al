@@ -124,6 +124,13 @@ class Checklist {
 
   Checklist({this.isChecked = false, this.title = ""});
 
+  Checklist copyWith({bool? isChecked, String? title}) {
+    return Checklist(
+      isChecked: isChecked ?? this.isChecked,
+      title: title ?? this.title,
+    );
+  }
+
   factory Checklist.fromJson(Map<String, dynamic> json) {
     return Checklist(
       isChecked: json['isChecked'] ?? false,
