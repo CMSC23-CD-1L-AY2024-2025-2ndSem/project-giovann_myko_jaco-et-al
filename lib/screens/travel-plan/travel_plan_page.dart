@@ -218,7 +218,8 @@ class _TravelPlanPageState extends State<TravelPlanPage>
     );
   }
 
-  Widget travelListTile(double width, double height, TravelPlan plan) {
+  Widget travelListTile(double width, double height, TravelPlan plan) 
+  {
     return GestureDetector(
       onTap: () {
         Get.to(() => TravelOverviewPage(plan: plan), arguments: [profilePicture]);
@@ -270,7 +271,8 @@ class _TravelPlanPageState extends State<TravelPlanPage>
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+                children: 
+                [
                   Text(
                     plan.tripTitle,
                     style: TextStyle(
@@ -281,7 +283,8 @@ class _TravelPlanPageState extends State<TravelPlanPage>
                   ),
                   SizedBox(height: height * 0.0036),
                   Row(
-                    children: [
+                    children: 
+                    [
                       Icon(Icons.location_on, size: height * 0.017177),
                       SizedBox(width: width * 0.008),
                       Text(
@@ -292,7 +295,8 @@ class _TravelPlanPageState extends State<TravelPlanPage>
                   ),
                   SizedBox(height: height * 0.0014),
                   Row(
-                    children: [
+                    children: 
+                    [
                       Icon(Icons.calendar_today, size: height * 0.017177),
                       SizedBox(width: width * 0.008),
                       Text(

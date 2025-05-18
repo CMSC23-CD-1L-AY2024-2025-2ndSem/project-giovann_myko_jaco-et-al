@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:planago/models/travel_plan_model.dart';
 import 'package:uuid/uuid.dart';
 import '/models/travel_model.dart';
 
@@ -17,9 +18,10 @@ class ItineraryController extends GetxController
   //
   //  
   // Trip details
+  // initialize values to avoid garbage values
   final duration = 5.obs;
-  final travelers = 2.obs;
-  final budget = 20.9.obs;
+  final travelers = 1.obs;
+  final RxDouble budget = 0.0.obs;
   final currency = "PHP".obs;
   
   // Lists for each day
@@ -42,18 +44,30 @@ class ItineraryController extends GetxController
   final destinationDescriptionController = TextEditingController();
   final destinationTimeController = TextEditingController();
   final destinationTypeController = TextEditingController();
-  
-  @override
-  void onInit() 
-  {
-    super.onInit();
 
-    // Initialize lists with empty lists for each day
-    expenses.value = List.generate(duration.value, (_) => []);
-    activities.value = List.generate(duration.value, (_) => []);
-    destinations.value = List.generate(duration.value, (_) => []);
+  void setDurationFromDates(DateTime start, DateTime end) 
+  {
+    final int days = end.difference(start).inDays + 1;
+    duration.value = days;
+    expenses.value = List.generate(days, (_) => []);
+    activities.value = List.generate(days, (_) => []);
+    destinations.value = List.generate(days, (_) => []);
   }
   
+  void setTravelersFromPlan(TravelPlan plan) 
+  {
+    travelers.value = plan.people != null ? plan.people!.length : 1;
+  }
+
+  double get currentDayTotalExpenses 
+  {
+    double sum = 0.0;
+    for (var expense in currentDayExpenses) 
+    {
+      sum += expense.amount;
+    }
+    return sum;
+  }
   @override
   void onClose() 
   {

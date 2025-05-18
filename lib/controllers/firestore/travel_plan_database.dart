@@ -60,11 +60,21 @@ class TravelPlanDatabase extends GetxController {
     await _db.collection('TravelPlans').doc(plan.id).update(plan.toJson());
   }
 
+  Future<TravelPlan?> getPlanById(String id) async 
+  {
+    final doc = await _db.collection('TravelPlans').doc(id).get();
+    if (doc.exists && doc.data() != null) {
+      return TravelPlan.fromJson(doc.data()!, id: doc.id);
+    }
+    return null;
+  }
+
 
   Future<void> updateChecklist(TravelPlan plan, List<Checklist> updatedChecklist) async {
     final updatedPlan = plan.copyWith(checklist: updatedChecklist);
     await TravelPlanDatabase.instance.updateTravelPlan(updatedPlan);
 }
+
 
   
 

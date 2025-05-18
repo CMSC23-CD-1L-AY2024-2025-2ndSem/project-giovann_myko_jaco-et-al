@@ -24,10 +24,8 @@ class DestinationsTab extends StatelessWidget
     }
   }
 
-  DestinationsTab({Key? key}) : super(key: key);
-  
-  final ItineraryController controller = Get.find<ItineraryController>();
-
+  final ItineraryController controller;
+  DestinationsTab({required this.controller, Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) 
   {
@@ -52,11 +50,14 @@ class DestinationsTab extends StatelessWidget
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: 
               [
-                _buildInfoColumn('${controller.duration.value} days', 'Duration'),
-                _buildInfoColumn('${controller.travelers.value} Adults', 'Travellers'),
                 _buildInfoColumn(
-                  '${controller.currency.value} ${controller.budget.value}k',
-                  'Est. budget',
+                  '${controller.duration.value} ${controller.duration.value > 1 ? "Days" : "Day"}',
+                  'Duration',
+                ),
+
+                _buildInfoColumn(
+                  '${controller.travelers.value} ${controller.travelers.value > 1 ? "Adults" : "Adult"}',
+                  'Travellers',
                 ),
               ],
             ),

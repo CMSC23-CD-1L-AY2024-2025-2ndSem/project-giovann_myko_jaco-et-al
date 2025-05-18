@@ -1,7 +1,8 @@
 import 'package:planago/models/acommodation_details_model.dart';
 import 'package:planago/models/flight_details_model.dart';
 
-class TravelPlan {
+class TravelPlan 
+{
   String? id;
   String creator;
   String? destImage;
@@ -16,7 +17,8 @@ class TravelPlan {
   List<String>? people;
   String? notes;
 
-  TravelPlan({
+  TravelPlan(
+  {
     this.id,
     this.destImage,
     this.imageIndex,
@@ -32,6 +34,7 @@ class TravelPlan {
     this.notes,
   });
 
+  // initialize to empty travel plan
   static TravelPlan empty() => TravelPlan(
         id: null,
         imageIndex: null,
@@ -48,7 +51,9 @@ class TravelPlan {
         people: [],
       );
 
-  factory TravelPlan.fromJson(Map<String, dynamic> json, {String? id}) {
+  //take json and convert to travel plan
+  factory TravelPlan.fromJson(Map<String, dynamic> json, {String? id}) 
+  {
     return TravelPlan(
       id: id,
       creator: json['creator'] ?? '',
@@ -76,8 +81,11 @@ class TravelPlan {
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
+  
+  Map<String, dynamic> toJson() 
+  {
+    return 
+    {
       'creator': creator,
       'destImage': destImage,
       'imageIndex': imageIndex,
@@ -93,7 +101,8 @@ class TravelPlan {
     };
   }
 
-  TravelPlan copyWith({
+  TravelPlan copyWith(
+  {
     String? id,
     String? creator,
     String? destImage,
@@ -126,18 +135,19 @@ class TravelPlan {
   }
 }
 
-class Checklist {
+class Checklist 
+{
   bool isChecked;
   String title;
 
   Checklist({this.isChecked = false, this.title = ''});
 
-  Checklist copyWith({bool? isChecked, String? title}) {
-    return Checklist(
-      isChecked: isChecked ?? this.isChecked,
-      title: title ?? this.title,
-    );
-  }
+Checklist copyWith({bool? isChecked, String? title}) {
+  return Checklist(
+    isChecked: isChecked ?? this.isChecked,
+    title: title ?? this.title,
+  );
+}
 
   factory Checklist.fromJson(Map<String, dynamic> json) {
     return Checklist(

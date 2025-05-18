@@ -9,6 +9,7 @@ import 'package:planago/controllers/firestore/travel_plan_database.dart';
 import 'package:planago/controllers/firestore/user_database.dart';
 import 'package:planago/controllers/user_controller.dart';
 import 'package:planago/firebase_options.dart';
+import 'package:planago/screens/travel-plan/notification_service.dart';
 
   Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,5 +29,6 @@ import 'package:planago/firebase_options.dart';
       statusBarIconBrightness: Brightness.dark,
     ),
   );
+  await NotificationService().init();
   runApp(App());
 }
