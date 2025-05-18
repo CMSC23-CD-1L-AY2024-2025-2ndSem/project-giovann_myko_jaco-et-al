@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:planago/app.dart';
+import 'package:planago/controllers/authentication_controller.dart';
 import 'package:planago/controllers/user_controller.dart';
 import 'package:planago/utils/constants/colors.dart';
 import 'package:planago/utils/constants/image_strings.dart';
+import 'package:planago/utils/helper/converter.dart';
 import 'package:simple_gradient_text/simple_gradient_text.dart';
 
 
@@ -38,8 +40,8 @@ class CustomAppBar extends StatelessWidget{
                 icon: ClipOval(
                   child: SizedBox.square(
                     dimension: width * 0.12,
-                    child: Image.asset(
-                      AppImages.defaultProfile,
+                    child: Image.memory(
+                      AppConvert.base64toImage(UserController.instance.user.value.avatar),
                       fit: BoxFit.cover,
                     ),
                   ),

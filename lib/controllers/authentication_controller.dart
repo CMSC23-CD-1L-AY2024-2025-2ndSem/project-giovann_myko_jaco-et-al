@@ -1,8 +1,8 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:planago/controllers/firestore/user_database.dart';
-import 'package:planago/models/user_model.dart';
 import 'package:planago/navigation_menu.dart';
 import 'package:planago/screens/authentication/login/login_page.dart';
 import 'package:planago/utils/helper/exceptions.dart';
@@ -10,6 +10,7 @@ import 'package:planago/utils/helper/validator.dart';
 
 class AuthenticationController extends GetxController{
   static AuthenticationController get instance => Get.find();
+  Rx<Position?> userLocation = Rx<Position?>(null);
 
   //variables
   final errorMessage = ''.obs;
@@ -59,6 +60,7 @@ class AuthenticationController extends GetxController{
 
   Future<void> signOut() async {
     try{
+      
       await _auth.signOut();
     } on FirebaseAuthException catch (e) {
       throw "Error: ${e}";
@@ -77,4 +79,20 @@ class AuthenticationController extends GetxController{
       Get.offAll(() => LoginPage());
     }
   }
+
+  Future<void> requestAndStoreLocation() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+        // Handle denied permission gracefully
+        return;
+      }
+    }
+
+    final position = await Geolocator.getCurrentPosition();
+    userLocation.value = position;
+    print("User location stored: ${position.latitude}, ${position.longitude}");
+  }
+
 }

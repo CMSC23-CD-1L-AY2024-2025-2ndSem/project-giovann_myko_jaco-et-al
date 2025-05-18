@@ -46,3 +46,4 @@ app.*.map.json
 
 #Add Firebase Options in gitignore
 lib/firebase_options.dart
+assets/env/.env

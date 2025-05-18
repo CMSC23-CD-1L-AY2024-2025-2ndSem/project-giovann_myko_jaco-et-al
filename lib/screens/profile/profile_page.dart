@@ -9,6 +9,9 @@ import 'package:planago/navigation_menu.dart';
 import 'package:planago/screens/profile/edit_profile_page.dart';
 import 'package:planago/screens/profile/profile_detail_page.dart';
 import 'package:planago/utils/constants/colors.dart';
+import 'package:planago/utils/constants/image_strings.dart';
+import 'package:planago/utils/helper/converter.dart';
+import 'package:planago/utils/loader/app_loader.dart';
 
 // Temporary model
 class ProfileInfo
@@ -240,12 +243,9 @@ class _ProfilePageState extends State<ProfilePage> {
             dimension: height * 0.1169, //102
             child: ClipOval(
               child:
-                  _imageFile != null
-                      ? Image.file(_imageFile!, fit: BoxFit.cover)
-                      : Image.asset(
-                        'assets/images/default_profile.png',
-                      ), // temp only
+                  Image.memory(AppConvert.base64toImage(UserController.instance.user.value.avatar), // temp only
             ),
+          ),
           ),
           // spacing between profile pic and texts
           SizedBox(width: width * 0.88, height: height * 0.01),
@@ -284,7 +284,10 @@ class _ProfilePageState extends State<ProfilePage> {
           TextButton(
             style: TextButton.styleFrom(padding: EdgeInsets.zero),
             onPressed: () async {
+              //Start loading animation
+              AppLoader.openLoadingDialog("Logging you out...", AppImages.docerAnimation);
               await AuthenticationController.instance.signOut();
+              AppLoader.stopLoading();
               await AuthenticationController.instance.screenRedirect();
               NavigationController.instance.selectedIndex.value = 1;
               print("User logged out successfully");

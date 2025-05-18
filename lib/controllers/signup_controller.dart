@@ -5,6 +5,7 @@ import 'package:planago/controllers/firestore/user_database.dart';
 import 'package:planago/controllers/user_controller.dart';
 import 'package:planago/models/user_model.dart';
 import 'package:planago/utils/constants/image_strings.dart';
+import 'package:planago/utils/helper/converter.dart';
 import 'package:planago/utils/loader/app_loader.dart';
 
 class SignupController extends GetxController
@@ -14,6 +15,7 @@ class SignupController extends GetxController
   final signUp1key = GlobalKey<FormState>();
   final signUp2key = GlobalKey<FormState>();
   //Variables
+  final Rx<String> avatar = "".obs;
   final username = TextEditingController();
   final password = TextEditingController();
   final repassword = TextEditingController();
@@ -23,6 +25,7 @@ class SignupController extends GetxController
   final email = TextEditingController();
   final RxList<String> interests = <String>[].obs;
   final RxList<String> travelStyles = <String>[].obs;
+  final selectedAvatarIndex = (-1).obs;
 
   //Utility Variables
   final isPassObscured = true.obs;
@@ -54,7 +57,6 @@ class SignupController extends GetxController
     }
   }
 
-
   Future<void> signUp() async {
     try{
       //Start loading animation
@@ -62,13 +64,15 @@ class SignupController extends GetxController
       //Register User in Firebase Authentication
       final userCredential = await AuthenticationController.instance.registerWithEmailAndPassword(email.text.trim(), password.text.trim());
 
+      //Convert avatar to base64
+      final base64Avatar = await AppConvert.convertAssetToBase64(avatar.value);
+
       //Save Authenticated user date in Firebase Firestore
-      final newUser = UserModel(uid: userCredential.user!.uid, username: username.text.trim(), 
-      email: email.text.trim(), interests: interests, travelStyle: travelStyles, firstName: firstName.text.trim(), lastName: lastName.text.trim(), phoneNumber: phoneNumber.text.trim(), following: []);
+      final newUser = UserModel(uid: userCredential.user!.uid, username: username.text.trim(), avatar: base64Avatar, isPrivate: false,
+      email: email.text.trim(), interests: interests, travelStyle: travelStyles, firstName: firstName.text.trim(), lastName: lastName.text.trim(), phoneNumber: phoneNumber.text.trim(), following: [], followers: 0);
       UserController.instance.user(newUser);
       final userController = Get.put(UserDatabase());
       userController.saveUserRecord(newUser);
-
       await AppLoader.stopLoading();
       await AuthenticationController.instance.screenRedirect();
     }catch (e){

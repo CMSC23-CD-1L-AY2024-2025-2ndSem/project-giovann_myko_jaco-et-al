@@ -38,6 +38,10 @@ dependencies:
   flutter_local_notifications: ^19.2.0
   timezone: ^0.10.1
   permission_handler: ^12.0.0+1
+  http: ^1.4.0
+  geolocator: ^13.0.4
+  google_maps_flutter: ^2.12.2
+  flutter_dotenv: ^5.2.1
 
 #--------------- end of packages -------------#
 dev_dependencies:
@@ -55,6 +59,7 @@ flutter:
     - assets/logos/
     - assets/icons/
     - assets/animations/
+    - assets/env/.env
 
   #------------ local fonts --------------#
   fonts:

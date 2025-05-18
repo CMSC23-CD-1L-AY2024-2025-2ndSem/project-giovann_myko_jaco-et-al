@@ -1,3 +1,13 @@
+/*
+In travel_overview_page.dart look for the following code snippet:
+
+
+  onPressed: () 
+  {
+    //fix this. dapat hindi gagawa ng panibagong instantance ng itinerary if pipindutin ulit ang existing itinerary.
+    Get.to(() => ItineraryScreen(plan: plan));
+  },
+*/
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:planago/models/travel_plan_model.dart';

@@ -5,6 +5,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:planago/components/custom_app_bar.dart';
 import 'package:planago/controllers/firestore/travel_plan_database.dart';
+import 'package:planago/controllers/firestore/user_database.dart';
 import 'package:planago/models/travel_plan_model.dart';
 import 'package:planago/screens/travel-plan/create_travel_plan_page.dart';
 import 'package:planago/screens/travel-plan/travel_overview_page.dart';
@@ -35,8 +36,21 @@ class _TravelPlanPageState extends State<TravelPlanPage>
         height: screenHeight * 0.065,
         child: OutlinedButton(
           //Implement creating a travel plan here
-          onPressed: () 
-          {
+          onPressed: () async {
+            final matches = await UserDatabase.instance.getMatchingUsers();
+              for (final user in matches) {
+                print('--- MATCHED USER ---');
+                print('UID: ${user.uid}');
+                print('Username: ${user.username}');
+                print('Email: ${user.email}');
+                print('Full Name: ${user.firstName} ${user.lastName}');
+                print('Phone: ${user.phoneNumber}');
+                print('Avatar (base64): ${user.avatar.substring(0, 30)}...'); // preview only
+                print('Interests: ${user.interests.join(", ")}');
+                print('Travel Styles: ${user.travelStyle.join(", ")}');
+                print('Is Private: ${user.isPrivate}');
+              }
+
             Get.to(() => CreatePlanPage());
           },
           style: OutlinedButton.styleFrom(
@@ -207,7 +221,7 @@ class _TravelPlanPageState extends State<TravelPlanPage>
   {
     return GestureDetector(
       onTap: () {
-        Get.to(TravelOverviewPage(plan: plan,), arguments: [profilePicture]);
+        Get.to(TravelOverviewPage(plan: plan), arguments: [profilePicture]);
       },
       child: Container(
         padding: EdgeInsets.all(width * 0.03),

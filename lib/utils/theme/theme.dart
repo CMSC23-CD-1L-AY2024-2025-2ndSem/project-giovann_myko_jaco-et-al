@@ -6,6 +6,11 @@ class AppTheme
 {
   AppTheme._();
   static ThemeData defaultTheme = ThemeData(
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: AppColors.primary, // Your custom primary color
+      primary: AppColors.primary,
+      secondary: AppColors.secondary,
+    ),
     useMaterial3: true,
     fontFamily: 'Poppins',
     brightness: Brightness.light,

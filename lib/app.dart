@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:planago/navigation_menu.dart';
 import 'package:planago/screens/authentication/login/login_page.dart';
 import 'package:planago/screens/authentication/signup/sign_up_page1.dart';
+import 'package:planago/screens/authentication/signup/sign_up_page4.dart';
 import 'package:planago/utils/theme/theme.dart';
 
 class App extends StatelessWidget 

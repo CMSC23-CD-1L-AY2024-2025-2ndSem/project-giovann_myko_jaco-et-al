@@ -33,75 +33,77 @@ class UserModel
 
   //Attributes
   final String uid;
+  final String avatar;
+  final bool isPrivate;
   final String username;
   final String firstName;
-  final String lastName;
-  final String phoneNumber;
-  final String email;
-  final List<String> interests;
-  final List<String> travelStyle;
-  final List<String> following;
-  final int followers;
+final String lastName;
+final String phoneNumber;
+final String email;
+final List<String> interests;
+final List<String> travelStyle;
+final List<String> following;
+final int followers;
 
-  UserModel(
- {
-    required this.uid,
-    required this.username,
-    required this.email,
-    required this.interests,
-    required this.travelStyle,
-    required this.firstName,
-    required this.lastName,
-    required this.phoneNumber,
-    required this.following,
-    this.followers = 0,
-  });
+UserModel({
+  required this.uid,
+  required this.avatar,
+  required this.username,
+  required this.email,
+  required this.interests,
+  required this.travelStyle,
+  required this.firstName,
+  required this.lastName,
+  required this.phoneNumber,
+  required this.following,
+  required this.followers,
+  required this.isPrivate,
+});
 
   //Convert model to JSON structure for storing in database
-  Map<String, dynamic> toJson() 
-  {
-    return 
-    {
-      "FirstName": firstName,
-      "LastName": lastName,
-      "Username": username,
-      "Email": email,
-      "PhoneNumber": phoneNumber,
-      "Interests": interests,
-      "TravelStyle": travelStyle,
-      "Following": following,
-      "Followers": followers,
-    };
-  }
-
-  //Create a user model from a Snapshot
-  factory UserModel.fromSnapshot(
-    DocumentSnapshot<Map<String, dynamic>> document,
-  ) {
-    if (document.data() != null) 
-    {
-      final data = document.data()!;
-      return UserModel(
-        uid: document.id,
-        username: data["Username"] ?? "",
-        email: data["Email"] ?? "",
-        interests: List<String>.from(data["Interests"] ?? []),
-        travelStyle: List<String>.from(data["TravelStyle"] ?? []),
-        firstName: data["FirstName"] ?? "",
-        lastName: data["LastName"] ?? "",
-        phoneNumber: data["PhoneNumber"] ?? "",
-        following: List<String>.from(data["Following"] ?? []),
-        followers: data["Followers"] ?? 0,
-      );
+Map<String, dynamic> toJson() 
+{
+  return {
+    "FirstName": firstName,
+    "isPrivate": isPrivate,
+    "LastName": lastName,
+    "Username": username,
+    "Email": email,
+    "PhoneNumber": phoneNumber,
+    "Interests": interests,
+    "TravelStyle": travelStyle,
+    "Following": following,
+    "Followers": followers,
+    "Avatar": avatar,
+  };
+}
+  factory UserModel.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> document) {
+    final data = document.data();
+    if (data == null) {
+      throw StateError("Data can't be fetched: Snapshot has no data.");
     }
-    throw StateError("Data can't be fetch");
+    return UserModel(
+      uid: document.id,
+      avatar: data["Avatar"] ?? "",
+      isPrivate: data["isPrivate"] ?? false,
+      username: data["Username"] ?? "",
+      email: data["Email"] ?? "",
+      interests: List<String>.from(data["Interests"] ?? []),
+      travelStyle: List<String>.from(data["TravelStyle"] ?? []),
+      firstName: data["FirstName"] ?? "",
+      lastName: data["LastName"] ?? "",
+      phoneNumber: data["PhoneNumber"] ?? "",
+      following: List<String>.from(data["Following"] ?? []),
+      followers: data["Followers"] ?? 0,
+    );
   }
 
   //Empty User Model
-  static UserModel empty() 
-  {
+  static UserModel empty() {
     return UserModel(
       uid: '',
+      avatar: '',
+      isPrivate: false,
       username: '',
       email: '',
       interests: [],
@@ -109,8 +111,8 @@ class UserModel
       firstName: '',
       lastName: '',
       phoneNumber: '',
-      followers: 0,
       following: [],
+      followers: 0,
     );
   }
 }

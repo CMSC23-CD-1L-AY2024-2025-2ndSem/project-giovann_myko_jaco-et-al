@@ -6,6 +6,7 @@ import 'package:planago/controllers/signup_controller.dart';
 import 'package:planago/models/user_model.dart';
 import 'package:planago/navigation_menu.dart';
 import 'package:planago/screens/authentication/login/login_page.dart';
+import 'package:planago/screens/authentication/signup/sign_up_page4.dart';
 import 'package:planago/utils/constants/colors.dart';
 import 'package:simple_gradient_text/simple_gradient_text.dart';
 
@@ -202,8 +203,7 @@ class SignUpPage3 extends StatelessWidget {
                         ),
                         child: OutlinedButton(
                           onPressed:() async {
-                            await controller.signUp();
-                            Get.to(NavigationMenu());
+                            Get.to(SignUpPage4());
                           },
                           style: OutlinedButton.styleFrom(
                             side: BorderSide(color: Colors.transparent),

@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class AccommodationDetails {
   String name;
   String room;
@@ -22,8 +24,16 @@ class AccommodationDetails {
     return AccommodationDetails(
       name: json['name'] ?? "",
       room: json['room'] ?? '',
-      startDate: json['startDate'] != null ? DateTime.tryParse(json['startDate']) : null,
-      endDate: json['endDate'] != null ? DateTime.tryParse(json['endDate']) : null,
+      startDate: json['startDate'] != null
+        ? (json['startDate'] is Timestamp
+            ? (json['startDate'] as Timestamp).toDate()
+            : DateTime.tryParse(json['startDate']))
+        : null,
+    endDate: json['endDate'] != null
+        ? (json['endDate'] is Timestamp
+            ? (json['endDate'] as Timestamp).toDate()
+            : DateTime.tryParse(json['endDate']))
+        : null,
     );
   }
 
