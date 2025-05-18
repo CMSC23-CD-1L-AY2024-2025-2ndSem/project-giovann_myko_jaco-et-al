@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
@@ -10,6 +11,7 @@ import 'package:planago/models/travel_plan_model.dart';
 import 'package:planago/screens/travel-plan/create_travel_plan_page.dart';
 import 'package:planago/screens/travel-plan/travel_overview_page.dart';
 import 'package:planago/utils/constants/colors.dart';
+import 'package:planago/utils/constants/image_strings.dart';
 
 class TravelPlanPage extends StatefulWidget {
   const TravelPlanPage({super.key});
@@ -45,7 +47,6 @@ class _TravelPlanPageState extends State<TravelPlanPage>
                 print('Email: ${user.email}');
                 print('Full Name: ${user.firstName} ${user.lastName}');
                 print('Phone: ${user.phoneNumber}');
-                print('Avatar (base64): ${user.avatar.substring(0, 30)}...'); // preview only
                 print('Interests: ${user.interests.join(", ")}');
                 print('Travel Styles: ${user.travelStyle.join(", ")}');
                 print('Is Private: ${user.isPrivate}');
@@ -220,7 +221,7 @@ class _TravelPlanPageState extends State<TravelPlanPage>
   Widget travelListTile(double width, double height, TravelPlan plan) {
     return GestureDetector(
       onTap: () {
-        Get.to(TravelOverviewPage(plan: plan), arguments: [profilePicture]);
+        Get.to(() => TravelOverviewPage(plan: plan), arguments: [profilePicture]);
       },
       child: Container(
         padding: EdgeInsets.all(width * 0.03),
@@ -242,7 +243,7 @@ class _TravelPlanPageState extends State<TravelPlanPage>
                       )
                       : Image.asset(
                         // HARD CODED IMAGE
-                        'assets/images/japan.png',
+                        AppImages.places[plan.imageIndex!],
                         width: width * 0.28,
                         height: height * 0.0977,
                         fit: BoxFit.cover,

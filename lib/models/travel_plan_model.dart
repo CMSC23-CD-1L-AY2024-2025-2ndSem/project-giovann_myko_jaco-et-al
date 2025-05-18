@@ -5,56 +5,59 @@ class TravelPlan {
   String? id;
   String creator;
   String? destImage;
+  int? imageIndex;
   String tripTitle;
   String destination;
   DateTime? startDate;
   DateTime? endDate;
   AccommodationDetails? accomodation;
   FlightDetails? flight;
-  List<Checklist>? checklist = [];
-  List? people = [];
+  List<Checklist>? checklist;
+  List<String>? people;
   String? notes;
 
   TravelPlan({
     this.id,
     this.destImage,
+    this.imageIndex,
     required this.creator,
     required this.tripTitle,
     required this.destination,
-    required this.startDate,
-    required this.endDate,
+    this.startDate,
+    this.endDate,
     this.accomodation,
     this.flight,
-    this.notes,
     this.checklist,
-    this.people, 
+    this.people,
+    this.notes,
   });
 
-  // Update empty factory too
   static TravelPlan empty() => TravelPlan(
-    id: null,
-    creator: '',
-    destImage: null,
-    tripTitle: '',
-    destination: '',
-    startDate: null,
-    endDate: null,
-    accomodation: AccommodationDetails.empty(),
-    flight: FlightDetails.empty(),
-    checklist: [],
-    notes: '',
-    people: [],
-  );
+        id: null,
+        imageIndex: null,
+        creator: '',
+        destImage: '',
+        tripTitle: '',
+        destination: '',
+        startDate: null,
+        endDate: null,
+        accomodation: AccommodationDetails.empty(),
+        flight: FlightDetails.empty(),
+        checklist: [],
+        notes: '',
+        people: [],
+      );
 
   factory TravelPlan.fromJson(Map<String, dynamic> json, {String? id}) {
     return TravelPlan(
       id: id,
-      creator: json['creator'] ?? "",
-      destImage: json['destImage'] ?? "",
-      tripTitle: json['tripTitle'] ?? "",
-      destination: json['destination'] ?? "",
-      startDate: json['startDate'] != null ? DateTime.tryParse(json["startDate"]) : null,
-      endDate: json['endDate'] != null ? DateTime.tryParse(json["endDate"]) : null,
+      creator: json['creator'] ?? '',
+      destImage: json['destImage'] ?? '',
+      imageIndex: json['imageIndex'] != null ? json['imageIndex'] as int : 0,
+      tripTitle: json['tripTitle'] ?? '',
+      destination: json['destination'] ?? '',
+      startDate: json['startDate'] != null ? DateTime.tryParse(json['startDate']) : null,
+      endDate: json['endDate'] != null ? DateTime.tryParse(json['endDate']) : null,
       accomodation: json['accomodation'] != null
           ? AccommodationDetails.fromJson(json['accomodation'])
           : null,
@@ -66,8 +69,10 @@ class TravelPlan {
               json['checklist'].map((item) => Checklist.fromJson(item)),
             )
           : [],
-      notes: json['notes'] ?? "",
-      people: json['people'] ?? [],
+      notes: json['notes'] ?? '',
+      people: json['people'] != null
+          ? List<String>.from(json['people'])
+          : [],
     );
   }
 
@@ -75,6 +80,7 @@ class TravelPlan {
     return {
       'creator': creator,
       'destImage': destImage,
+      'imageIndex': imageIndex,
       'tripTitle': tripTitle,
       'destination': destination,
       'startDate': startDate?.toIso8601String(),
@@ -83,7 +89,7 @@ class TravelPlan {
       'flight': flight?.toJson(),
       'checklist': checklist?.map((item) => item.toJson()).toList() ?? [],
       'notes': notes,
-      'people': people
+      'people': people,
     };
   }
 
@@ -91,6 +97,7 @@ class TravelPlan {
     String? id,
     String? creator,
     String? destImage,
+    int? imageIndex,
     String? tripTitle,
     String? destination,
     DateTime? startDate,
@@ -98,13 +105,14 @@ class TravelPlan {
     AccommodationDetails? accomodation,
     FlightDetails? flight,
     List<Checklist>? checklist,
+    List<String>? people,
     String? notes,
-    List? people,
   }) {
     return TravelPlan(
       id: id ?? this.id,
       creator: creator ?? this.creator,
       destImage: destImage ?? this.destImage,
+      imageIndex: imageIndex ?? this.imageIndex,
       tripTitle: tripTitle ?? this.tripTitle,
       destination: destination ?? this.destination,
       startDate: startDate ?? this.startDate,
@@ -112,8 +120,8 @@ class TravelPlan {
       accomodation: accomodation ?? this.accomodation,
       flight: flight ?? this.flight,
       checklist: checklist ?? this.checklist,
-      notes: notes ?? this.notes,
       people: people ?? this.people,
+      notes: notes ?? this.notes,
     );
   }
 }
@@ -122,7 +130,7 @@ class Checklist {
   bool isChecked;
   String title;
 
-  Checklist({this.isChecked = false, this.title = ""});
+  Checklist({this.isChecked = false, this.title = ''});
 
   Checklist copyWith({bool? isChecked, String? title}) {
     return Checklist(
@@ -134,7 +142,7 @@ class Checklist {
   factory Checklist.fromJson(Map<String, dynamic> json) {
     return Checklist(
       isChecked: json['isChecked'] ?? false,
-      title: json['title'] ?? "",
+      title: json['title'] ?? '',
     );
   }
 

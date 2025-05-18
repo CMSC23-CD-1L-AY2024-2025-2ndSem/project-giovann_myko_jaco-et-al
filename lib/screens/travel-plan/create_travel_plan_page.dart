@@ -285,7 +285,7 @@ class _CreatePlanPageState extends State<CreatePlanPage> {
                             if (!controller.validateInputs()) return;
                             await controller.createPlan();
                             //Navigate to created Travel Plan
-                            Get.to(
+                            Get.to( () =>
                               TravelOverviewPage(plan: controller.plan.value),
                             );
                           },

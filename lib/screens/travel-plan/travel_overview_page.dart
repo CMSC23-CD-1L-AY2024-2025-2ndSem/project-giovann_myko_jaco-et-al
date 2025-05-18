@@ -50,7 +50,7 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
             onTap: FocusScope.of(context).unfocus,
             child: Column(
               children: [
-                TravelAppBar(),
+                TravelAppBar(index: widget.plan.imageIndex == null ? 0 : widget.plan.imageIndex!,),
                 SizedBox(height: screenHeight * 0.02),
                 Container(
                   margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),

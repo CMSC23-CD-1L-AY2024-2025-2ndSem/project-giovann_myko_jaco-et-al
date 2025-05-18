@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:planago/navigation_menu.dart';
@@ -5,8 +7,8 @@ import 'package:planago/utils/constants/colors.dart';
 import 'package:planago/utils/constants/image_strings.dart';
 
 class TravelAppBar extends StatelessWidget {
-  const TravelAppBar({super.key});
-
+  final int index;
+  const TravelAppBar({super.key, required this.index});
   @override
   Widget build(BuildContext context) {
     final width = Get.width;
@@ -19,7 +21,7 @@ class TravelAppBar extends StatelessWidget {
             bottomRight: Radius.circular(45),
           ),
           child: Image.asset(
-            AppImages.mountains, // Replace with your header image
+            AppImages.illustrations[index], // Replace with your header image
             width: double.infinity,
             height: height * 0.22,
             fit: BoxFit.cover,

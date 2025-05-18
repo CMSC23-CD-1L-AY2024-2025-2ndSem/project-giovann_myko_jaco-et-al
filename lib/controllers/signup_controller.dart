@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:planago/controllers/authentication_controller.dart';
+import 'package:planago/controllers/firestore/travel_plan_database.dart';
 import 'package:planago/controllers/firestore/user_database.dart';
 import 'package:planago/controllers/user_controller.dart';
 import 'package:planago/models/user_model.dart';
@@ -73,6 +74,7 @@ class SignupController extends GetxController
       UserController.instance.user(newUser);
       final userController = Get.put(UserDatabase());
       userController.saveUserRecord(newUser);
+      TravelPlanDatabase.instance.listenToTravelPlans();
       await AppLoader.stopLoading();
       await AuthenticationController.instance.screenRedirect();
     }catch (e){
