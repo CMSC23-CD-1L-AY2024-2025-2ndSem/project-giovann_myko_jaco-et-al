@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
+import 'package:planago/components/search_user_delegate.dart';
 import 'package:planago/components/travel_app_bar.dart';
 import 'package:planago/controllers/firestore/travel_plan_database.dart';
 import 'package:planago/models/acommodation_details_model.dart';
@@ -60,10 +61,19 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                         widget.plan,
                         profilePicture,
                       ),
-                      accommodationTile(context, screenWidth, screenHeight, widget.plan),
+                      accommodationTile(
+                        context,
+                        screenWidth,
+                        screenHeight,
+                        widget.plan,
+                      ),
                       flightTile(screenWidth, screenHeight, widget.plan),
                       notesTile(screenWidth, screenHeight, widget.plan),
-                      ChecklistTile(width: screenWidth, height: screenHeight, plan: widget.plan)
+                      ChecklistTile(
+                        width: screenWidth,
+                        height: screenHeight,
+                        plan: widget.plan,
+                      ),
                     ],
                   ),
                 ),
@@ -95,7 +105,10 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
               children: [
                 Icon(Icons.location_on, size: height * 0.017177),
                 SizedBox(width: width * 0.008),
-                Text(plan.destination, style: TextStyle(fontSize: height * 0.0138)),
+                Text(
+                  plan.destination,
+                  style: TextStyle(fontSize: height * 0.0138),
+                ),
               ],
             ),
             SizedBox(height: height * 0.0014),
@@ -198,7 +211,18 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
               width: width * 0.24119,
               height: height * 0.02715,
               child: OutlinedButton(
-                onPressed: () {},
+                onPressed: () {
+                  // TEMP PUT ONLY
+                  Get.put(SearchTripController());
+                  showSearch(
+                    context: context,
+                    delegate: SearchUserDelegate(
+                      screenHeight: height,
+                      screenWidth: width,
+                      isSearchOnly: false,
+                    ),
+                  );
+                },
                 style: OutlinedButton.styleFrom(
                   padding: EdgeInsets.zero,
                   backgroundColor: AppColors.primary,
@@ -406,14 +430,18 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
     );
   }
 
-  Widget accommodationTile(BuildContext context, double width, double height, TravelPlan? plan) {
+  Widget accommodationTile(
+    BuildContext context,
+    double width,
+    double height,
+    TravelPlan? plan,
+  ) {
     return GestureDetector(
       onTap: () {
         showAddAccommodation(context, (newDetails) async {
           plan?.accomodation = newDetails;
           await TravelPlanDatabase.instance.updateTravelPlan(widget.plan);
-        },
-        initialDetails: plan?.accomodation);
+        }, initialDetails: plan?.accomodation);
       },
       child: SizedBox(
         width: width * 0.88,
@@ -548,7 +576,7 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
   void showAddFlight(
     BuildContext context,
     void Function(FlightDetails) onSave,
-    FlightDetails? initialDetails
+    FlightDetails? initialDetails,
   ) {
     final TextEditingController airlineController = TextEditingController();
 
@@ -560,7 +588,7 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
     String? fromAlpha3;
     String? toAlpha3;
 
-    if(initialDetails != null){
+    if (initialDetails != null) {
       airlineController.text = initialDetails.airlineName;
       fromTime = initialDetails.destFromTime;
       toTime = initialDetails.destToTime;
@@ -673,7 +701,10 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                     onTap: () async {
                       final picked = await showTimePicker(
                         context: context,
-                        initialTime: initialDetails == null ?TimeOfDay.now() : initialDetails.destFromTime!,
+                        initialTime:
+                            initialDetails == null
+                                ? TimeOfDay.now()
+                                : initialDetails.destFromTime!,
                       );
                       if (picked != null) {
                         setState(() => fromTime = picked);
@@ -693,7 +724,10 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                     onTap: () async {
                       final picked = await showTimePicker(
                         context: context,
-                        initialTime: initialDetails== null ? TimeOfDay.now(): initialDetails.destToTime!,
+                        initialTime:
+                            initialDetails == null
+                                ? TimeOfDay.now()
+                                : initialDetails.destToTime!,
                       );
                       if (picked != null) {
                         setState(() => toTime = picked);
@@ -914,7 +948,9 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                 onTap: () async {
                   showAddFlight(context, (newFlightDetails) async {
                     plan?.flight = newFlightDetails;
-                    await TravelPlanDatabase.instance.updateTravelPlan(widget.plan);
+                    await TravelPlanDatabase.instance.updateTravelPlan(
+                      widget.plan,
+                    );
                   }, widget.plan.flight);
                 },
               ),
@@ -926,80 +962,79 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
   }
 
   // USE AS PLACEHOLDER
-  
-
-  
 
   Widget notesTile(double width, double height, TravelPlan? plan) {
-  final TextEditingController notesController = TextEditingController();
+    final TextEditingController notesController = TextEditingController();
 
-  if (plan?.notes != null && plan!.notes!.isNotEmpty) {
-    notesController.text = plan.notes!;
-  }
+    if (plan?.notes != null && plan!.notes!.isNotEmpty) {
+      notesController.text = plan.notes!;
+    }
 
-  return SizedBox(
-    width: width * 0.88,
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        ListTile(
-          contentPadding: EdgeInsets.zero,
-          minTileHeight: height * 0.03,
-          minVerticalPadding: 0,
-          leading: Icon(
-            Icons.notes_rounded,
-            color: AppColors.black,
-            size: width * 0.08,
-          ),
-          title: Text(
-            "Notes",
-            style: TextStyle(
-              fontFamily: "Cal Sans",
-              fontSize: height * 0.03002,
-            ),
-          ),
-        ),
-        Divider(height: height * 0.0036, thickness: height * 0.0009),
-        Focus(
-          onFocusChange: (hasFocus) async {
-            if (!hasFocus) {
-              final trimmedNotes = notesController.text.trim();
-              if (trimmedNotes != plan?.notes) {
-                plan?.notes = trimmedNotes;
-                await TravelPlanDatabase.instance.updateTravelPlan(widget.plan);
-              }
-            }
-          },
-          child: TextField(
-            controller: notesController,
-            cursorColor: AppColors.black,
-            maxLines: null,
-            cursorHeight: height * 0.02,
-            style: TextStyle(
-              fontSize: height * 0.015,
-              fontWeight: FontWeight.w400,
+    return SizedBox(
+      width: width * 0.88,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            minTileHeight: height * 0.03,
+            minVerticalPadding: 0,
+            leading: Icon(
+              Icons.notes_rounded,
               color: AppColors.black,
+              size: width * 0.08,
             ),
-            decoration: InputDecoration(
-              contentPadding: EdgeInsets.only(
-                left: width * 0.02,
-                right: width * 0.02,
-                top: height * 0.01,
+            title: Text(
+              "Notes",
+              style: TextStyle(
+                fontFamily: "Cal Sans",
+                fontSize: height * 0.03002,
               ),
-              border: InputBorder.none,
-              hintStyle: TextStyle(
+            ),
+          ),
+          Divider(height: height * 0.0036, thickness: height * 0.0009),
+          Focus(
+            onFocusChange: (hasFocus) async {
+              if (!hasFocus) {
+                final trimmedNotes = notesController.text.trim();
+                if (trimmedNotes != plan?.notes) {
+                  plan?.notes = trimmedNotes;
+                  await TravelPlanDatabase.instance.updateTravelPlan(
+                    widget.plan,
+                  );
+                }
+              }
+            },
+            child: TextField(
+              controller: notesController,
+              cursorColor: AppColors.black,
+              maxLines: null,
+              cursorHeight: height * 0.02,
+              style: TextStyle(
                 fontSize: height * 0.015,
                 fontWeight: FontWeight.w400,
-                color: Color.fromRGBO(155, 155, 156, 1),
+                color: AppColors.black,
               ),
-              hintText: "Enter your notes here!",
+              decoration: InputDecoration(
+                contentPadding: EdgeInsets.only(
+                  left: width * 0.02,
+                  right: width * 0.02,
+                  top: height * 0.01,
+                ),
+                border: InputBorder.none,
+                hintStyle: TextStyle(
+                  fontSize: height * 0.015,
+                  fontWeight: FontWeight.w400,
+                  color: Color.fromRGBO(155, 155, 156, 1),
+                ),
+                hintText: "Enter your notes here!",
+              ),
             ),
           ),
-        ),
-      ],
-    ),
-  );
-}
+        ],
+      ),
+    );
+  }
 }
 
 class ChecklistTile extends StatefulWidget {
@@ -1031,7 +1066,10 @@ class _ChecklistTileState extends State<ChecklistTile> {
 
   Future<void> _updateChecklistInDb() async {
     if (widget.plan?.id != null) {
-      await TravelPlanDatabase.instance.updateChecklist(widget.plan!, checklistItems);
+      await TravelPlanDatabase.instance.updateChecklist(
+        widget.plan!,
+        checklistItems,
+      );
     }
   }
 
@@ -1058,7 +1096,11 @@ class _ChecklistTileState extends State<ChecklistTile> {
               contentPadding: EdgeInsets.zero,
               minTileHeight: height * 0.03,
               minVerticalPadding: 0,
-              leading: Icon(Icons.checklist_rounded, color: AppColors.black, size: width * 0.08),
+              leading: Icon(
+                Icons.checklist_rounded,
+                color: AppColors.black,
+                size: width * 0.08,
+              ),
               title: Text(
                 "Checklist",
                 style: TextStyle(
@@ -1173,4 +1215,3 @@ class _ChecklistTileState extends State<ChecklistTile> {
     );
   }
 }
-

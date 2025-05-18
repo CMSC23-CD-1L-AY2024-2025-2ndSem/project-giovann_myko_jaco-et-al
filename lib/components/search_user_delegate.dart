@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:planago/app.dart';
 import 'package:planago/controllers/user_controller.dart';
 import 'package:planago/models/user_model.dart';
 import 'package:planago/screens/profile/view_user_page.dart';
@@ -10,8 +9,13 @@ import 'package:planago/utils/constants/image_strings.dart';
 class SearchUserDelegate extends SearchDelegate {
   final double screenHeight;
   final double screenWidth;
+  final bool isSearchOnly;
 
-  SearchUserDelegate({required this.screenHeight, required this.screenWidth});
+  SearchUserDelegate({
+    required this.screenHeight,
+    required this.screenWidth,
+    required this.isSearchOnly,
+  });
 
   @override
   ThemeData appBarTheme(BuildContext context) {
@@ -88,6 +92,11 @@ class SearchUserDelegate extends SearchDelegate {
 
     UserController.instance.onSearchChanged(query);
 
+    if (!isSearchOnly) {
+      final results = UserController.instance.searchResults;
+      SearchTripController.instance.initToggles(results);
+    }
+
     return Obx(() {
       final results = UserController.instance.searchResults;
       if (results.isEmpty) {
@@ -109,6 +118,11 @@ class SearchUserDelegate extends SearchDelegate {
     final screenHeight = MediaQuery.of(context).size.height;
 
     UserController.instance.onSearchChanged(query);
+
+    if (!isSearchOnly) {
+      final results = UserController.instance.searchResults;
+      SearchTripController.instance.initToggles(results);
+    }
 
     return Obx(() {
       final results = UserController.instance.searchResults;
@@ -175,11 +189,82 @@ class SearchUserDelegate extends SearchDelegate {
                 ),
               ],
             ),
-            // removed button (animated container)
-            //
+            // Reused same search delegate sa find people
+            // nilagyan ko na lang bool to isolate button
+            // temp controller check below
+            !isSearchOnly
+                ? Obx(() {
+                  final toggled =
+                      SearchTripController.instance
+                          .getToggle(user.username)
+                          .value;
+                  return GestureDetector(
+                    onTap: () {
+                      SearchTripController.instance.toggle(user.username);
+                    },
+                    child: AnimatedContainer(
+                      height: screenHeight * 0.036,
+                      width: screenWidth * 0.23,
+                      duration: Duration(milliseconds: 300),
+                      decoration: BoxDecoration(
+                        color:
+                            toggled
+                                ? AppColors.primary
+                                : AppColors.mutedPrimary,
+                        borderRadius: BorderRadius.circular(5),
+                        border: Border.all(
+                          color:
+                              toggled
+                                  ? Colors.transparent
+                                  : AppColors.mutedPrimary,
+                        ),
+                      ),
+                      child: Center(
+                        child: Text(
+                          toggled ? 'Remove' : 'Add',
+                          style: TextStyle(
+                            color:
+                                toggled
+                                    ? AppColors.mutedWhite
+                                    : AppColors.mutedBlack,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                })
+                : Container(),
           ],
         ),
       ),
     );
+  }
+}
+
+// TEMP CLASS FOR LOGIC ONLY
+// REMOVE LATER
+class SearchTripController extends GetxController {
+  static SearchTripController get instance => Get.find();
+
+  // Map of username -> toggle status
+  // simulate storing lang para makita if nag
+  // u-update/ work yung button
+  final toggles = <String, RxBool>{};
+
+  void initToggles(List<UserModel> users) {
+    for (var user in users) {
+      toggles.putIfAbsent(user.username, () => false.obs);
+    }
+  }
+
+  void toggle(String username) {
+    if (toggles.containsKey(username)) {
+      // switch
+      toggles[username]!.value = !toggles[username]!.value;
+    }
+  }
+
+  RxBool getToggle(String username) {
+    return toggles[username] ?? false.obs;
   }
 }
