@@ -18,6 +18,8 @@ class UserModel {
 
   //Attributes
   final String uid;
+  final String avatar;
+  final bool isPrivate;
   final String username;
   final String firstName;
   final String lastName;
@@ -28,25 +30,29 @@ class UserModel {
 
   UserModel({
     required this.uid,
+    required this.avatar,
     required this.username,
     required this.email,
     required this.interests,
     required this.travelStyle,
     required this.firstName,
     required this.lastName,
-    required this.phoneNumber
+    required this.phoneNumber,
+    required this.isPrivate
   });
 
   //Convert model to JSON structure for storing in database
   Map<String, dynamic> toJson(){
     return {
       "FirstName": firstName,
+      "isPrivate": isPrivate,
       "LastName": lastName,
       "Username": username,
       "Email": email,
       "PhoneNumber": phoneNumber,
       "Interests": interests,
-      "TravelStyle": travelStyle
+      "TravelStyle": travelStyle,
+      "Avatar": avatar
     };
   }
 
@@ -54,7 +60,7 @@ class UserModel {
   factory UserModel.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> document){
     if(document.data() != null){
       final data = document.data()!;
-      return UserModel(uid: document.id, 
+      return UserModel(uid: document.id, avatar: data["Avatar"], isPrivate: data["isPrivate"] ?? false,
       username: data["Username"], email: data["Email"], interests: List<String>.from(data["Interests"] ?? []), travelStyle: List<String>.from(data["TravelStyle"] ?? []), firstName: data["FirstName"], lastName: data["LastName"], phoneNumber: data["PhoneNumber"]);
     }
     throw StateError("Data can't be fetch");
@@ -66,6 +72,8 @@ class UserModel {
     return UserModel(
       uid: '',
       username: '',
+      isPrivate: false,
+      avatar: '',
       email: '',
       interests: [],
       travelStyle: [],

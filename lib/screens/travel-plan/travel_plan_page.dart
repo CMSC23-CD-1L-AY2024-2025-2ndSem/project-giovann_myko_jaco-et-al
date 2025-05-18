@@ -5,6 +5,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:planago/components/custom_app_bar.dart';
 import 'package:planago/controllers/firestore/travel_plan_database.dart';
+import 'package:planago/controllers/firestore/user_database.dart';
 import 'package:planago/models/travel_plan_model.dart';
 import 'package:planago/screens/travel-plan/create_travel_plan_page.dart';
 import 'package:planago/screens/travel-plan/travel_overview_page.dart';
@@ -35,7 +36,9 @@ class _TravelPlanPageState extends State<TravelPlanPage>
         height: screenHeight * 0.065,
         child: OutlinedButton(
           //Implement creating a travel plan here
-          onPressed: () {
+          onPressed: () async {
+            final matches = await UserDatabase.instance.getMatchingUsers();
+            print(matches);
             Get.to(() => CreatePlanPage());
           },
           style: OutlinedButton.styleFrom(

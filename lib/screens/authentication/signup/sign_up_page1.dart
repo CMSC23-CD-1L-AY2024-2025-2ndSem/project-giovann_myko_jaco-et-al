@@ -6,6 +6,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:planago/controllers/signup_controller.dart';
 import 'package:planago/screens/authentication/login/login_page.dart';
 import 'package:planago/screens/authentication/signup/sign_up_page2.dart';
+import 'package:planago/screens/authentication/signup/sign_up_page4.dart';
 import 'package:planago/utils/constants/colors.dart';
 import 'package:planago/utils/constants/texts.dart';
 import 'package:planago/utils/helper/validator.dart';

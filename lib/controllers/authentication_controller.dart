@@ -60,6 +60,7 @@ class AuthenticationController extends GetxController{
 
   Future<void> signOut() async {
     try{
+      
       await _auth.signOut();
     } on FirebaseAuthException catch (e) {
       throw "Error: ${e}";

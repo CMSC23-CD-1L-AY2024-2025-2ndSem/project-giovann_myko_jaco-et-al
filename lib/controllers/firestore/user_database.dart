@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:planago/controllers/authentication_controller.dart';
+import 'package:planago/controllers/user_controller.dart';
 import 'package:planago/models/user_model.dart';
 
 class UserDatabase extends GetxController {
@@ -105,4 +106,49 @@ class UserDatabase extends GetxController {
       throw "Error: ${e}";
     }
   }
+
+
+  //Function fror getting matched users
+  Future<List<UserModel>> getMatchingUsers() async {
+  try {
+    final currentUserId = AuthenticationController.instance.authUser?.uid;
+    final currentUser = UserController.instance.user.value;
+
+    // Get users with matching interests
+    final interestQuery = await _db
+        .collection("Users")
+        .where("Interests", arrayContainsAny: currentUser.interests)
+        .get();
+    // Get users with matching travel style
+    final travelStyleQuery = await _db
+        .collection("Users")
+        .where("TravelStyle", arrayContainsAny: currentUser.travelStyle)
+        .get();
+
+    final Map<String, UserModel> matchMap = {}; //initialize map for matched Users
+    for (final doc in [...interestQuery.docs, ...travelStyleQuery.docs]) {
+      if (doc.id == currentUserId) continue; //skip if current user
+
+      final user = UserModel.fromSnapshot(doc);
+      if (!user.isPrivate) { //check if user is private
+        matchMap[doc.id] = user; //if not store the user in the matchMap with id as key
+      }
+    }
+    // Compute match scores
+    final List<MapEntry<UserModel, int>> scoredUsers = matchMap.values.map((user) {
+      final interestMatches = user.interests.where((i) => currentUser.interests.contains(i)).length;
+      final styleMatches = user.travelStyle.where((t) => currentUser.travelStyle.contains(t)).length;
+      final totalMatches = interestMatches + styleMatches; //add count of matches
+      return MapEntry(user, totalMatches);
+    }).toList();
+
+    // Sort by match score descending
+    scoredUsers.sort((a, b) => b.value.compareTo(a.value));
+
+    // Return only users list
+    return scoredUsers.map((entry) => entry.key).toList();
+  } on FirebaseException catch (e) {
+    throw "Error fetching matching users: $e";
+  }
+}
 }
