@@ -207,30 +207,36 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
               ),
             ],
             
+            SizedBox(height: height * 0.03),
+
             Spacer(),
             
-            // Save button
+            // Save button + notification tester
             SizedBox(
               width: double.infinity,
               height: height * 0.06,
               child: ElevatedButton(
                 onPressed: () async 
                 {
-                  if (_notificationsEnabled) 
-                  {
-                    await _notificationService.scheduleTravelPlanReminder(
-                      widget.plan,
-                      _selectedDays,
-                    );
+                  // if (_notificationsEnabled) 
+                  // {
+                  //   await _notificationService.scheduleTravelPlanReminder(
+                  //     widget.plan,
+                  //     _selectedDays,
+                  //   );
                     
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Notification set for $_selectedDays days before trip'),
-                        backgroundColor: AppColors.primary,
-                      ),
-                    );
-                  }
+                  //   ScaffoldMessenger.of(context).showSnackBar(
+                  //     SnackBar(
+                  //       content: Text('Notification set for $_selectedDays days before trip'),
+                  //       backgroundColor: AppColors.primary,
+                  //     ),
+                  //   );
+                  // }
+                  await _notificationService.showImmediateNotification(widget.plan);
                   
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Test notification scheduled!')),
+                  );
                   Get.back();
                 },
                 style: ElevatedButton.styleFrom(

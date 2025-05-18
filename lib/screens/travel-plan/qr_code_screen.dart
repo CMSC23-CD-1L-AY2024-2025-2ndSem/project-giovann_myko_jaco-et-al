@@ -56,7 +56,7 @@ class _QRCodeScreenState extends State<QRCodeScreen>
 
     try 
     {
-      // Capture the QR code as an image
+      // Capture the QR code as an image + renderrepaintboundary to minimize redundant work and improve app performance
       RenderRepaintBoundary boundary = _qrKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
       ui.Image image = await boundary.toImage(pixelRatio: 4.0);
       ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);

@@ -1,4 +1,8 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:get/get.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:planago/controllers/firestore/travel_plan_database.dart';
+import 'package:planago/screens/travel-plan/travel_overview_page.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:planago/models/travel_plan_model.dart';
@@ -22,6 +26,8 @@ class NotificationService
     // Initialize timezone
     tz.initializeTimeZones();
     
+    await requestNotificationPermission();
+
     // Initialize notification settings
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -38,14 +44,21 @@ class NotificationService
       iOS: initializationSettingsIOS,
     );
     
-    await flutterLocalNotificationsPlugin.initialize(
-      initializationSettings,
-      onDidReceiveNotificationResponse: (NotificationResponse response) 
-      {
-        // Handle notification tap
-        print('Notification tapped: ${response.payload}');
-      },
-    );
+  await flutterLocalNotificationsPlugin.initialize(
+    initializationSettings,
+    onDidReceiveNotificationResponse: (NotificationResponse response) async 
+    {
+      // Get the plan ID from the payload
+      final planId = response.payload;
+      if (planId != null) {
+        // Fetch the TravelPlan by ID (implement this method in your database/controller)
+        final plan = await TravelPlanDatabase().getPlanById(planId);
+        if (plan != null) {
+          await onNotificationTap(plan);
+        }
+      }
+    },
+  );
     
     // Request permissions for iOS
     await flutterLocalNotificationsPlugin
@@ -58,8 +71,17 @@ class NotificationService
         );
   }
   
+  Future<void> requestNotificationPermission() async 
+  {
+    if (await Permission.notification.isDenied) 
+    {
+      await Permission.notification.request();
+    }
+  }
+
   // Schedule a notification for a travel plan
-  Future<void> scheduleTravelPlanReminder(TravelPlan plan, int daysBeforeTrip) async {
+  Future<void> scheduleTravelPlanReminder(TravelPlan plan, int daysBeforeTrip) async 
+  {
     if (plan.startDate == null) return;
     
     // Calculate notification time (X days before trip)
@@ -78,23 +100,17 @@ class NotificationService
       showWhen: true,
     );
     
-    const DarwinNotificationDetails iOSPlatformChannelSpecifics =
-        DarwinNotificationDetails(
-      presentAlert: true,
-      presentBadge: true,
-      presentSound: true,
-    );
-    
     const NotificationDetails platformChannelSpecifics = NotificationDetails(
       android: androidPlatformChannelSpecifics,
-      iOS: iOSPlatformChannelSpecifics,
     );
     
-    // Schedule the notification with the required androidScheduleMode parameter
+    final String title = 'Don\'t forget your upcoming trip!';
+    final String body = 'Destination: ${plan.destination}\n';
+
     await flutterLocalNotificationsPlugin.zonedSchedule(
-      plan.id.hashCode, // Use plan ID hash as notification ID
-      'Upcoming Trip: ${plan.tripTitle}',
-      'Your trip to ${plan.destination} is in $daysBeforeTrip days!',
+      plan.id.hashCode,
+      title,
+      body,
       tz.TZDateTime.from(notificationDate, tz.local),
       platformChannelSpecifics,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
@@ -112,5 +128,40 @@ class NotificationService
   Future<void> cancelAllNotifications() async 
   {
     await flutterLocalNotificationsPlugin.cancelAll();
+  }
+
+  //testing if notif is working
+  Future<void> showImmediateNotification(TravelPlan plan) async 
+  {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails(
+      'travel_reminder_channel',
+      'Travel Reminders',
+      channelDescription: 'Notifications for upcoming travel plans',
+      importance: Importance.max,
+      priority: Priority.high,
+      showWhen: true,
+    );
+
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(
+      android: androidPlatformChannelSpecifics,
+    );
+
+    final String title = 'Don\'t forget your upcoming trip!';
+    final String body = 'Destination: ${plan.destination}\n';
+
+    await flutterLocalNotificationsPlugin.show(
+      plan.id.hashCode, // Unique ID for this plan
+      title,
+      body,
+      platformChannelSpecifics,
+      payload: plan.id,
+    );
+  }
+
+  // Handle notification tap
+  Future<void> onNotificationTap(TravelPlan plan) async 
+  {
+      Get.to(() => TravelOverviewPage(plan: plan));
   }
 }

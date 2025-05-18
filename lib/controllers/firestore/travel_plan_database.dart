@@ -58,6 +58,15 @@ class TravelPlanDatabase extends GetxController {
     await _db.collection('TravelPlans').doc(plan.id).update(plan.toJson());
   }
 
+  Future<TravelPlan?> getPlanById(String id) async 
+  {
+    final doc = await _db.collection('TravelPlans').doc(id).get();
+    if (doc.exists && doc.data() != null) {
+      return TravelPlan.fromJson(doc.data()!, id: doc.id);
+    }
+    return null;
+  }
+
   @override
   void onClose() {
     _subscription?.cancel();
