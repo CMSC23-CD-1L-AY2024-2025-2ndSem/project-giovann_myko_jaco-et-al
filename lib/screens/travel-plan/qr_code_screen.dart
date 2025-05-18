@@ -3,9 +3,11 @@
   https://pub.dev/packages/render --to capture widget as image
   https://pub.dev/packages/qr_flutter --to generate qr code
 */
+import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:planago/controllers/user_controller.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:planago/models/travel_plan_model.dart';
@@ -13,7 +15,7 @@ import 'package:planago/utils/constants/colors.dart';
 import 'package:flutter/rendering.dart';
 import 'dart:ui' as ui;
 
-class QRCodeScreen extends StatefulWidget 
+class QRCodeScreen extends StatefulWidget
 {
   //create final travelplan obj
   final TravelPlan plan;
@@ -259,7 +261,7 @@ class _QRCodeScreenState extends State<QRCodeScreen>
                     backgroundColor: Colors.white,
                     // ignore: deprecated_member_use
                     foregroundColor: AppColors.primary,
-                    embeddedImage: AssetImage('assets/images/default_profile.png'),
+                    embeddedImage: MemoryImage(base64Decode(UserController.instance.user.value.avatar)),
                     embeddedImageStyle: QrEmbeddedImageStyle(
                       size: Size(width * 0.1, width * 0.1),
                     ),

@@ -16,7 +16,6 @@ import 'package:planago/models/flight_details_model.dart';
 import 'package:planago/models/travel_plan_model.dart';
 import 'package:planago/screens/travel-plan/notification_settings_screen.dart';
 import 'package:planago/screens/travel-plan/qr_code_screen.dart';
-import 'package:planago/screens/travel-plan/travel_plan_page.dart';
 import 'package:planago/utils/constants/colors.dart';
 import 'package:planago/utils/constants/image_strings.dart';
 import 'itinerary_screen.dart';
@@ -1112,6 +1111,7 @@ Widget buildFlightCard(BuildContext context, double width, double height, Flight
                 fontSize: height * 0.015,
                 fontWeight: FontWeight.w400,
                 color: AppColors.black,
+                letterSpacing: -0.3
               ),
               decoration: InputDecoration(
                 contentPadding: EdgeInsets.only(
@@ -1241,6 +1241,7 @@ class _ChecklistTileState extends State<ChecklistTile> {
                               item.title = val;
                             },
                             style: TextStyle(
+                              letterSpacing: -0.3,
                               fontSize: height * 0.017,
                               fontWeight: FontWeight.w400,
                               color: AppColors.black,
