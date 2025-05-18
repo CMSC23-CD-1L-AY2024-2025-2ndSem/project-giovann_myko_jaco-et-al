@@ -44,10 +44,31 @@ const Map<String, IconData> activityIcons =
 
 class ActivitiesTab extends StatelessWidget 
 {
+  String formatMoney(double value, {String currency = '₱'}) 
+  {
+    if (value >= 1e9) 
+    {
+      return '$currency${(value / 1e9).toStringAsFixed(2)}B';
+    } 
+    
+    else if (value >= 1e6) 
+    {
+      return '$currency${(value / 1e6).toStringAsFixed(2)}M';
+    } 
+    
+    else if (value >= 1e3) 
+    {
+      return '$currency${(value / 1e3).toStringAsFixed(2)}k';
+    } 
+    
+    else 
+    {
+      return '$currency${value.toStringAsFixed(2)}';
+    }
+  }
 
-  ActivitiesTab({Key? key}) : super(key: key);
-  
-  final ItineraryController controller = Get.find<ItineraryController>();
+  final ItineraryController controller;
+  ActivitiesTab({required this.controller, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) 
@@ -71,13 +92,21 @@ class ActivitiesTab extends StatelessWidget
             padding: const EdgeInsets.symmetric(vertical: 16.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildInfoColumn('${controller.duration.value} days', 'Duration'),
-                _buildInfoColumn('${controller.travelers.value} Adults', 'Travellers'),
+              children: 
+              [
                 _buildInfoColumn(
-                  '${controller.currency.value} ${controller.budget.value}k',
-                  'Est. budget',
+                  '${controller.duration.value} ${controller.duration.value > 1 ? "Days" : "Day"}',
+                  'Duration',
                 ),
+
+                _buildInfoColumn(
+                  '${controller.travelers.value} ${controller.travelers.value > 1 ? "Adults" : "Adult"}',
+                  'Travellers',
+                ),
+                Obx(() => _buildInfoColumn(
+                formatMoney(controller.budget.value, currency: controller.currency.value),
+                'Est. budget',
+                )),
               ],
             ),
           ),

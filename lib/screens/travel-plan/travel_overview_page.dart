@@ -214,9 +214,9 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
               width: width * 0.24119,
               height: height * 0.02715,
               child: OutlinedButton(
-                onPressed: () {
-                  // Navigate directly to the itinerary screen
-                  Get.to(() => ItineraryScreen());
+                onPressed: () 
+                {
+                  Get.to(() => ItineraryScreen(plan: plan));
                 },
                 style: OutlinedButton.styleFrom(
                   padding: EdgeInsets.zero,
