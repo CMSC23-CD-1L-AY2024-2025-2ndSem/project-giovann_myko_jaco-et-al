@@ -57,29 +57,42 @@ class UserModel {
   }
 
   //Create a user model from a Snapshot
-  factory UserModel.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> document){
-    if(document.data() != null){
-      final data = document.data()!;
-      return UserModel(uid: document.id, avatar: data["Avatar"], isPrivate: data["isPrivate"] ?? false,
-      username: data["Username"], email: data["Email"], interests: List<String>.from(data["Interests"] ?? []), travelStyle: List<String>.from(data["TravelStyle"] ?? []), firstName: data["FirstName"], lastName: data["LastName"], phoneNumber: data["PhoneNumber"]);
-    }
-    throw StateError("Data can't be fetch");
+  factory UserModel.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> document) {
+  final data = document.data();
+  
+  if (data == null) {
+    throw StateError("Data can't be fetched: Snapshot has no data.");
   }
+
+  return UserModel(
+    uid: document.id,
+    avatar: data["Avatar"] ?? "",
+    isPrivate: data["isPrivate"] ?? false,
+    username: data["Username"] ?? "",
+    email: data["Email"] ?? "",
+    interests: List<String>.from(data["Interests"] ?? []),
+    travelStyle: List<String>.from(data["TravelStyle"] ?? []),
+    firstName: data["FirstName"] ?? "",
+    lastName: data["LastName"] ?? "",
+    phoneNumber: data["PhoneNumber"] ?? "",
+  );
+}
+
 
 
   //Empty User Model
-  static UserModel empty() {
-    return UserModel(
-      uid: '',
-      username: '',
-      isPrivate: false,
-      avatar: '',
-      email: '',
-      interests: [],
-      travelStyle: [],
-      firstName: '',
-      lastName: '',
-      phoneNumber: ''
-    );
-  }
+static UserModel empty() {
+  return UserModel(
+    uid: '',
+    avatar: '',
+    isPrivate: false,
+    username: '',
+    email: '',
+    interests: [],
+    travelStyle: [],
+    firstName: '',
+    lastName: '',
+    phoneNumber: '',
+  );
+}
 }

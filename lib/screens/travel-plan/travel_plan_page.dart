@@ -38,7 +38,19 @@ class _TravelPlanPageState extends State<TravelPlanPage>
           //Implement creating a travel plan here
           onPressed: () async {
             final matches = await UserDatabase.instance.getMatchingUsers();
-            print(matches);
+              for (final user in matches) {
+                print('--- MATCHED USER ---');
+                print('UID: ${user.uid}');
+                print('Username: ${user.username}');
+                print('Email: ${user.email}');
+                print('Full Name: ${user.firstName} ${user.lastName}');
+                print('Phone: ${user.phoneNumber}');
+                print('Avatar (base64): ${user.avatar.substring(0, 30)}...'); // preview only
+                print('Interests: ${user.interests.join(", ")}');
+                print('Travel Styles: ${user.travelStyle.join(", ")}');
+                print('Is Private: ${user.isPrivate}');
+              }
+
             Get.to(() => CreatePlanPage());
           },
           style: OutlinedButton.styleFrom(
