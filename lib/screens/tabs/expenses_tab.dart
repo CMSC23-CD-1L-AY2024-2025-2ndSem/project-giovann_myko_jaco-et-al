@@ -54,7 +54,6 @@ class ExpensesTab extends StatelessWidget
 
   final ItineraryController controller;
   ExpensesTab({required this.controller, Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) 
   {
@@ -88,9 +87,10 @@ class ExpensesTab extends StatelessWidget
                   '${controller.travelers.value} ${controller.travelers.value > 1 ? "Adults" : "Adult"}',
                   'Travellers',
                 ),
+                
                 Obx(() => _buildInfoColumn(
-                formatMoney(controller.budget.value, currency: controller.currency.value),
-                'Est. budget',
+                  formatMoney(controller.currentDayTotalExpenses, currency: controller.currency.value),
+                  'Total Expenses',
                 )),
               ],
             ),

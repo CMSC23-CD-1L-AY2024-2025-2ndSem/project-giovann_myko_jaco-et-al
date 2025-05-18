@@ -59,6 +59,15 @@ class ItineraryController extends GetxController
     travelers.value = plan.people != null ? plan.people!.length : 1;
   }
 
+  double get currentDayTotalExpenses 
+  {
+    double sum = 0.0;
+    for (var expense in currentDayExpenses) 
+    {
+      sum += expense.amount;
+    }
+    return sum;
+  }
   @override
   void onClose() 
   {

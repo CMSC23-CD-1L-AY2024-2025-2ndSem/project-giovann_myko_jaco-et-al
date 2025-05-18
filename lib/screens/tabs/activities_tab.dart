@@ -44,28 +44,6 @@ const Map<String, IconData> activityIcons =
 
 class ActivitiesTab extends StatelessWidget 
 {
-  String formatMoney(double value, {String currency = '₱'}) 
-  {
-    if (value >= 1e9) 
-    {
-      return '$currency${(value / 1e9).toStringAsFixed(2)}B';
-    } 
-    
-    else if (value >= 1e6) 
-    {
-      return '$currency${(value / 1e6).toStringAsFixed(2)}M';
-    } 
-    
-    else if (value >= 1e3) 
-    {
-      return '$currency${(value / 1e3).toStringAsFixed(2)}k';
-    } 
-    
-    else 
-    {
-      return '$currency${value.toStringAsFixed(2)}';
-    }
-  }
 
   final ItineraryController controller;
   ActivitiesTab({required this.controller, Key? key}) : super(key: key);
@@ -103,10 +81,6 @@ class ActivitiesTab extends StatelessWidget
                   '${controller.travelers.value} ${controller.travelers.value > 1 ? "Adults" : "Adult"}',
                   'Travellers',
                 ),
-                Obx(() => _buildInfoColumn(
-                formatMoney(controller.budget.value, currency: controller.currency.value),
-                'Est. budget',
-                )),
               ],
             ),
           ),
