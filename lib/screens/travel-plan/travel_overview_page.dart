@@ -61,9 +61,9 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                         profilePicture,
                       ),
                       accommodationTile(context, screenWidth, screenHeight, widget.plan),
-                      flightTile(screenWidth, screenHeight),
-                      notesTile(screenWidth, screenHeight),
-                      checklistTile(screenWidth, screenHeight),
+                      flightTile(screenWidth, screenHeight, widget.plan),
+                      notesTile(screenWidth, screenHeight, widget.plan),
+                      ChecklistTile(width: screenWidth, height: screenHeight, plan: widget.plan)
                     ],
                   ),
                 ),
@@ -95,7 +95,7 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
               children: [
                 Icon(Icons.location_on, size: height * 0.017177),
                 SizedBox(width: width * 0.008),
-                Text(plan.id!, style: TextStyle(fontSize: height * 0.0138)),
+                Text(plan.destination, style: TextStyle(fontSize: height * 0.0138)),
               ],
             ),
             SizedBox(height: height * 0.0014),
@@ -673,7 +673,7 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                     onTap: () async {
                       final picked = await showTimePicker(
                         context: context,
-                        initialTime: TimeOfDay.now(),
+                        initialTime: initialDetails == null ?TimeOfDay.now() : initialDetails.destFromTime!,
                       );
                       if (picked != null) {
                         setState(() => fromTime = picked);
@@ -693,7 +693,7 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                     onTap: () async {
                       final picked = await showTimePicker(
                         context: context,
-                        initialTime: TimeOfDay.now(),
+                        initialTime: initialDetails== null ? TimeOfDay.now(): initialDetails.destToTime!,
                       );
                       if (picked != null) {
                         setState(() => toTime = picked);
@@ -791,7 +791,7 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
     return completer.future;
   }
 
-  Widget buildFlightCard(double width, double height) {
+  Widget buildFlightCard(double width, double height, FlightDetails details) {
     return Container(
       padding: EdgeInsets.all(width * 0.03),
       decoration: BoxDecoration(
@@ -805,7 +805,7 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  flightDetails!.airlineName,
+                  details.airlineName,
                   style: TextStyle(
                     fontSize: height * 0.0183,
                     color: AppColors.mutedWhite,
@@ -814,7 +814,7 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                 SizedBox(height: height * 0.005),
                 Text('FROM:', style: TextStyle(color: AppColors.mutedWhite)),
                 Text(
-                  flightDetails?.destFrom ?? '',
+                  details.destFrom,
                   style: TextStyle(
                     fontSize: height * 0.026,
                     fontFamily: "Cal Sans",
@@ -823,7 +823,7 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                   ),
                 ),
                 Text(
-                  flightDetails!.destFromTime as String,
+                  details.destFromTime!.format(context),
                   style: TextStyle(color: AppColors.mutedWhite),
                 ),
               ],
@@ -835,7 +835,7 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  flightDetails!.travelClass,
+                  details.travelClass,
                   style: TextStyle(
                     fontSize: height * 0.0183,
                     color: AppColors.mutedWhite,
@@ -844,7 +844,7 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                 SizedBox(height: height * 0.005),
                 Text('TO:', style: TextStyle(color: AppColors.mutedWhite)),
                 Text(
-                  flightDetails?.destTo ?? '',
+                  details.destTo,
                   style: TextStyle(
                     fontSize: height * 0.026,
                     fontFamily: "Cal Sans",
@@ -853,7 +853,7 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                   ),
                 ),
                 Text(
-                  flightDetails!.destToTime!.format(context),
+                  details.destToTime!.format(context),
                   style: TextStyle(color: AppColors.mutedWhite),
                 ),
               ],
@@ -864,7 +864,7 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
     );
   }
 
-  Widget flightTile(double width, double height) {
+  Widget flightTile(double width, double height, TravelPlan? plan) {
     return GestureDetector(
       child: SizedBox(
         width: width * 0.88,
@@ -887,9 +887,9 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                 ),
               ),
             ),
-            if (hasFlightDetails) ...[
+            if (plan?.flight != null) ...[
               Padding(padding: EdgeInsets.only(top: height * 0.01)),
-              buildFlightCard(width, height),
+              buildFlightCard(width, height, plan!.flight!),
             ] else ...[
               Divider(height: height * 0.0036, thickness: height * 0.0009),
               ListTile(
@@ -912,12 +912,9 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                   ),
                 ),
                 onTap: () async {
-                  showAddFlight(context, (newFlightDetails) {
-                    setState(() {
-                      if (widget.plan.flight != null) {
-                        hasFlightDetails = true;
-                      }
-                    });
+                  showAddFlight(context, (newFlightDetails) async {
+                    plan?.flight = newFlightDetails;
+                    await TravelPlanDatabase.instance.updateTravelPlan(widget.plan);
                   }, widget.plan.flight);
                 },
               ),
@@ -929,38 +926,51 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
   }
 
   // USE AS PLACEHOLDER
-  TextEditingController notesController = TextEditingController();
+  
 
-  @override
-  void dispose() {
-    notesController.dispose();
-    super.dispose();
+  
+
+  Widget notesTile(double width, double height, TravelPlan? plan) {
+  final TextEditingController notesController = TextEditingController();
+
+  if (plan?.notes != null && plan!.notes!.isNotEmpty) {
+    notesController.text = plan.notes!;
   }
 
-  Widget notesTile(double width, double height) {
-    return SizedBox(
-      width: width * 0.88,
-      child: Column(
-        children: [
-          ListTile(
-            contentPadding: EdgeInsets.zero,
-            minTileHeight: height * 0.03,
-            minVerticalPadding: 0,
-            leading: Icon(
-              Icons.notes_rounded,
-              color: AppColors.black,
-              size: width * 0.08,
-            ),
-            title: Text(
-              "Notes",
-              style: TextStyle(
-                fontFamily: "Cal Sans",
-                fontSize: height * 0.03002,
-              ),
+  return SizedBox(
+    width: width * 0.88,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          minTileHeight: height * 0.03,
+          minVerticalPadding: 0,
+          leading: Icon(
+            Icons.notes_rounded,
+            color: AppColors.black,
+            size: width * 0.08,
+          ),
+          title: Text(
+            "Notes",
+            style: TextStyle(
+              fontFamily: "Cal Sans",
+              fontSize: height * 0.03002,
             ),
           ),
-          Divider(height: height * 0.0036, thickness: height * 0.0009),
-          TextField(
+        ),
+        Divider(height: height * 0.0036, thickness: height * 0.0009),
+        Focus(
+          onFocusChange: (hasFocus) async {
+            if (!hasFocus) {
+              final trimmedNotes = notesController.text.trim();
+              if (trimmedNotes != plan?.notes) {
+                plan?.notes = trimmedNotes;
+                await TravelPlanDatabase.instance.updateTravelPlan(widget.plan);
+              }
+            }
+          },
+          child: TextField(
             controller: notesController,
             cursorColor: AppColors.black,
             maxLines: null,
@@ -985,51 +995,60 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
               hintText: "Enter your notes here!",
             ),
           ),
-          // ListTile(
-          //   contentPadding: EdgeInsets.only(
-          //     left: width * 0.012,
-          //     top: height * 0.01,
-          //   ),
-          //   minTileHeight: height * 0.03,
-          //   minVerticalPadding: 0,
-          //   leading: Icon(
-          //     Icons.add,
-          //     color: Color.fromRGBO(155, 155, 156, 1),
-          //   ),
-          //   title: Text(
-          //     "Enter your notes here!",
-          //     style: TextStyle(
-          //       fontSize: height * 0.015,
-          //       fontWeight: FontWeight.w400,
-          //       color: Color.fromRGBO(155, 155, 156, 1),
-          //     ),
-          //   ),
-          // ),
-        ],
-      ),
-    );
+        ),
+      ],
+    ),
+  );
+}
+}
+
+class ChecklistTile extends StatefulWidget {
+  final double width;
+  final double height;
+  final TravelPlan? plan;
+
+  const ChecklistTile({
+    super.key,
+    required this.width,
+    required this.height,
+    required this.plan,
+  });
+
+  @override
+  State<ChecklistTile> createState() => _ChecklistTileState();
+}
+
+class _ChecklistTileState extends State<ChecklistTile> {
+  late bool isChecklist;
+  late List<Checklist> checklistItems;
+
+  @override
+  void initState() {
+    super.initState();
+    isChecklist = widget.plan?.checklist?.isNotEmpty ?? false;
+    checklistItems = List<Checklist>.from(widget.plan?.checklist ?? []);
   }
 
-  // TEMP REPLACEMENT FOR DATABASE
-  bool isChecklist = false; // initially set to false
-  List<Checklist> checklistItems = [
-    // FOR CHECKING PURPOSE
-    // Checklist(title: "Go to mountains", isChecked: false),
-    // Checklist(title: "Go to pool", isChecked: false),
-    // Checklist(title: "See flower field", isChecked: true),
-  ];
-
-  void addChecklistItems() {
-    setState(() {
-      isChecklist = true;
-      checklistItems.add(Checklist());
-    });
+  Future<void> _updateChecklistInDb() async {
+    if (widget.plan?.id != null) {
+      await TravelPlanDatabase.instance.updateChecklist(widget.plan!, checklistItems);
+    }
   }
 
-  Widget checklistTile(double width, double height) {
+  @override
+  Widget build(BuildContext context) {
+    final width = widget.width;
+    final height = widget.height;
+
     return GestureDetector(
-      onTap: () {
-        if (!isChecklist) addChecklistItems();
+      onTap: () async {
+        if (!isChecklist) {
+          setState(() {
+            isChecklist = true;
+            checklistItems.add(Checklist());
+          });
+          await _updateChecklistInDb();
+        }
       },
       child: SizedBox(
         width: width * 0.88,
@@ -1039,11 +1058,7 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
               contentPadding: EdgeInsets.zero,
               minTileHeight: height * 0.03,
               minVerticalPadding: 0,
-              leading: Icon(
-                Icons.checklist_rounded,
-                color: AppColors.black,
-                size: width * 0.08,
-              ),
+              leading: Icon(Icons.checklist_rounded, color: AppColors.black, size: width * 0.08),
               title: Text(
                 "Checklist",
                 style: TextStyle(
@@ -1057,7 +1072,7 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
             if (isChecklist) ...[
               ListView.builder(
                 shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
+                physics: const NeverScrollableScrollPhysics(),
                 itemCount: checklistItems.length,
                 itemBuilder: (context, index) {
                   final item = checklistItems[index];
@@ -1066,56 +1081,68 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                       Checkbox(
                         value: item.isChecked,
                         activeColor: AppColors.primary,
-                        onChanged: (val) {
+                        onChanged: (val) async {
                           setState(() {
                             item.isChecked = val ?? false;
                           });
+                          await _updateChecklistInDb();
                         },
                       ),
                       Expanded(
-                        child: TextFormField(
-                          initialValue: item.title,
-                          onChanged: (val) {
-                            item.title = val;
+                        child: Focus(
+                          onFocusChange: (hasFocus) async {
+                            if (!hasFocus) {
+                              await _updateChecklistInDb();
+                            }
                           },
-                          style: TextStyle(
-                            fontSize: height * 0.017,
-                            fontWeight: FontWeight.w400,
-                            color: AppColors.black,
-                          ),
-                          cursorColor: AppColors.black,
-                          cursorHeight: height * 0.02,
-                          decoration: InputDecoration(
-                            hintStyle: TextStyle(
+                          child: TextFormField(
+                            initialValue: item.title,
+                            onChanged: (val) {
+                              item.title = val;
+                            },
+                            style: TextStyle(
                               fontSize: height * 0.017,
                               fontWeight: FontWeight.w400,
-                              color: Color.fromRGBO(155, 155, 156, 1),
+                              color: AppColors.black,
                             ),
-                            hintText: 'List item...',
-                            border: InputBorder.none,
+                            cursorColor: AppColors.black,
+                            cursorHeight: height * 0.02,
+                            decoration: InputDecoration(
+                              hintStyle: TextStyle(
+                                fontSize: height * 0.017,
+                                fontWeight: FontWeight.w400,
+                                color: const Color.fromRGBO(155, 155, 156, 1),
+                              ),
+                              hintText: 'List item...',
+                              border: InputBorder.none,
+                            ),
                           ),
                         ),
                       ),
                       IconButton(
-                        icon: Icon(Icons.close, size: 18),
-                        onPressed: () {
+                        icon: const Icon(Icons.close, size: 18),
+                        onPressed: () async {
                           setState(() {
                             checklistItems.removeAt(index);
                             if (checklistItems.isEmpty) {
                               isChecklist = false;
                             }
                           });
+                          await _updateChecklistInDb();
                         },
                       ),
                     ],
                   );
                 },
               ),
-
-              // Add new empty item row
               TextButton.icon(
-                onPressed: addChecklistItems,
-                icon: Icon(Icons.add, size: 18, color: AppColors.black),
+                onPressed: () async {
+                  setState(() {
+                    checklistItems.add(Checklist());
+                  });
+                  await _updateChecklistInDb();
+                },
+                icon: const Icon(Icons.add, size: 18, color: AppColors.black),
                 label: Text(
                   "Add item",
                   style: TextStyle(fontSize: height * 0.015),
@@ -1127,7 +1154,7 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                 contentPadding: EdgeInsets.only(left: width * 0.012),
                 minTileHeight: height * 0.03,
                 minVerticalPadding: 0,
-                leading: Icon(
+                leading: const Icon(
                   Icons.add,
                   color: Color.fromRGBO(155, 155, 156, 1),
                 ),
@@ -1146,3 +1173,4 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
     );
   }
 }
+

@@ -44,7 +44,7 @@ class TravelPlanDatabase extends GetxController {
     plans.value = userPlans;
   },
   onError: (error, stackTrace) {
-    print('🔥 Error fetching travel plans: $error');
+    print('Error fetching travel plans: $error');
   },
   );
   }
@@ -61,10 +61,10 @@ class TravelPlanDatabase extends GetxController {
     await _db.collection('TravelPlans').doc(plan.id).update(plan.toJson());
   }
 
-  Future<void> addChecklistItem(TravelPlan plan, Checklist newItem) async {
-  final updatedChecklist = [...?plan.checklist, newItem];
-  final updatedPlan = plan.copyWith(checklist: updatedChecklist);
-  await updateTravelPlan(updatedPlan);
+
+  Future<void> updateChecklist(TravelPlan plan, List<Checklist> updatedChecklist) async {
+    final updatedPlan = plan.copyWith(checklist: updatedChecklist);
+    await TravelPlanDatabase.instance.updateTravelPlan(updatedPlan);
 }
 
   
