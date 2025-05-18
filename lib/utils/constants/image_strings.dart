@@ -11,6 +11,7 @@ class AppImages
 
   //Background Images Here
   static const String mountains = "assets/images/mountains.jpg";
+  static const String map_bg = "assets/images/map_scale.png";
 
   //Avatars Images Here
   static const String img1 = "assets/images/1.png";
