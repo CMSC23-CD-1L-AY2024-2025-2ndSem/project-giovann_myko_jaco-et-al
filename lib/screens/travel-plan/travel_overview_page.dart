@@ -124,7 +124,7 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   SizedBox.square(
-                    dimension: width * 0.065,
+                    dimension: width * 0.07,
                     child: pfp != null
                         ? Image.memory(base64Decode(pfp), fit: BoxFit.cover)
                         : Image.asset(
@@ -797,9 +797,9 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
     return completer.future;
   }
 
-  Widget buildFlightCard(BuildContext context, double width, double height, FlightDetails details) {
+Widget buildFlightCard(BuildContext context, double width, double height, FlightDetails details) {
   return Container(
-    height: height * 0.18,
+    height: height * 0.16,
     decoration: BoxDecoration(
       color: AppColors.primary,
       borderRadius: BorderRadius.circular(16),
@@ -817,49 +817,63 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
         // Foreground content
         Padding(
           padding: EdgeInsets.all(width * 0.03),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // FROM column
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      details.airlineName,
-                      style: TextStyle(
-                        fontFamily: "Cal Sans",
-                        fontSize: height * 0.03,
-                        color: AppColors.mutedWhite,
-                      ),
-                    ),
-                    SizedBox(height: height * 0.005),
-                    Text('FROM:', style: TextStyle(color: AppColors.mutedBlack)),
-                    Text(
-                      details.destFrom,
-                      style: TextStyle(
-                        fontSize: height * 0.026,
-                        fontFamily: "Cal Sans",
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.mutedWhite,
-                      ),
-                    ),
-                    Text(
-                      details.destFromTime!.format(context),
-                      style: TextStyle(color: AppColors.mutedWhite),
-                    ),
-                  ],
-                ),
-              ),
-
-              // Dotted Line + Arrow
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+              // Airline Name and Travel Class Row
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  Text(
+                    details.airlineName,
+                    style: TextStyle(
+                      fontFamily: "Cal Sans",
+                      fontSize: height * 0.025,
+                      color: AppColors.mutedWhite,
+                    ),
+                  ),
+                  Text(
+                    details.travelClass,
+                    style: TextStyle(
+                      fontSize: height * 0.02,
+                      color: AppColors.mutedWhite,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                ],
+              ),
+              // FROM - DOT - TO Row
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // FROM column
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('FROM:', style: TextStyle(color: AppColors.mutedBlack, letterSpacing: -0.3, fontWeight: FontWeight.w500)),
+                        Text(
+                          details.destFrom,
+                          style: TextStyle(
+                            fontSize: height * 0.035,
+                            fontFamily: "Cal Sans",
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.mutedWhite,
+                          ),
+                        ),
+                        Text(
+                          details.destFromTime!.format(context),
+                          style: TextStyle(color: AppColors.mutedWhite),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Dotted Line + Arrow
                   Row(
                     children: [
                       SizedBox(
-                        width: width * 0.25,
+                        width: width * 0.15,
                         height: 10,
                         child: CustomPaint(
                           painter: DottedLinePainter(
@@ -872,39 +886,30 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                       const Icon(Icons.arrow_forward, color: AppColors.mutedBlack, size: 17),
                     ],
                   ),
-                ],
-              ),
 
-              // TO column
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      details.travelClass,
-                      style: TextStyle(
-                        fontSize: height * 0.025,
-                        color: AppColors.mutedWhite,
-                        letterSpacing: -0.3
-                      ),
+                  // TO column
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text('TO:', style: TextStyle(color: AppColors.mutedBlack, letterSpacing: -0.3, fontWeight: FontWeight.w500)),
+                        Text(
+                          details.destTo,
+                          style: TextStyle(
+                            fontSize: height * 0.035,
+                            fontFamily: "Cal Sans",
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.mutedWhite,
+                          ),
+                        ),
+                        Text(
+                          details.destToTime!.format(context),
+                          style: TextStyle(color: AppColors.mutedWhite),
+                        ),
+                      ],
                     ),
-                    SizedBox(height: height * 0.005),
-                    Text('TO:', style: TextStyle(color: AppColors.mutedBlack)),
-                    Text(
-                      details.destTo,
-                      style: TextStyle(
-                        fontSize: height * 0.026,
-                        fontFamily: "Cal Sans",
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.mutedWhite,
-                      ),
-                    ),
-                    Text(
-                      details.destToTime!.format(context),
-                      style: TextStyle(color: AppColors.mutedWhite),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ],
           ),
