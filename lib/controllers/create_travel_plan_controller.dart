@@ -10,12 +10,12 @@ class CreateTravelPlanController extends GetxController{
 
   final plan = TravelPlan.empty().obs;
   final tripName = TextEditingController();
-  final location = TextEditingController();
+  final location = "".obs;
   final Rx<DateTimeRange?> selectedDateRange = Rx<DateTimeRange?>(null);
   RxString errorMessage = "".obs;
 
   bool validateInputs() {
-  if (tripName.text.trim().isEmpty || location.text.trim().isEmpty || selectedDateRange.value == null) {
+  if (tripName.text.trim().isEmpty || location.isEmpty || selectedDateRange.value == null) {
     errorMessage.value = "Please fill in all fields and select a date range.";
     return false;
   }
@@ -24,7 +24,7 @@ class CreateTravelPlanController extends GetxController{
 }
 
   Future<void> createPlan() async { 
-      var newPlan = TravelPlan(creator: AuthenticationController.instance.authUser!.uid, tripTitle: tripName.text.trim(), destination: location.text.trim(), startDate: selectedDateRange.value!.start, endDate: selectedDateRange.value!.end);
+      var newPlan = TravelPlan(creator: AuthenticationController.instance.authUser!.uid, tripTitle: tripName.text.trim(), destination: location.value, startDate: selectedDateRange.value!.start, endDate: selectedDateRange.value!.end);
       newPlan = await TravelPlanDatabase.instance.addTravelPlan(newPlan);
       plan.value = newPlan;
   }

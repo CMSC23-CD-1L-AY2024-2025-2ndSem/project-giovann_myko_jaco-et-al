@@ -1,14 +1,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <!--Locatio Permissions -->
+    <!--Location Permissions -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.INTERNET" />
     <application
         android:label="planago"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <!--GOOGLE MAPS API KEY HERE-->
-        <meta-data android:name= "com.google.android.geo.API_KEY"
-        android:value = "AIzaSyDD1mT7rMWBUZn_S9CbGNUQsuKi41QH9Qk"/>
+        <meta-data android:name="com.google.android.geo.API_KEY"
+        android:value ="AIzaSyDVjrQVaLWaPB8lnCl2fhUxGZriTPZwH9k"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"
