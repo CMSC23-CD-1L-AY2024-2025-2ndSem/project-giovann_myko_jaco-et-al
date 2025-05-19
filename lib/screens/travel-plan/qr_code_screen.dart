@@ -260,7 +260,7 @@ class _QRCodeScreenState extends State<QRCodeScreen>
                     size: width * 0.6,
                     backgroundColor: Colors.white,
                     // ignore: deprecated_member_use
-                    foregroundColor: AppColors.primary,
+                    foregroundColor: AppColors.black,
                     embeddedImage: MemoryImage(base64Decode(UserController.instance.user.value.avatar)),
                     embeddedImageStyle: QrEmbeddedImageStyle(
                       size: Size(width * 0.1, width * 0.1),

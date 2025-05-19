@@ -16,7 +16,8 @@ class QRScannerScreen extends StatefulWidget {
   State<StatefulWidget> createState() => _QRViewExampleState();
 }
 
-class _QRViewExampleState extends State<QRScannerScreen> {
+class _QRViewExampleState extends State<QRScannerScreen> 
+{
   Barcode? result;
   QRViewController? controller;
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
@@ -24,17 +25,38 @@ class _QRViewExampleState extends State<QRScannerScreen> {
   // In order to get hot reload to work we need to pause the camera if the platform
   // is android, or resume the camera if the platform is iOS.
   @override
-  void reassemble() {
+  void reassemble() 
+  {
     super.reassemble();
-    if (Platform.isAndroid) {
+    if (Platform.isAndroid) 
+    {
       controller!.pauseCamera();
     }
     controller!.resumeCamera();
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) 
+  {
+    final width = Get.width;
+    final height = Get.height;
     return Scaffold(
+            appBar: AppBar(
+        title: Text(
+          "Scan QR code",
+          style: TextStyle(
+            fontFamily: "Cal Sans",
+            fontSize: height * 0.025,
+            color: AppColors.black,
+          ),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: AppColors.primary),
+          onPressed: () => Get.back(),
+        ),
+      ),
       body: Column(
         children: <Widget>[
           Expanded(flex: 4, child: _buildQrView(context)),
@@ -145,25 +167,36 @@ class _QRViewExampleState extends State<QRScannerScreen> {
     );
   }
 
-  void _onQRViewCreated(QRViewController controller) {
+  void _onQRViewCreated(QRViewController controller) 
+  {
     setState(() {
       this.controller = controller;
     });
-    controller.scannedDataStream.listen((scanData) {
-      setState(() {
-        result = scanData;
-      });
-    },
-    onDone: () async {
-      if(result != null){
-        await TravelPlanDatabase.instance.addPeople(result!.code!, AuthenticationController.instance.authUser!.uid);
-        Get.snackbar("Sucess", "Successfully Added");
-        TravelPlanDatabase.instance.listenToTravelPlans();
-      }else{
-        Get.snackbar("ERROR", "Scan failed");
+    controller.scannedDataStream.listen((scanData) async 
+    {
+      if (result == null) 
+      {
+        setState(() 
+        {
+          result = scanData;
+        });
+        await controller.pauseCamera();
+        try 
+        {
+          await TravelPlanDatabase.instance.addPeople(
+            result!.code!,
+            AuthenticationController.instance.authUser!.uid,
+          );
+          Get.snackbar("Success", "Successfully Added");
+          TravelPlanDatabase.instance.listenToTravelPlans();
+        } 
+        
+        catch (e) 
+        {
+          Get.snackbar("ERROR", "Scan failed: $e");
+        }
       }
-    },
-    );
+    });
   }
 
   void _onPermissionSet(BuildContext context, QRViewController ctrl, bool p) {
