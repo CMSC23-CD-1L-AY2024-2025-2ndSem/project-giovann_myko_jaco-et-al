@@ -6,9 +6,9 @@ import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:planago/components/custom_app_bar.dart';
 import 'package:planago/controllers/firestore/travel_plan_database.dart';
-import 'package:planago/controllers/firestore/user_database.dart';
 import 'package:planago/models/travel_plan_model.dart';
 import 'package:planago/screens/travel-plan/create_travel_plan_page.dart';
+import 'package:planago/screens/travel-plan/qr_code_scanner.dart';
 import 'package:planago/screens/travel-plan/travel_overview_page.dart';
 import 'package:planago/utils/constants/colors.dart';
 import 'package:planago/utils/constants/image_strings.dart';
@@ -38,20 +38,7 @@ class _TravelPlanPageState extends State<TravelPlanPage>
         height: screenHeight * 0.065,
         child: OutlinedButton(
           //Implement creating a travel plan here
-          onPressed: () async {
-            final matches = await UserDatabase.instance.getMatchingUsers();
-              for (final user in matches) {
-                print('--- MATCHED USER ---');
-                print('UID: ${user.uid}');
-                print('Username: ${user.username}');
-                print('Email: ${user.email}');
-                print('Full Name: ${user.firstName} ${user.lastName}');
-                print('Phone: ${user.phoneNumber}');
-                print('Interests: ${user.interests.join(", ")}');
-                print('Travel Styles: ${user.travelStyle.join(", ")}');
-                print('Is Private: ${user.isPrivate}');
-              }
-
+          onPressed: () {
             Get.to(() => CreatePlanPage());
           },
           style: OutlinedButton.styleFrom(
@@ -106,18 +93,31 @@ class _TravelPlanPageState extends State<TravelPlanPage>
             // PADDING
             SizedBox(width: screenWidth * 0.88, height: screenHeight * 0.025),
             // TRAVEL PLANS TEXT
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                "Travel Plans",
-                style: TextStyle(
-                  fontSize: screenHeight * 0.0333,
-                  fontFamily: "Cal Sans",
-                  fontWeight: FontWeight.w400,
-                  color: AppColors.black,
-                  letterSpacing: -0.5,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Travel Plans",
+                  style: TextStyle(
+                    fontSize: screenHeight * 0.0333,
+                    fontFamily: "Cal Sans",
+                    fontWeight: FontWeight.w400,
+                    color: AppColors.black,
+                    letterSpacing: -0.5,
+                  ),
                 ),
-              ),
+                IconButton(onPressed: (){
+                  //Navigate to QR scanner page
+                  Get.to(()=> QRScannerScreen());
+                }, icon: Container(
+                  width: screenWidth * 0.12,
+                  height: screenWidth * 0.12,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(40)),
+                    color: AppColors.mutedPrimary,
+                  ),child: Icon(Icons.qr_code),
+                ))
+              ],
             ),
             // PADDING
             SizedBox(width: screenWidth * 0.88, height: screenHeight * 0.02),

@@ -14,7 +14,7 @@ class TravelPlanDatabase extends GetxController {
 
   /// Call this after login
   void listenToTravelPlans() {
-    _subscription?.cancel(); // Cancel old listener if it exists
+    _subscription?.cancel(); // Cancel old listener if it exists  
     final currentUser = AuthenticationController.instance.authUser;
     if (currentUser == null) {
       plans.value = [];
@@ -59,7 +59,6 @@ class TravelPlanDatabase extends GetxController {
   Future<void> updateTravelPlan(TravelPlan plan) async {
     await _db.collection('TravelPlans').doc(plan.id).update(plan.toJson());
   }
-
   Future<TravelPlan?> getPlanById(String id) async 
   {
     final doc = await _db.collection('TravelPlans').doc(id).get();
@@ -73,10 +72,7 @@ class TravelPlanDatabase extends GetxController {
   Future<void> updateChecklist(TravelPlan plan, List<Checklist> updatedChecklist) async {
     final updatedPlan = plan.copyWith(checklist: updatedChecklist);
     await TravelPlanDatabase.instance.updateTravelPlan(updatedPlan);
-}
-
-
-  
+  }
 
   @override
   void onClose() {

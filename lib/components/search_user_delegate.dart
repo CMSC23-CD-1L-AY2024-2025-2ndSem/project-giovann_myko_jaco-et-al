@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:planago/controllers/user_controller.dart';
@@ -159,12 +161,9 @@ class SearchUserDelegate extends SearchDelegate {
                   dimension: screenHeight * 0.056,
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(25),
-                    child: Image.asset(
-                      AppImages.defaultProfile,
-                      fit: BoxFit.cover,
+                    child: Image.memory(base64Decode(user.avatar), fit: BoxFit.cover,)
                     ),
                   ),
-                ),
                 SizedBox(width: screenWidth * 0.015),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

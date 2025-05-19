@@ -224,7 +224,9 @@ class UserDatabase extends GetxController {
       throw "Error: ${e}";
     }
   }
-    //Function fror getting matched users
+
+
+  //Function fror getting matched users
   Future<List<UserModel>> getMatchingUsers() async {
   try {
     final currentUserId = AuthenticationController.instance.authUser?.uid;

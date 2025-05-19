@@ -74,7 +74,10 @@ class _ProfilePageState extends State<ProfilePage> {
                 profilePicture(screenWidth, screenHeight),
                 editProfile(screenWidth, screenHeight),
                 signOutButton(screenHeight, screenHeight),
-                profileInfo(screenWidth, screenHeight)
+                profileInfo(screenWidth, screenHeight),
+                Container(
+                  height: screenHeight * 0.1,
+                )
               ],
             ),
           ),

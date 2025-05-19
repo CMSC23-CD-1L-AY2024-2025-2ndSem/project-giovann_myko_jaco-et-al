@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -79,7 +80,7 @@ class _ViewUserPageState extends State<ViewUserPage> {
             child: Column(
               children: [
                 headButtons(screenWidth, screenHeight),
-                profilePicture(screenWidth, screenHeight),
+                profilePicture(screenWidth, screenHeight, widget.viewedUser.avatar),
                 profileInfo(screenWidth, screenHeight),
               ],
             ),
@@ -202,7 +203,7 @@ class _ViewUserPageState extends State<ViewUserPage> {
     });
   }
 
-  Widget profilePicture(double width, double height) {
+  Widget profilePicture(double width, double height, String image) {
     return SizedBox(
       width: width * 0.88,
       height: height * 0.1828, //updated height val
@@ -212,11 +213,8 @@ class _ViewUserPageState extends State<ViewUserPage> {
             dimension: height * 0.1169, //102
             child: ClipOval(
               child:
-                  _imageFile != null
-                      ? Image.file(_imageFile!, fit: BoxFit.cover)
-                      : Image.asset(
-                        'assets/images/default_profile.png',
-                      ), // temp only
+                    Image.memory(base64Decode(image), 
+                    fit: BoxFit.cover,)
             ),
           ),
           // spacing between profile pic and texts
