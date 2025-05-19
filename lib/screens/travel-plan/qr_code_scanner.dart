@@ -3,6 +3,9 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:planago/controllers/authentication_controller.dart';
+import 'package:planago/controllers/firestore/travel_plan_database.dart';
+import 'package:planago/controllers/user_controller.dart';
 import 'package:planago/utils/constants/colors.dart';
 import 'package:qr_code_scanner_plus/qr_code_scanner_plus.dart';
 
@@ -151,9 +154,11 @@ class _QRViewExampleState extends State<QRScannerScreen> {
         result = scanData;
       });
     },
-    onDone: () {
+    onDone: () async {
       if(result != null){
-        Get.snackbar("TRAVEL ID", result!.code!);
+        await TravelPlanDatabase.instance.addPeople(result!.code!, AuthenticationController.instance.authUser!.uid);
+        Get.snackbar("Sucess", "Successfully Added");
+        TravelPlanDatabase.instance.listenToTravelPlans();
       }else{
         Get.snackbar("ERROR", "Scan failed");
       }
@@ -162,7 +167,7 @@ class _QRViewExampleState extends State<QRScannerScreen> {
   }
 
   void _onPermissionSet(BuildContext context, QRViewController ctrl, bool p) {
-    log('${DateTime.now().toIso8601String()}_onPermissionSet $p');
+    log('${DateTime.now().toIso8601String()}_onPermissionSet $p');Get.snackbar("TRAVEL ID", result!.code!);
     if (!p) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('no Permission')),

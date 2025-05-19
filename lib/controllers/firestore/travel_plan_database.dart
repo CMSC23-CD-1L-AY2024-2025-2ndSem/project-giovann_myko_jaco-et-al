@@ -59,6 +59,7 @@ class TravelPlanDatabase extends GetxController {
   Future<void> updateTravelPlan(TravelPlan plan) async {
     await _db.collection('TravelPlans').doc(plan.id).update(plan.toJson());
   }
+
   Future<TravelPlan?> getPlanById(String id) async 
   {
     final doc = await _db.collection('TravelPlans').doc(id).get();
@@ -78,5 +79,18 @@ class TravelPlanDatabase extends GetxController {
   void onClose() {
     _subscription?.cancel();
     super.onClose();
+  }
+
+  //Function for adding user on a travel plan
+  Future<void> addPeople(String id, String uid) async {
+    final plan = await getPlanById(id); //finds document
+    //check is null
+    
+    if(plan != null){
+      final people = plan.people ?? [];
+      people.add(uid);
+      plan.copyWith(people: people);
+    }
+    await updateTravelPlan(plan!);
   }
 }

@@ -45,7 +45,7 @@ class _QRCodeScreenState extends State<QRCodeScreen>
   {
     // Generate the data to be encoded in the QR code
     //id; title; destination; start date (yyyy-MM-ddTHH:mm:ss.mmmuuuZ); end date (yyyy-MM-ddTHH:mm:ss.mmmuuuZ)
-    return "${widget.plan.id}|${widget.plan.tripTitle}|${widget.plan.destination}|${widget.plan.startDate?.toIso8601String()}|${widget.plan.endDate?.toIso8601String()}";
+    return "${widget.plan.id}";
   }
 
   // Save QR code to gallery
