@@ -9,15 +9,19 @@ import 'package:intl/intl.dart';
 import 'package:planago/components/custom_dotted_line.dart';
 import 'package:planago/components/search_user_delegate.dart';
 import 'package:planago/components/travel_app_bar.dart';
+import 'package:planago/controllers/authentication_controller.dart';
 import 'package:planago/controllers/firestore/travel_plan_database.dart';
 import 'package:planago/controllers/user_controller.dart';
+import 'package:planago/main.dart';
 import 'package:planago/models/acommodation_details_model.dart';
 import 'package:planago/models/flight_details_model.dart';
 import 'package:planago/models/travel_plan_model.dart';
+import 'package:planago/navigation_menu.dart';
 import 'package:planago/screens/travel-plan/notification_settings_screen.dart';
 import 'package:planago/screens/travel-plan/qr_code_screen.dart';
 import 'package:planago/utils/constants/colors.dart';
 import 'package:planago/utils/constants/image_strings.dart';
+import 'package:planago/utils/loader/app_loader.dart';
 import 'itinerary_screen.dart';
 
 /* 
@@ -92,9 +96,11 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
 
   Widget header(double width, double height, TravelPlan plan, String? pfp) {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Column(
+          mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
@@ -126,6 +132,48 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                   style: TextStyle(fontSize: height * 0.0138),
                 ),
               ],
+            ),
+            SizedBox(height: height * 0.013,),
+            SizedBox(
+              width: width * 0.24119,
+              height: height * 0.02715,
+              child: OutlinedButton(
+                onPressed: () async {
+                  // Delete plan
+                  if(AuthenticationController.instance.authUser!.uid == plan.creator){
+                    AppLoader.openLoadingDialog("Deleting Plan", AppImages.docerAnimation);
+                    final message = await TravelPlanDatabase.instance.deletePlan(plan.id!);
+                    AppLoader.stopLoading();
+                    Get.offUntil(
+                    MaterialPageRoute(builder: (_) => NavigationMenu()),
+                    (route) => route.settings.name == '/navigation');
+                    Get.snackbar("Success", message);
+                  }
+                },
+                style: OutlinedButton.styleFrom(
+                  padding: EdgeInsets.zero,
+                  backgroundColor: AuthenticationController.instance.authUser!.uid == plan.creator ? Color.fromARGB(255, 169, 94, 94) : AppColors.gray,
+                  side: BorderSide(color: Colors.transparent),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.delete,
+                      color: AppColors.mutedWhite,
+                      size: width * 0.035,
+                    ),
+                    SizedBox(width: width * 0.008),
+                    Text(
+                      "Delete",
+                      style: TextStyle(
+                        fontSize: height * 0.0128,
+                        color: AppColors.mutedWhite,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         ),

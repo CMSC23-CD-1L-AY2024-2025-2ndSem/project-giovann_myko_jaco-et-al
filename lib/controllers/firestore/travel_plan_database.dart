@@ -82,15 +82,28 @@ class TravelPlanDatabase extends GetxController {
   }
 
   //Function for adding user on a travel plan
-  Future<void> addPeople(String id, String uid) async {
+  Future<String> addPeople(String id, String uid) async {
     final plan = await getPlanById(id); //finds document
     //check is null
-    
     if(plan != null){
       final people = plan.people ?? [];
+      if(people.contains(uid)){
+        return "Already in this Plan";
+      }
       people.add(uid);
       plan.copyWith(people: people);
     }
     await updateTravelPlan(plan!);
+    return "Successfully added to Plan!";
+  }
+
+  //Function for delete a travel plan given an id
+  Future<String> deletePlan (String id) async {
+    try {
+      await _db.collection("TravelPlans").doc(id).delete();
+      return "Successfully deleted plan!";
+    } catch (e) {
+      return "Error: $e";
+    }
   }
 }
