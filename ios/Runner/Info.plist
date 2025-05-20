@@ -4,8 +4,10 @@
 <dict>
 	<key>io.flutter.embedded_views_preview</key>
 	<true/>
+    <key>NSPhotoLibraryUsageDescription</key>
+	<string>This app needs access to photo library to select profile picture</string>
 	<key>NSCameraUsageDescription</key>
-	<string>This app needs camera access to scan QR codes</string>
+	<string>This app needs camera access to scan QR codes and take your profile photo</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>This app needs access to location when open.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
