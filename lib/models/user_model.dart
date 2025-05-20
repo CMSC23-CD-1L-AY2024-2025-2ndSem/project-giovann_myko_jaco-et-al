@@ -1,10 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class UserModel 
-{
+class UserModel {
   //Static Lists of Interest and Travel Styles
-  static final setInterests = 
-  [
+  static final setInterests = [
     'Food',
     'Arts & Culture',
     'History & Heritage',
@@ -17,8 +15,7 @@ class UserModel
     'Photography',
   ];
 
-  static final settravelStyles = 
-  [
+  static final settravelStyles = [
     'Backpacking',
     'Luxury Travel',
     'Eco-friendly Travel',
@@ -37,47 +34,80 @@ class UserModel
   final bool isPrivate;
   final String username;
   final String firstName;
-final String lastName;
-final String phoneNumber;
-final String email;
-final List<String> interests;
-final List<String> travelStyle;
-final List<String> following;
-final int followers;
+  final String lastName;
+  final String phoneNumber;
+  final String email;
+  final List<String> interests;
+  final List<String> travelStyle;
+  final List<String> following;
+  final int followers;
 
-UserModel({
-  required this.uid,
-  required this.avatar,
-  required this.username,
-  required this.email,
-  required this.interests,
-  required this.travelStyle,
-  required this.firstName,
-  required this.lastName,
-  required this.phoneNumber,
-  required this.following,
-  required this.followers,
-  required this.isPrivate,
-});
+  UserModel({
+    required this.uid,
+    required this.avatar,
+    required this.username,
+    required this.email,
+    required this.interests,
+    required this.travelStyle,
+    required this.firstName,
+    required this.lastName,
+    required this.phoneNumber,
+    required this.following,
+    required this.followers,
+    required this.isPrivate,
+  });
+
+  // Copy with function
+  UserModel copyWith({
+    String? uid,
+    String? avatar,
+    String? username,
+    String? email,
+    List<String>? interests,
+    List<String>? travelStyle,
+    String? firstName,
+    String? lastName,
+    String? phoneNumber,
+    List<String>? following,
+    int? followers,
+    bool? isPrivate,
+  }) {
+    return UserModel(
+      uid: uid ?? this.uid,
+      avatar: avatar ?? this.avatar,
+      username: username ?? this.username,
+      email: email ?? this.email,
+      interests: interests ?? this.interests,
+      travelStyle: travelStyle ?? this.travelStyle,
+      firstName: firstName ?? this.firstName,
+      lastName: lastName ?? this.lastName,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      following: following ?? this.following,
+      followers: followers ?? this.followers,
+      isPrivate: isPrivate ?? this.isPrivate,
+    );
+  }
 
   //Convert model to JSON structure for storing in database
-Map<String, dynamic> toJson() 
-{
-  return {
-    "FirstName": firstName,
-    "isPrivate": isPrivate,
-    "LastName": lastName,
-    "Username": username,
-    "Email": email,
-    "PhoneNumber": phoneNumber,
-    "Interests": interests,
-    "TravelStyle": travelStyle,
-    "Following": following,
-    "Followers": followers,
-    "Avatar": avatar,
-  };
-}
-  factory UserModel.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> document) {
+  Map<String, dynamic> toJson() {
+    return {
+      "FirstName": firstName,
+      "isPrivate": isPrivate,
+      "LastName": lastName,
+      "Username": username,
+      "Email": email,
+      "PhoneNumber": phoneNumber,
+      "Interests": interests,
+      "TravelStyle": travelStyle,
+      "Following": following,
+      "Followers": followers,
+      "Avatar": avatar,
+    };
+  }
+
+  factory UserModel.fromSnapshot(
+    DocumentSnapshot<Map<String, dynamic>> document,
+  ) {
     final data = document.data();
     if (data == null) {
       throw StateError("Data can't be fetched: Snapshot has no data.");
@@ -115,35 +145,5 @@ Map<String, dynamic> toJson()
       followers: 0,
     );
   }
-  //Copy with method
-  UserModel copyWith({
-  String? uid,
-  String? avatar,
-  bool? isPrivate,
-  String? username,
-  String? firstName,
-  String? lastName,
-  String? phoneNumber,
-  String? email,
-  List<String>? interests,
-  List<String>? travelStyle,
-  List<String>? following,
-  int? followers,
-}) {
-  return UserModel(
-    uid: uid ?? this.uid,
-    avatar: avatar ?? this.avatar,
-    isPrivate: isPrivate ?? this.isPrivate,
-    username: username ?? this.username,
-    firstName: firstName ?? this.firstName,
-    lastName: lastName ?? this.lastName,
-    phoneNumber: phoneNumber ?? this.phoneNumber,
-    email: email ?? this.email,
-    interests: interests ?? this.interests,
-    travelStyle: travelStyle ?? this.travelStyle,
-    following: following ?? this.following,
-    followers: followers ?? this.followers,
-  );
-}
 
 }

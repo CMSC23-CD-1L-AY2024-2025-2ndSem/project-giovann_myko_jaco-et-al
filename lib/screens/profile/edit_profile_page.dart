@@ -1,10 +1,12 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:planago/controllers/user_controller.dart';
+import 'package:planago/models/user_model.dart';
 import 'package:planago/utils/constants/colors.dart';
+import 'package:planago/utils/helper/converter.dart';
+import 'package:planago/utils/helper/imagepicker.dart';
+import 'package:planago/utils/helper/validator.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key});
@@ -19,16 +21,26 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final lastNameController = TextEditingController();
   final phoneNumberController = TextEditingController();
 
-  File? _imageFile;
+  final RxList<String> interests = <String>[].obs;
+  final RxList<String> travelStyles = <String>[].obs;
 
-  // Temporary variables habang wala pa data model + database
-  // ifefetch yung current details para mapalitan
-  String firstName = 'Myko Jefferson';
-  String lastName = 'Javier';
-  String phoneNumber = '997xxxxxxxx';
+  @override
+  void initState() {
+    firstNameController.text = UserController.instance.user.value.firstName;
+    lastNameController.text = UserController.instance.user.value.lastName;
+    phoneNumberController.text = UserController.instance.user.value.phoneNumber;
+    interests.value = UserController.instance.user.value.interests;
+    travelStyles.value = UserController.instance.user.value.travelStyle;
+    super.initState();
+  }
 
-  //
-  
+  @override
+  void dispose() {
+    firstNameController.dispose();
+    lastNameController.dispose();
+    phoneNumberController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,17 +60,21 @@ class _EditProfilePageState extends State<EditProfilePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 editProfileText(screenWidth, screenHeight),
-                Column(
-                  // Separate Column for spacing only
-                  spacing: screenHeight * 0.0183,
-                  children: [
-                    profilePicture(screenWidth, screenHeight),
-                    firstNameField(screenWidth, screenHeight),
-                    lastNameField(screenWidth, screenHeight),
-                    phoneNumberField(screenWidth, screenHeight),
-                    saveEditedProfile(screenWidth, screenHeight),
-                  ],
-                ),
+                Obx(() {
+                  return Column(
+                    // Separate Column for spacing only
+                    spacing: screenHeight * 0.0183,
+                    children: [
+                      profilePicture(screenWidth, screenHeight),
+                      firstNameField(screenWidth, screenHeight),
+                      lastNameField(screenWidth, screenHeight),
+                      phoneNumberField(screenWidth, screenHeight),
+                      buildInterestOptions(screenWidth, screenHeight),
+                      buildTravelStyleOptions(screenWidth, screenHeight),
+                      saveEditedProfile(screenWidth, screenHeight),
+                    ],
+                  );
+                }),
               ],
             ),
           ),
@@ -106,31 +122,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
     ),
   );
 
-  Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    final XFile? pickedFile = await picker.pickImage(
-      source: ImageSource.gallery,
-    );
-
-    if (pickedFile != null) {
-      setState(() {
-        _imageFile = File(pickedFile.path);
-      });
-    }
-  }
-
   Widget profilePicture(double width, double height) {
     return GestureDetector(
-      onTap: _pickImage,
+      onTap: () => ImagePickerUtil.pickProfileImage(context),
       child: SizedBox.square(
         dimension: height * 0.1169, //102
         child: ClipOval(
-          child:
-              _imageFile != null
-                  ? Image.file(_imageFile!, fit: BoxFit.cover)
-                  : Image.asset(
-                    'assets/images/default_profile.png',
-                  ), // temp only
+          child: Image.memory(
+            AppConvert.base64toImage(UserController.instance.user.value.avatar),
+            fit: BoxFit.cover,
+          ),
         ),
       ),
     );
@@ -139,7 +140,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Widget firstNameField(double width, double height) => Container(
     padding: EdgeInsets.zero,
     width: width * 0.88,
-    height: height * 0.065,
+    height: height * 0.1,
     child: Column(
       children: [
         Flexible(
@@ -160,6 +161,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
           flex: 2,
           child: TextFormField(
             controller: firstNameController,
+            validator:
+                (value) => AppValidator.validateEmptyText('First name', value),
             textAlignVertical: TextAlignVertical.center,
             decoration: InputDecoration(
               contentPadding: EdgeInsets.symmetric(
@@ -176,7 +179,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 borderSide: BorderSide.none,
                 borderRadius: BorderRadius.circular(100),
               ),
-              labelText: firstName,
+              labelText: "Enter your first name",
               labelStyle: TextStyle(
                 fontSize: height * 0.015,
                 color: Color.fromARGB(255, 155, 155, 156),
@@ -195,7 +198,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Widget lastNameField(double width, double height) => Container(
     padding: EdgeInsets.zero,
     width: width * 0.88,
-    height: height * 0.065,
+    height: height * 0.1,
     child: Column(
       children: [
         Flexible(
@@ -215,7 +218,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
         Flexible(
           flex: 2,
           child: TextFormField(
-            controller: firstNameController,
+            controller: lastNameController,
+            validator:
+                (value) => AppValidator.validateEmptyText('Last name', value),
             textAlignVertical: TextAlignVertical.center,
             decoration: InputDecoration(
               contentPadding: EdgeInsets.symmetric(
@@ -232,7 +237,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 borderSide: BorderSide.none,
                 borderRadius: BorderRadius.circular(100),
               ),
-              labelText: lastName,
+              labelText: "Enter your last name",
               labelStyle: TextStyle(
                 fontSize: height * 0.015,
                 color: Color.fromARGB(255, 155, 155, 156),
@@ -251,7 +256,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Widget phoneNumberField(double width, double height) => Container(
     padding: EdgeInsets.zero,
     width: width * 0.88,
-    height: height * 0.065,
+    height: height * 0.1,
     child: Column(
       children: [
         Flexible(
@@ -271,7 +276,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
         Flexible(
           flex: 2,
           child: TextFormField(
-            controller: firstNameController,
+            controller: phoneNumberController,
+            validator: (value) => AppValidator.validatePhoneNumber(value),
             textAlignVertical: TextAlignVertical.center,
             decoration: InputDecoration(
               contentPadding: EdgeInsets.symmetric(
@@ -288,7 +294,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 borderSide: BorderSide.none,
                 borderRadius: BorderRadius.circular(100),
               ),
-              labelText: "+63  |  $phoneNumber",
+              labelText: "+63",
               labelStyle: TextStyle(
                 fontSize: height * 0.015,
                 color: Color.fromARGB(255, 155, 155, 156),
@@ -317,8 +323,21 @@ class _EditProfilePageState extends State<EditProfilePage> {
     ),
     child: OutlinedButton(
       onPressed: () {
-        /* SAVE PROFILE HERE*/
-        Get.back(result: _imageFile);
+        if (_formKey.currentState!.validate()) {
+          final userDetails = UserController.instance.user;
+          final user = userDetails.value.copyWith(
+            firstName: firstNameController.text,
+            lastName: lastNameController.text,
+            phoneNumber: phoneNumberController.text,
+            interests: interests,
+            travelStyle: travelStyles,
+          );
+
+          final controller = UserController.instance;
+          controller.editUserProfile(user);
+
+          Get.back();
+        }
       },
       style: OutlinedButton.styleFrom(
         side: BorderSide(color: Colors.transparent),
@@ -333,4 +352,138 @@ class _EditProfilePageState extends State<EditProfilePage> {
       ),
     ),
   );
+
+  Widget buildInterestOptions(double screenWidth, double screenHeight) {
+    return SizedBox(
+      width: screenWidth * 0.88,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Interests",
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              letterSpacing: -0.3,
+              fontSize: Get.height * 0.020,
+            ),
+          ),
+          Text(
+            "Select all the applies",
+            style: TextStyle(
+              fontWeight: FontWeight.w300,
+              letterSpacing: -0.3,
+              fontSize: Get.height * 0.014,
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+          SizedBox(height: screenHeight * 0.02),
+          Wrap(
+            spacing: 4,
+            runSpacing: 4,
+            children:
+                UserModel.setInterests.map((interest) {
+                  final isSelected = interests.contains(interest);
+                  return FilterChip(
+                    label: Text(interest),
+                    selected: isSelected,
+                    showCheckmark: false,
+                    onSelected: (selected) {
+                      if (selected) {
+                        interests.add(interest);
+                      } else {
+                        interests.remove(interest);
+                      }
+                    },
+                    labelStyle: TextStyle(
+                      fontSize: Get.height * 0.014,
+                      letterSpacing: -0.3,
+                      color:
+                          isSelected ? AppColors.mutedWhite : AppColors.black,
+                    ),
+                    selectedColor: AppColors.secondary,
+                    backgroundColor: Color(0xffF5F7FB),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      side: BorderSide.none,
+                    ),
+                    labelPadding: const EdgeInsets.symmetric(
+                      vertical: 0,
+                      horizontal: 5,
+                    ),
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  );
+                }).toList(),
+          ),
+          SizedBox(height: screenHeight * 0.02),
+        ],
+      ),
+    );
+  }
+
+  Widget buildTravelStyleOptions(double screenWidth, double screenHeight) {
+    return SizedBox(
+      width: screenWidth * 0.88,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Travel Styles",
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              letterSpacing: -0.3,
+              fontSize: Get.height * 0.020,
+            ),
+          ),
+          Text(
+            "Select all the applies",
+            style: TextStyle(
+              fontWeight: FontWeight.w300,
+              letterSpacing: -0.3,
+              fontSize: Get.height * 0.014,
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+          SizedBox(height: screenHeight * 0.02),
+          Wrap(
+            spacing: 4,
+            runSpacing: 4,
+            children:
+                UserModel.settravelStyles.map((style) {
+                  final isSelected = travelStyles.contains(style);
+                  return FilterChip(
+                    label: Text(style),
+                    selected: isSelected,
+                    showCheckmark: false,
+                    onSelected: (selected) {
+                      if (selected) {
+                        travelStyles.add(style);
+                      } else {
+                        travelStyles.remove(style);
+                      }
+                    },
+                    labelStyle: TextStyle(
+                      fontSize: Get.height * 0.014,
+                      letterSpacing: -0.3,
+                      color:
+                          isSelected ? AppColors.mutedWhite : AppColors.black,
+                    ),
+                    selectedColor: AppColors.secondary,
+                    backgroundColor: Color(0xffF5F7FB),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      side: BorderSide.none,
+                    ),
+                    labelPadding: const EdgeInsets.symmetric(
+                      vertical: 0,
+                      horizontal: 5,
+                    ),
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  );
+                }).toList(),
+          ),
+          SizedBox(height: screenHeight * 0.02),
+        ],
+      ),
+    );
+  }
 }
