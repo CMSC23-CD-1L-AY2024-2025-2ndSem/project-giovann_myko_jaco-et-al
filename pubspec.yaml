@@ -44,6 +44,7 @@ dependencies:
   flutter_dotenv: ^5.2.1
   qr_code_scanner_plus: ^2.0.10+1
   flutter_image_compress: ^2.4.0
+  google_sign_in: ^6.3.0
 
 #--------------- end of packages -------------#
 dev_dependencies:

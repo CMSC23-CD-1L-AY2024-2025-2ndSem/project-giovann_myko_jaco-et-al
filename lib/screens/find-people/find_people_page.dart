@@ -8,6 +8,7 @@ import 'package:planago/models/user_model.dart';
 import 'package:planago/screens/find-people/view_user_page.dart';
 import 'package:planago/utils/constants/colors.dart';
 import 'package:planago/utils/constants/image_strings.dart';
+import 'package:planago/utils/helper/converter.dart';
 
 class FindPeoplePage extends StatefulWidget {
   const FindPeoplePage({super.key});
@@ -173,14 +174,20 @@ class _UserInfo extends StatelessWidget {
           dimension: screenHeight * 0.056,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(25),
-            child: user.avatar != null
-                ? Image.memory(
-                    base64Decode(user.avatar),
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) =>
-                        Image.asset(AppImages.defaultProfile, fit: BoxFit.cover),
-                  )
-                : Image.asset(AppImages.defaultProfile, fit: BoxFit.cover),
+            child: AppConvert.isBase64(user.avatar)
+                                ? Image.memory(
+                                  base64Decode(user.avatar),
+                                  fit: BoxFit.cover,
+                                )
+                                : Image.network(
+                                  user.avatar,
+                                  fit: BoxFit.cover,
+                                  errorBuilder:
+                                      (_, __, ___) => Image.asset(
+                                        'assets/images/default_profile.png',
+                                        fit: BoxFit.cover,
+                                      ),
+                                ),
           ),
         ),
         SizedBox(width: screenWidth * 0.015),

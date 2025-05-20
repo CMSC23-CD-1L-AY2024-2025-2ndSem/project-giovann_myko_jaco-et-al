@@ -269,4 +269,20 @@ class UserDatabase extends GetxController {
     throw "Error fetching matching users: $e";
   }
   }
+
+  //Function for retrieving avatar given a uid
+  Future<String?> getAvatarByUid(String uid) async {
+  try {
+    final doc = await _db.collection("Users").doc(uid).get();
+    if (doc.exists) {
+      final data = doc.data();
+      if (data != null && data.containsKey("Avatar")) {
+        return data["Avatar"] as String;
+      }
+    }
+    return null; // No avatar found
+  } on FirebaseException catch (e) {
+    throw "Error fetching avatar: ${e.message}";
+  }
+}
 }

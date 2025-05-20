@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -19,7 +21,7 @@ class CustomAppBar extends StatelessWidget{
   Widget build(BuildContext context) {
     final width = Get.width;
     final height = Get.height;
-
+  
     return Obx(() => SafeArea(child: 
     Container(
       decoration: BoxDecoration(
@@ -40,10 +42,20 @@ class CustomAppBar extends StatelessWidget{
                 icon: ClipOval(
                   child: SizedBox.square(
                     dimension: width * 0.12,
-                    child: Image.memory(
-                      AppConvert.base64toImage(UserController.instance.user.value.avatar),
-                      fit: BoxFit.cover,
-                    ),
+                    child: AppConvert.isBase64(UserController.instance.user.value.avatar)
+                                ? Image.memory(
+                                  base64Decode(UserController.instance.user.value.avatar),
+                                  fit: BoxFit.cover,
+                                )
+                                : Image.network(
+                                  UserController.instance.user.value.avatar,
+                                  fit: BoxFit.cover,
+                                  errorBuilder:
+                                      (_, __, ___) => Image.asset(
+                                        'assets/images/default_profile.png',
+                                        fit: BoxFit.cover,
+                                      ),
+                                ),
                   ),
                 )),
                 SizedBox(width: 10),

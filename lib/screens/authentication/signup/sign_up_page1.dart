@@ -15,12 +15,14 @@ import 'package:simple_gradient_text/simple_gradient_text.dart';
 class SignUpPage1 extends StatelessWidget {
   SignUpPage1({super.key});
 
-  final controller = Get.put(SignupController());
+  final String? prefilledEmail = Get.arguments?['email'];
+  late final SignupController controller;
   
   @override
   Widget build(BuildContext context) {
     final screenWidth = Get.width;
     final screenHeight = Get.height;
+    final SignupController controller = Get.put(SignupController(prefilledEmail: prefilledEmail));
 
     return Obx(
       () => Scaffold(

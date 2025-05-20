@@ -11,6 +11,7 @@ import 'package:planago/components/search_user_delegate.dart';
 import 'package:planago/components/travel_app_bar.dart';
 import 'package:planago/controllers/authentication_controller.dart';
 import 'package:planago/controllers/firestore/travel_plan_database.dart';
+import 'package:planago/controllers/firestore/user_database.dart';
 import 'package:planago/controllers/user_controller.dart';
 import 'package:planago/main.dart';
 import 'package:planago/models/acommodation_details_model.dart';
@@ -21,6 +22,7 @@ import 'package:planago/screens/travel-plan/notification_settings_screen.dart';
 import 'package:planago/screens/travel-plan/qr_code_screen.dart';
 import 'package:planago/utils/constants/colors.dart';
 import 'package:planago/utils/constants/image_strings.dart';
+import 'package:planago/utils/helper/converter.dart';
 import 'package:planago/utils/loader/app_loader.dart';
 import 'itinerary_screen.dart';
 
@@ -40,7 +42,19 @@ class TravelOverviewPage extends StatefulWidget {
 }
 
 class _TravelOverviewPageState extends State<TravelOverviewPage> {
-  final String? profilePicture = UserController.instance.user.value.avatar;
+  String? profilePicture;
+  @override
+  void initState() {
+    super.initState();
+    _loadAvatar();
+  }
+
+  Future<void> _loadAvatar() async {
+    final avatar = await UserDatabase.instance.getAvatarByUid(widget.plan.creator);
+    setState(() {
+      profilePicture = avatar;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +71,12 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
             onTap: FocusScope.of(context).unfocus,
             child: Column(
               children: [
-                TravelAppBar(index: widget.plan.imageIndex == null ? 0 : widget.plan.imageIndex!,),
+                TravelAppBar(
+                  index:
+                      widget.plan.imageIndex == null
+                          ? 0
+                          : widget.plan.imageIndex!,
+                ),
                 SizedBox(height: screenHeight * 0.02),
                 Container(
                   margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
@@ -133,26 +152,36 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                 ),
               ],
             ),
-            SizedBox(height: height * 0.013,),
+            SizedBox(height: height * 0.013),
             SizedBox(
               width: width * 0.24119,
               height: height * 0.02715,
               child: OutlinedButton(
                 onPressed: () async {
                   // Delete plan
-                  if(AuthenticationController.instance.authUser!.uid == plan.creator){
-                    AppLoader.openLoadingDialog("Deleting Plan", AppImages.docerAnimation);
-                    final message = await TravelPlanDatabase.instance.deletePlan(plan.id!);
+                  if (AuthenticationController.instance.authUser!.uid ==
+                      plan.creator) {
+                    AppLoader.openLoadingDialog(
+                      "Deleting Plan",
+                      AppImages.docerAnimation,
+                    );
+                    final message = await TravelPlanDatabase.instance
+                        .deletePlan(plan.id!);
                     AppLoader.stopLoading();
                     Get.offUntil(
-                    MaterialPageRoute(builder: (_) => NavigationMenu()),
-                    (route) => route.settings.name == '/navigation');
+                      MaterialPageRoute(builder: (_) => NavigationMenu()),
+                      (route) => route.settings.name == '/navigation',
+                    );
                     Get.snackbar("Success", message);
                   }
                 },
                 style: OutlinedButton.styleFrom(
                   padding: EdgeInsets.zero,
-                  backgroundColor: AuthenticationController.instance.authUser!.uid == plan.creator ? Color.fromARGB(255, 169, 94, 94) : AppColors.gray,
+                  backgroundColor:
+                      AuthenticationController.instance.authUser!.uid ==
+                              plan.creator
+                          ? Color.fromARGB(255, 169, 94, 94)
+                          : AppColors.gray,
                   side: BorderSide(color: Colors.transparent),
                 ),
                 child: Row(
@@ -188,14 +217,28 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                 children: [
                   SizedBox.square(
                     dimension: width * 0.07,
-                    child: pfp != null
-                        ? Image.memory(base64Decode(pfp), fit: BoxFit.cover)
-                        : Image.asset(
-                          // HARD CODED IMAGE
-                          'assets/images/default_profile.png',
-                          width: width * 0.02,
-                          fit: BoxFit.cover,
-                        ),
+                    child:
+                        pfp != null
+                            ? AppConvert.isBase64(pfp)
+                                ? Image.memory(
+                                  base64Decode(pfp),
+                                  fit: BoxFit.cover,
+                                )
+                                : Image.network(
+                                  pfp,
+                                  fit: BoxFit.cover,
+                                  errorBuilder:
+                                      (_, __, ___) => Image.asset(
+                                        'assets/images/default_profile.png',
+                                        fit: BoxFit.cover,
+                                      ),
+                                )
+                            : Image.asset(
+                              // HARD CODED IMAGE
+                              'assets/images/default_profile.png',
+                              width: width * 0.02,
+                              fit: BoxFit.cover,
+                            ),
                   ),
                   SizedBox(
                     width: width * 0.16519,
@@ -237,8 +280,7 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
               width: width * 0.24119,
               height: height * 0.02715,
               child: OutlinedButton(
-                onPressed: () 
-                {
+                onPressed: () {
                   //fix this. dapat hindi gagawa ng panibagong instantance ng itinerary if pipindutin ulit ang existing itinerary.
                   Get.to(() => ItineraryScreen(plan: plan));
                 },
@@ -919,129 +961,147 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
     return completer.future;
   }
 
-Widget buildFlightCard(BuildContext context, double width, double height, FlightDetails details) {
-  return Container(
-    height: height * 0.16,
-    decoration: BoxDecoration(
-      color: AppColors.primary,
-      borderRadius: BorderRadius.circular(16),
-    ),
-    child: Stack(
-      children: [
-        // 🌍 Background world map image
-        Positioned.fill(
-          child: Image.asset(
-            AppImages.map_bg,
-            fit: BoxFit.contain,
+  Widget buildFlightCard(
+    BuildContext context,
+    double width,
+    double height,
+    FlightDetails details,
+  ) {
+    return Container(
+      height: height * 0.16,
+      decoration: BoxDecoration(
+        color: AppColors.primary,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Stack(
+        children: [
+          // 🌍 Background world map image
+          Positioned.fill(
+            child: Image.asset(AppImages.map_bg, fit: BoxFit.contain),
           ),
-        ),
 
-        // Foreground content
-        Padding(
-          padding: EdgeInsets.all(width * 0.03),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Airline Name and Travel Class Row
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    details.airlineName,
-                    style: TextStyle(
-                      fontFamily: "Cal Sans",
-                      fontSize: height * 0.025,
-                      color: AppColors.mutedWhite,
-                    ),
-                  ),
-                  Text(
-                    details.travelClass,
-                    style: TextStyle(
-                      fontSize: height * 0.02,
-                      color: AppColors.mutedWhite,
-                      letterSpacing: -0.5,
-                    ),
-                  ),
-                ],
-              ),
-              // FROM - DOT - TO Row
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  // FROM column
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('FROM:', style: TextStyle(color: AppColors.mutedBlack, letterSpacing: -0.3, fontWeight: FontWeight.w500)),
-                        Text(
-                          details.destFrom,
-                          style: TextStyle(
-                            fontSize: height * 0.035,
-                            fontFamily: "Cal Sans",
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.mutedWhite,
-                          ),
-                        ),
-                        Text(
-                          details.destFromTime!.format(context),
-                          style: TextStyle(color: AppColors.mutedWhite),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  // Dotted Line + Arrow
-                  Row(
-                    children: [
-                      SizedBox(
-                        width: width * 0.15,
-                        height: 10,
-                        child: CustomPaint(
-                          painter: DottedLinePainter(
-                            color: AppColors.mutedBlack,
-                            dotSpacing: 8,
-                            dotRadius: 1.5,
-                          ),
-                        ),
+          // Foreground content
+          Padding(
+            padding: EdgeInsets.all(width * 0.03),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Airline Name and Travel Class Row
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      details.airlineName,
+                      style: TextStyle(
+                        fontFamily: "Cal Sans",
+                        fontSize: height * 0.025,
+                        color: AppColors.mutedWhite,
                       ),
-                      const Icon(Icons.arrow_forward, color: AppColors.mutedBlack, size: 17),
-                    ],
-                  ),
+                    ),
+                    Text(
+                      details.travelClass,
+                      style: TextStyle(
+                        fontSize: height * 0.02,
+                        color: AppColors.mutedWhite,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                  ],
+                ),
+                // FROM - DOT - TO Row
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // FROM column
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'FROM:',
+                            style: TextStyle(
+                              color: AppColors.mutedBlack,
+                              letterSpacing: -0.3,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          Text(
+                            details.destFrom,
+                            style: TextStyle(
+                              fontSize: height * 0.035,
+                              fontFamily: "Cal Sans",
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.mutedWhite,
+                            ),
+                          ),
+                          Text(
+                            details.destFromTime!.format(context),
+                            style: TextStyle(color: AppColors.mutedWhite),
+                          ),
+                        ],
+                      ),
+                    ),
 
-                  // TO column
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
+                    // Dotted Line + Arrow
+                    Row(
                       children: [
-                        Text('TO:', style: TextStyle(color: AppColors.mutedBlack, letterSpacing: -0.3, fontWeight: FontWeight.w500)),
-                        Text(
-                          details.destTo,
-                          style: TextStyle(
-                            fontSize: height * 0.035,
-                            fontFamily: "Cal Sans",
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.mutedWhite,
+                        SizedBox(
+                          width: width * 0.15,
+                          height: 10,
+                          child: CustomPaint(
+                            painter: DottedLinePainter(
+                              color: AppColors.mutedBlack,
+                              dotSpacing: 8,
+                              dotRadius: 1.5,
+                            ),
                           ),
                         ),
-                        Text(
-                          details.destToTime!.format(context),
-                          style: TextStyle(color: AppColors.mutedWhite),
+                        const Icon(
+                          Icons.arrow_forward,
+                          color: AppColors.mutedBlack,
+                          size: 17,
                         ),
                       ],
                     ),
-                  ),
-                ],
-              ),
-            ],
+
+                    // TO column
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            'TO:',
+                            style: TextStyle(
+                              color: AppColors.mutedBlack,
+                              letterSpacing: -0.3,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          Text(
+                            details.destTo,
+                            style: TextStyle(
+                              fontSize: height * 0.035,
+                              fontFamily: "Cal Sans",
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.mutedWhite,
+                            ),
+                          ),
+                          Text(
+                            details.destToTime!.format(context),
+                            style: TextStyle(color: AppColors.mutedWhite),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-        ),
-      ],
-    ),
-  );
-}
-
-
+        ],
+      ),
+    );
+  }
 
   Widget flightTile(double width, double height, TravelPlan? plan) {
     return GestureDetector(
@@ -1159,7 +1219,7 @@ Widget buildFlightCard(BuildContext context, double width, double height, Flight
                 fontSize: height * 0.015,
                 fontWeight: FontWeight.w400,
                 color: AppColors.black,
-                letterSpacing: -0.3
+                letterSpacing: -0.3,
               ),
               decoration: InputDecoration(
                 contentPadding: EdgeInsets.only(

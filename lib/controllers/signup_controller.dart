@@ -13,6 +13,26 @@ class SignupController extends GetxController
 {
   static SignupController get instance => Get.find();
 
+  //Custom Constructor for Google auth sign up
+  SignupController({String? prefilledEmail}) {
+  final displayName = AuthenticationController.instance.authUser?.displayName;
+  //Get first and last name from display name
+  if (displayName != null && displayName.trim().isNotEmpty) {
+    final nameParts = displayName.trim().split(' ');
+    if (nameParts.length == 1) {
+      firstName.text = nameParts[0];
+      lastName.text = '';
+    } else {
+      lastName.text = nameParts.last;
+      firstName.text = nameParts.sublist(0, nameParts.length - 1).join(' ');
+    }
+  }
+  if (prefilledEmail != null) {
+    email.text = prefilledEmail;
+  }
+}
+
+
   final signUp1key = GlobalKey<FormState>();
   final signUp2key = GlobalKey<FormState>();
   //Variables

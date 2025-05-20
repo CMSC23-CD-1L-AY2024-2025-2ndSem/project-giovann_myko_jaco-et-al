@@ -11,7 +11,12 @@ class AppConvert {
   return base64Encode(bytes);
   }
 
+  //
   static Uint8List base64toImage (String base64String){
     return base64Decode(base64String);
+  }
+  //check if base64Image
+  static bool isBase64(String input) {
+  return !input.startsWith('http://') && !input.startsWith('https://');
   }
 }

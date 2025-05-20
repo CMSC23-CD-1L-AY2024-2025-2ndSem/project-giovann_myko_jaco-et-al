@@ -2,11 +2,16 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:planago/controllers/firestore/travel_plan_database.dart';
 import 'package:planago/controllers/firestore/user_database.dart';
+import 'package:planago/controllers/user_controller.dart';
 import 'package:planago/navigation_menu.dart';
 import 'package:planago/screens/authentication/login/login_page.dart';
+import 'package:planago/utils/constants/image_strings.dart';
 import 'package:planago/utils/helper/exceptions.dart';
 import 'package:planago/utils/helper/validator.dart';
+import 'package:planago/utils/loader/app_loader.dart';
 
 class AuthenticationController extends GetxController{
   static AuthenticationController get instance => Get.find();
@@ -58,6 +63,58 @@ class AuthenticationController extends GetxController{
   }
 }
 
+//Google Signin [https://www.youtube.com/watch?v=oUYiCbOETls&t=1s]
+Future<void> signInWithGoogle() async {
+  try {
+    AppLoader.openLoadingDialog("Logging In with Google", AppImages.docerAnimation);
+
+    final GoogleSignInAccount? userAccount = await GoogleSignIn().signIn();
+    if (userAccount == null) {
+      AppLoader.stopLoading();
+      return; // User cancelled
+    }
+
+    final GoogleSignInAuthentication googleAuth = await userAccount.authentication;
+    final credentials = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+
+    final userCredential = await _auth.signInWithCredential(credentials);
+    final email = userCredential.user?.email;
+    final uid = userCredential.user?.uid;
+
+    AppLoader.stopLoading();
+
+    if (email == null) {
+      Get.snackbar("Error", "Failed to retrieve email from Google account.");
+      return;
+    }
+
+    final exists = await UserDatabase.instance.isEmailTaken(email);
+
+    if (exists) {
+      await UserController.instance.fetchUserData(); // Get user from Firestore
+      TravelPlanDatabase.instance.listenToTravelPlans();
+      await screenRedirect(); // Navigate to home
+    } else {
+      // User does not exist in Firestore
+      // Navigate to sign-up screen with prefilled email (optional)
+      Get.offAllNamed('/signup', arguments: {
+        "uid": uid,
+        "email": email,
+        "fullName": userAccount.displayName ?? "",
+        "profilePic": userAccount.photoUrl ?? "",
+      });
+    }
+  } catch (e) {
+    AppLoader.stopLoading();
+    Get.snackbar("Google Sign-In Failed", "Something went wrong. Try again.");
+    print("Google Sign-In Error: $e");
+  }
+}
+
+  //SignOut
   Future<void> signOut() async {
     try{
       

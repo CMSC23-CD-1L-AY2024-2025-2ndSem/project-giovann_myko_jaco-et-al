@@ -71,4 +71,18 @@ class LoginController extends GetxController {
     }
   }
 
+  //Function for Google Signin
+  Future<void> googleSignIn () async {
+    try {
+      //Load animation
+      AppLoader.openLoadingDialog("Logging In with Google", AppImages.docerAnimation);
+
+      //Get user credentials
+      final userCredentials = AuthenticationController.instance.signInWithGoogle();
+      
+    } catch (e) {
+      
+    }
+  }
+
 }
