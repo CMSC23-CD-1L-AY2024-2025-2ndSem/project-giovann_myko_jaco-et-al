@@ -79,4 +79,15 @@ class UserController extends GetxController {
       }
     });
   }
+
+  Future<void> editUserProfile(UserModel user) async {
+    try {
+      await userRepo.updateUserData(user);
+      // refresh details on app
+      fetchUserData();
+      print("Update successful!");
+    } catch (e) {
+      print("Update failed: $e");
+    }
+  }
 }

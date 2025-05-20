@@ -4,7 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:planago/controllers/authentication_controller.dart';
+import 'package:planago/controllers/user_controller.dart';
+import 'package:planago/models/user_model.dart';
+import 'package:planago/screens/profile/choose_avatar_page.dart';
 import 'package:planago/utils/constants/colors.dart';
+import 'package:planago/utils/helper/converter.dart';
+import 'package:planago/utils/helper/validator.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key});
@@ -23,12 +29,25 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   // Temporary variables habang wala pa data model + database
   // ifefetch yung current details para mapalitan
-  String firstName = 'Myko Jefferson';
-  String lastName = 'Javier';
-  String phoneNumber = '997xxxxxxxx';
+  // String firstName = 'Myko Jefferson';
+  // String lastName = 'Javier';
+  // String phoneNumber = '997xxxxxxxx';
 
-  //
-  
+  @override
+  void initState() {
+    firstNameController.text = UserController.instance.user.value.firstName;
+    lastNameController.text = UserController.instance.user.value.lastName;
+    phoneNumberController.text = UserController.instance.user.value.phoneNumber;
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    firstNameController.dispose();
+    lastNameController.dispose();
+    phoneNumberController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,17 +67,19 @@ class _EditProfilePageState extends State<EditProfilePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 editProfileText(screenWidth, screenHeight),
-                Column(
-                  // Separate Column for spacing only
-                  spacing: screenHeight * 0.0183,
-                  children: [
-                    profilePicture(screenWidth, screenHeight),
-                    firstNameField(screenWidth, screenHeight),
-                    lastNameField(screenWidth, screenHeight),
-                    phoneNumberField(screenWidth, screenHeight),
-                    saveEditedProfile(screenWidth, screenHeight),
-                  ],
-                ),
+                Obx(() {
+                  return Column(
+                    // Separate Column for spacing only
+                    spacing: screenHeight * 0.0183,
+                    children: [
+                      profilePicture(screenWidth, screenHeight),
+                      firstNameField(screenWidth, screenHeight),
+                      lastNameField(screenWidth, screenHeight),
+                      phoneNumberField(screenWidth, screenHeight),
+                      saveEditedProfile(screenWidth, screenHeight),
+                    ],
+                  );
+                }),
               ],
             ),
           ),
@@ -107,16 +128,42 @@ class _EditProfilePageState extends State<EditProfilePage> {
   );
 
   Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    final XFile? pickedFile = await picker.pickImage(
-      source: ImageSource.gallery,
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+      ),
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: Icon(Icons.person),
+                title: Text('Choose from default avatar'),
+                onTap: () {
+                  Get.to(() => ChooseAvatarPage()); // Placeholder action
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.camera_alt),
+                title: Text('Use Camera'),
+                onTap: () {
+                  Get.back(); // Placeholder action
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.photo_library),
+                title: Text('Choose from gallery'),
+                onTap: () {
+                  Get.back(); // Placeholder action
+                },
+              ),
+            ],
+          ),
+        );
+      },
     );
-
-    if (pickedFile != null) {
-      setState(() {
-        _imageFile = File(pickedFile.path);
-      });
-    }
   }
 
   Widget profilePicture(double width, double height) {
@@ -125,12 +172,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
       child: SizedBox.square(
         dimension: height * 0.1169, //102
         child: ClipOval(
-          child:
-              _imageFile != null
-                  ? Image.file(_imageFile!, fit: BoxFit.cover)
-                  : Image.asset(
-                    'assets/images/default_profile.png',
-                  ), // temp only
+          child: Image.memory(
+            AppConvert.base64toImage(UserController.instance.user.value.avatar),
+          ),
         ),
       ),
     );
@@ -139,7 +183,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Widget firstNameField(double width, double height) => Container(
     padding: EdgeInsets.zero,
     width: width * 0.88,
-    height: height * 0.065,
+    height: height * 0.1,
     child: Column(
       children: [
         Flexible(
@@ -160,6 +204,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
           flex: 2,
           child: TextFormField(
             controller: firstNameController,
+            validator:
+                (value) => AppValidator.validateEmptyText('First name', value),
             textAlignVertical: TextAlignVertical.center,
             decoration: InputDecoration(
               contentPadding: EdgeInsets.symmetric(
@@ -176,7 +222,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 borderSide: BorderSide.none,
                 borderRadius: BorderRadius.circular(100),
               ),
-              labelText: firstName,
+              labelText: "Enter your first name",
               labelStyle: TextStyle(
                 fontSize: height * 0.015,
                 color: Color.fromARGB(255, 155, 155, 156),
@@ -195,7 +241,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Widget lastNameField(double width, double height) => Container(
     padding: EdgeInsets.zero,
     width: width * 0.88,
-    height: height * 0.065,
+    height: height * 0.1,
     child: Column(
       children: [
         Flexible(
@@ -215,7 +261,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
         Flexible(
           flex: 2,
           child: TextFormField(
-            controller: firstNameController,
+            controller: lastNameController,
+            validator:
+                (value) => AppValidator.validateEmptyText('Last name', value),
             textAlignVertical: TextAlignVertical.center,
             decoration: InputDecoration(
               contentPadding: EdgeInsets.symmetric(
@@ -232,7 +280,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 borderSide: BorderSide.none,
                 borderRadius: BorderRadius.circular(100),
               ),
-              labelText: lastName,
+              labelText: "Enter your last name",
               labelStyle: TextStyle(
                 fontSize: height * 0.015,
                 color: Color.fromARGB(255, 155, 155, 156),
@@ -251,7 +299,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Widget phoneNumberField(double width, double height) => Container(
     padding: EdgeInsets.zero,
     width: width * 0.88,
-    height: height * 0.065,
+    height: height * 0.1,
     child: Column(
       children: [
         Flexible(
@@ -271,7 +319,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
         Flexible(
           flex: 2,
           child: TextFormField(
-            controller: firstNameController,
+            controller: phoneNumberController,
+            validator: (value) => AppValidator.validatePhoneNumber(value),
             textAlignVertical: TextAlignVertical.center,
             decoration: InputDecoration(
               contentPadding: EdgeInsets.symmetric(
@@ -288,7 +337,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 borderSide: BorderSide.none,
                 borderRadius: BorderRadius.circular(100),
               ),
-              labelText: "+63  |  $phoneNumber",
+              labelText: "+63",
               labelStyle: TextStyle(
                 fontSize: height * 0.015,
                 color: Color.fromARGB(255, 155, 155, 156),
@@ -317,8 +366,19 @@ class _EditProfilePageState extends State<EditProfilePage> {
     ),
     child: OutlinedButton(
       onPressed: () {
-        /* SAVE PROFILE HERE*/
-        Get.back(result: _imageFile);
+        if (_formKey.currentState!.validate()) {
+          final userDetails = UserController.instance.user;
+          final user = userDetails.value.copyWith(
+            firstName: firstNameController.text,
+            lastName: lastNameController.text,
+            phoneNumber: phoneNumberController.text,
+          );
+
+          final controller = UserController.instance;
+          controller.editUserProfile(user);
+
+          Get.back();
+        }
       },
       style: OutlinedButton.styleFrom(
         side: BorderSide(color: Colors.transparent),
