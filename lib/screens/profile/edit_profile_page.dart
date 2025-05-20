@@ -12,6 +12,7 @@ import 'package:planago/models/user_model.dart';
 import 'package:planago/screens/profile/choose_avatar_page.dart';
 import 'package:planago/utils/constants/colors.dart';
 import 'package:planago/utils/helper/converter.dart';
+import 'package:planago/utils/helper/imagepicker.dart';
 import 'package:planago/utils/helper/validator.dart';
 
 class EditProfilePage extends StatefulWidget {
@@ -29,6 +30,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   final ImagePicker _picker = ImagePicker();
 
+  final RxList<String> interests = <String>[].obs;
+  final RxList<String> travelStyles = <String>[].obs;
+
   // Temporary variables habang wala pa data model + database
   // ifefetch yung current details para mapalitan
   // String firstName = 'Myko Jefferson';
@@ -40,6 +44,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
     firstNameController.text = UserController.instance.user.value.firstName;
     lastNameController.text = UserController.instance.user.value.lastName;
     phoneNumberController.text = UserController.instance.user.value.phoneNumber;
+    interests.value = UserController.instance.user.value.interests;
+    travelStyles.value = UserController.instance.user.value.travelStyle;
     super.initState();
   }
 
@@ -78,6 +84,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       firstNameField(screenWidth, screenHeight),
                       lastNameField(screenWidth, screenHeight),
                       phoneNumberField(screenWidth, screenHeight),
+                      buildInterestOptions(screenWidth, screenHeight),
+                      buildTravelStyleOptions(screenWidth, screenHeight),
                       saveEditedProfile(screenWidth, screenHeight),
                     ],
                   );
@@ -129,99 +137,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
     ),
   );
 
-  Future<void> _pickImage() async {
-    showModalBottomSheet(
-      context: context,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-      ),
-      builder: (BuildContext context) {
-        return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: Icon(Icons.person),
-                title: Text('Choose from default avatar'),
-                onTap: () {
-                  Get.to(() => ChooseAvatarPage()); // Placeholder action
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.camera_alt),
-                title: Text('Use Camera'),
-                onTap: () async {
-                  Get.back();
-                  XFile? image = await _picker.pickImage(source: ImageSource.camera);
-
-                  if (image != null) {
-                    final file = File(image.path);
-
-                    final compressedBytes = await FlutterImageCompress.compressWithFile(
-                      file.absolute.path,
-                      minWidth: 400,
-                      minHeight: 400,
-                      quality: 70,
-                    );
-
-                    if (compressedBytes != null) {
-                      final base64Profile = base64Encode(compressedBytes);
-
-                      final userDetails = UserController.instance.user;
-                      final user = userDetails.value.copyWith(
-                        avatar: base64Profile,
-                      );
-
-                      final controller = UserController.instance;
-                      controller.editUserProfile(user);
-                    }
-                  }
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.photo_library),
-                title: Text('Choose from gallery'),
-                onTap: () async {
-                  Get.back();
-                  XFile? image = await _picker.pickImage(
-                    source: ImageSource.gallery,
-                  );
-
-                  if (image != null) {
-                    final file = File(image.path);
-
-                    final compressedBytes =
-                        await FlutterImageCompress.compressWithFile(
-                          file.absolute.path,
-                          minWidth: 400,
-                          minHeight: 400,
-                          quality: 70,
-                        );
-
-                    if (compressedBytes != null) {
-                      final base64Profile = base64Encode(compressedBytes);
-
-                      final userDetails = UserController.instance.user;
-                      final user = userDetails.value.copyWith(
-                        avatar: base64Profile,
-                      );
-
-                      final controller = UserController.instance;
-                      controller.editUserProfile(user);
-                    }
-                  }
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
   Widget profilePicture(double width, double height) {
     return GestureDetector(
-      onTap: _pickImage,
+      onTap: () => ImagePickerUtil.pickProfileImage(context),
       child: SizedBox.square(
         dimension: height * 0.1169, //102
         child: ClipOval(
@@ -426,6 +344,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
             firstName: firstNameController.text,
             lastName: lastNameController.text,
             phoneNumber: phoneNumberController.text,
+            interests: interests,
+            travelStyle: travelStyles,
           );
 
           final controller = UserController.instance;
@@ -447,4 +367,138 @@ class _EditProfilePageState extends State<EditProfilePage> {
       ),
     ),
   );
+
+  Widget buildInterestOptions(double screenWidth, double screenHeight) {
+    return SizedBox(
+      width: screenWidth * 0.88,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Interests",
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              letterSpacing: -0.3,
+              fontSize: Get.height * 0.020,
+            ),
+          ),
+          Text(
+            "Select all the applies",
+            style: TextStyle(
+              fontWeight: FontWeight.w300,
+              letterSpacing: -0.3,
+              fontSize: Get.height * 0.014,
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+          SizedBox(height: screenHeight * 0.02),
+          Wrap(
+            spacing: 4,
+            runSpacing: 4,
+            children:
+                UserModel.setInterests.map((interest) {
+                  final isSelected = interests.contains(interest);
+                  return FilterChip(
+                    label: Text(interest),
+                    selected: isSelected,
+                    showCheckmark: false,
+                    onSelected: (selected) {
+                      if (selected) {
+                        interests.add(interest);
+                      } else {
+                        interests.remove(interest);
+                      }
+                    },
+                    labelStyle: TextStyle(
+                      fontSize: Get.height * 0.014,
+                      letterSpacing: -0.3,
+                      color:
+                          isSelected ? AppColors.mutedWhite : AppColors.black,
+                    ),
+                    selectedColor: AppColors.secondary,
+                    backgroundColor: Color(0xffF5F7FB),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      side: BorderSide.none,
+                    ),
+                    labelPadding: const EdgeInsets.symmetric(
+                      vertical: 0,
+                      horizontal: 5,
+                    ),
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  );
+                }).toList(),
+          ),
+          SizedBox(height: screenHeight * 0.02),
+        ],
+      ),
+    );
+  }
+
+  Widget buildTravelStyleOptions(double screenWidth, double screenHeight) {
+    return SizedBox(
+      width: screenWidth * 0.88,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Travel Styles",
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              letterSpacing: -0.3,
+              fontSize: Get.height * 0.020,
+            ),
+          ),
+          Text(
+            "Select all the applies",
+            style: TextStyle(
+              fontWeight: FontWeight.w300,
+              letterSpacing: -0.3,
+              fontSize: Get.height * 0.014,
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+          SizedBox(height: screenHeight * 0.02),
+          Wrap(
+            spacing: 4,
+            runSpacing: 4,
+            children:
+                UserModel.settravelStyles.map((style) {
+                  final isSelected = travelStyles.contains(style);
+                  return FilterChip(
+                    label: Text(style),
+                    selected: isSelected,
+                    showCheckmark: false,
+                    onSelected: (selected) {
+                      if (selected) {
+                        travelStyles.add(style);
+                      } else {
+                        travelStyles.remove(style);
+                      }
+                    },
+                    labelStyle: TextStyle(
+                      fontSize: Get.height * 0.014,
+                      letterSpacing: -0.3,
+                      color:
+                          isSelected ? AppColors.mutedWhite : AppColors.black,
+                    ),
+                    selectedColor: AppColors.secondary,
+                    backgroundColor: Color(0xffF5F7FB),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      side: BorderSide.none,
+                    ),
+                    labelPadding: const EdgeInsets.symmetric(
+                      vertical: 0,
+                      horizontal: 5,
+                    ),
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  );
+                }).toList(),
+          ),
+          SizedBox(height: screenHeight * 0.02),
+        ],
+      ),
+    );
+  }
 }

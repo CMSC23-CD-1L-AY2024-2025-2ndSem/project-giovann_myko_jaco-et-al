@@ -11,6 +11,7 @@ import 'package:planago/screens/profile/profile_detail_page.dart';
 import 'package:planago/utils/constants/colors.dart';
 import 'package:planago/utils/constants/image_strings.dart';
 import 'package:planago/utils/helper/converter.dart';
+import 'package:planago/utils/helper/imagepicker.dart';
 import 'package:planago/utils/loader/app_loader.dart';
 
 // Temporary model
@@ -109,6 +110,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget profileInfo(double width, double height) {
     return ListView.builder(
+      physics: NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       itemCount: profileItems.length,
       itemBuilder: (context, index) {
@@ -248,14 +250,17 @@ class _ProfilePageState extends State<ProfilePage> {
       height: height * 0.1828, //updated height val
       child: Column(
         children: [
-          SizedBox.square(
-            dimension: height * 0.1169, //102
-            child: ClipOval(
-              child: Image.memory(
-                AppConvert.base64toImage(
-                  UserController.instance.user.value.avatar,
+          GestureDetector(
+            onTap: () => ImagePickerUtil.pickProfileImage(context),
+            child: SizedBox.square(
+              dimension: height * 0.1169, //102
+              child: ClipOval(
+                child: Image.memory(
+                  AppConvert.base64toImage(
+                    UserController.instance.user.value.avatar,
+                  ),
+                  fit: BoxFit.cover,
                 ),
-                fit: BoxFit.cover,
               ),
             ),
           ),
