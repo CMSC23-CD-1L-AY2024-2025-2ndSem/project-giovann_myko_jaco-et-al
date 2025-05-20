@@ -1,15 +1,8 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:planago/controllers/authentication_controller.dart';
 import 'package:planago/controllers/user_controller.dart';
 import 'package:planago/models/user_model.dart';
-import 'package:planago/screens/profile/choose_avatar_page.dart';
 import 'package:planago/utils/constants/colors.dart';
 import 'package:planago/utils/helper/converter.dart';
 import 'package:planago/utils/helper/imagepicker.dart';
@@ -28,16 +21,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final lastNameController = TextEditingController();
   final phoneNumberController = TextEditingController();
 
-  final ImagePicker _picker = ImagePicker();
-
   final RxList<String> interests = <String>[].obs;
   final RxList<String> travelStyles = <String>[].obs;
-
-  // Temporary variables habang wala pa data model + database
-  // ifefetch yung current details para mapalitan
-  // String firstName = 'Myko Jefferson';
-  // String lastName = 'Javier';
-  // String phoneNumber = '997xxxxxxxx';
 
   @override
   void initState() {

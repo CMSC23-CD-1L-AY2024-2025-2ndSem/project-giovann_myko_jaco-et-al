@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:planago/components/app_bar_return.dart';
 import 'package:planago/controllers/user_controller.dart';
-import 'package:planago/models/user_model.dart';
 import 'package:planago/utils/constants/colors.dart';
 import 'package:planago/utils/constants/image_strings.dart';
 import 'package:planago/utils/helper/converter.dart';

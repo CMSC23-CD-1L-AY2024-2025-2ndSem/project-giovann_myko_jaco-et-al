@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
@@ -35,11 +33,8 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  File? _imageFile;
-  final controller = UserController.instance;
-  // Temporary variables habang wala pa data model + database
-  bool isPrivate = false;
 
+  final controller = UserController.instance;
   late List<ProfileInfo> profileItems;
 
   @override
