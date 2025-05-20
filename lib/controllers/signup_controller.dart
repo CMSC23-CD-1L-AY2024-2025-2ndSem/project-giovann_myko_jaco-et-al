@@ -13,24 +13,47 @@ class SignupController extends GetxController
 {
   static SignupController get instance => Get.find();
 
+  RxBool isGoogleSignUp = false.obs;
+
+  // Optional Google user data (passed via arguments)
+  String? googleUid;
+  String? googleEmail;
+  String? googleFullName;
+  String? googleProfilePic;
+
   //Custom Constructor for Google auth sign up
   SignupController({String? prefilledEmail}) {
-  final displayName = AuthenticationController.instance.authUser?.displayName;
-  //Get first and last name from display name
-  if (displayName != null && displayName.trim().isNotEmpty) {
-    final nameParts = displayName.trim().split(' ');
-    if (nameParts.length == 1) {
-      firstName.text = nameParts[0];
-      lastName.text = '';
+    final args = Get.arguments;
+    if (args != null) {
+      isGoogleSignUp.value = true;
+      googleUid = args['uid'];
+      googleEmail = args['email'];
+      googleFullName = args['fullName'];
+      googleProfilePic = args['profilePic'];
+
+      // Prefill email field
+      if (googleEmail != null) {
+        email.text = googleEmail!;
+      }
+      // Prefill name fields from fullName if available
+      if (googleFullName != null && googleFullName!.trim().isNotEmpty) {
+        final nameParts = googleFullName!.trim().split(' ');
+        if (nameParts.length == 1) {
+          firstName.text = nameParts[0];
+          lastName.text = '';
+        } else {
+          lastName.text = nameParts.last;
+          firstName.text = nameParts.sublist(0, nameParts.length - 1).join(' ');
+        }
+        isForm2Valid.value = true;
+      }
     } else {
-      lastName.text = nameParts.last;
-      firstName.text = nameParts.sublist(0, nameParts.length - 1).join(' ');
+      // Normal signup flow (email prefill if any)
+      if (prefilledEmail != null) {
+        email.text = prefilledEmail;
+      }
     }
   }
-  if (prefilledEmail != null) {
-    email.text = prefilledEmail;
-  }
-}
 
 
   final signUp1key = GlobalKey<FormState>();
@@ -73,34 +96,78 @@ class SignupController extends GetxController
     emailError.value = '';
     if(signUp2key.currentState!.validate()){
       isForm2Valid.value = true;
-    }else{
+    }
+    else{
       isForm2Valid.value = false;
     }
   }
 
   Future<void> signUp() async {
-    try{
-      //Start loading animation
-      AppLoader.openLoadingDialog("Creating your account", AppImages.docerAnimation);
-      //Register User in Firebase Authentication
-      final userCredential = await AuthenticationController.instance.registerWithEmailAndPassword(email.text.trim(), password.text.trim());
+  try {
+    AppLoader.openLoadingDialog("Creating your account", AppImages.docerAnimation);
 
-      //Convert avatar to base64
-      final base64Avatar = await AppConvert.convertAssetToBase64(avatar.value);
+    UserModel newUser;
 
-      //Save Authenticated user date in Firebase Firestore
-      final newUser = UserModel(uid: userCredential.user!.uid, username: username.text.trim(), avatar: base64Avatar, isPrivate: false,
-      email: email.text.trim(), interests: interests, travelStyle: travelStyles, firstName: firstName.text.trim(), lastName: lastName.text.trim(), phoneNumber: phoneNumber.text.trim(), following: [], followers: 0);
+    if (isGoogleSignUp.value) {
+      // Google signup completion: No password registration here, user already authenticated by Google.
+
+      // Use googleUid for Firebase UID, email and profilePic from Google data
+
+      newUser = UserModel(
+        uid: googleUid!,
+        username: username.text.trim(),
+        avatar: googleProfilePic ?? '',
+        isPrivate: false,
+        email: googleEmail!,
+        interests: interests,
+        travelStyle: travelStyles,
+        firstName: firstName.text.trim(),
+        lastName: lastName.text.trim(),
+        phoneNumber: phoneNumber.text.trim(),
+        following: [],
+        followers: 0,
+      );
+
+      // Save user in Firestore without Firebase Auth registration step
       UserController.instance.user(newUser);
       final userController = Get.put(UserDatabase());
-      userController.saveUserRecord(newUser);
-      TravelPlanDatabase.instance.listenToTravelPlans();
-      await AppLoader.stopLoading();
-      await AuthenticationController.instance.screenRedirect();
-    }catch (e){
-      throw "Error: ${e}";
+      await userController.saveUserRecord(newUser);
+    } else {
+      // Normal signup with email/password
+      final userCredential = await AuthenticationController.instance
+          .registerWithEmailAndPassword(email.text.trim(), password.text.trim());
+
+      final base64Avatar = await AppConvert.convertAssetToBase64(avatar.value);
+
+      newUser = UserModel(
+        uid: userCredential.user!.uid,
+        username: username.text.trim(),
+        avatar: base64Avatar,
+        isPrivate: false,
+        email: email.text.trim(),
+        interests: interests,
+        travelStyle: travelStyles,
+        firstName: firstName.text.trim(),
+        lastName: lastName.text.trim(),
+        phoneNumber: phoneNumber.text.trim(),
+        following: [],
+        followers: 0,
+      );
+
+      UserController.instance.user(newUser);
+      final userController = Get.put(UserDatabase());
+      await userController.saveUserRecord(newUser);
     }
+
+    TravelPlanDatabase.instance.listenToTravelPlans();
+    await AppLoader.stopLoading();
+    await AuthenticationController.instance.screenRedirect();
+
+  } catch (e) {
+    await AppLoader.stopLoading();
+    throw "Error: ${e}";
   }
+}
 
   Future<bool> isUsernameAvailable(String username) async {
   final existingUser = await UserDatabase.instance.getEmailFromUsername(username);

@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:planago/controllers/authentication_controller.dart';
 import 'package:planago/controllers/firestore/travel_plan_database.dart';
 import 'package:planago/controllers/user_controller.dart';
+import 'package:planago/navigation_menu.dart';
 import 'package:planago/utils/constants/colors.dart';
 import 'package:qr_code_scanner_plus/qr_code_scanner_plus.dart';
 
@@ -188,6 +189,10 @@ class _QRViewExampleState extends State<QRScannerScreen>
             AuthenticationController.instance.authUser!.uid,
           );
           Get.snackbar("Success", "Successfully Added");
+          Get.offUntil(
+                    MaterialPageRoute(builder: (_) => NavigationMenu()),
+                    (route) => route.settings.name == '/navigation',
+          );
           TravelPlanDatabase.instance.listenToTravelPlans();
         } 
         

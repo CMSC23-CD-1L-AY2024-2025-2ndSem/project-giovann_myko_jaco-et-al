@@ -423,7 +423,9 @@ class _LoginPageState extends State<LoginPage> {
         SizedBox(
           height: height * 0.0527,
           child: OutlinedButton(
-            onPressed: () {},
+            onPressed: () async {
+              await controller.googleSignIn();
+            },
             style: OutlinedButton.styleFrom(
               side: BorderSide(color: Color.fromARGB(255, 82, 82, 82)),
             ),

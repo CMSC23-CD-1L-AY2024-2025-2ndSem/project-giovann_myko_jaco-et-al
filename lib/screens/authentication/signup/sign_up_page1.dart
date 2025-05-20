@@ -6,7 +6,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:planago/controllers/signup_controller.dart';
 import 'package:planago/screens/authentication/login/login_page.dart';
 import 'package:planago/screens/authentication/signup/sign_up_page2.dart';
-import 'package:planago/screens/authentication/signup/sign_up_page4.dart';
+
 import 'package:planago/utils/constants/colors.dart';
 import 'package:planago/utils/constants/texts.dart';
 import 'package:planago/utils/helper/validator.dart';
@@ -22,7 +22,7 @@ class SignUpPage1 extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenWidth = Get.width;
     final screenHeight = Get.height;
-    final SignupController controller = Get.put(SignupController(prefilledEmail: prefilledEmail));
+    controller = Get.put(SignupController(prefilledEmail: prefilledEmail));
 
     return Obx(
       () => Scaffold(
@@ -113,14 +113,20 @@ class SignUpPage1 extends StatelessWidget {
                         textAlign: TextAlign.left,
                       ),
                       TextFormField(
+                        enabled: !controller.isGoogleSignUp.value,
                         controller: controller.password,
                         validator:
-                            (value) => AppValidator.validatePassword(value),
+                            (value) {
+                              if(controller.isGoogleSignUp.value){
+                                return null;
+                              }
+                              AppValidator.validatePassword(value);
+                            },
                         textAlignVertical: TextAlignVertical.center,
                         decoration: InputDecoration(
                           contentPadding: EdgeInsets.symmetric(vertical: 4),
                           filled: true,
-                          fillColor: Color.fromARGB(255, 245, 247, 251),
+                          fillColor: controller.isGoogleSignUp.value ? const Color.fromARGB(255, 199, 199, 199) : Color.fromARGB(255, 245, 247, 251),
                           border: OutlineInputBorder(
                             borderSide: BorderSide.none,
                             borderRadius: BorderRadius.circular(100),
@@ -181,7 +187,11 @@ class SignUpPage1 extends StatelessWidget {
                         textAlign: TextAlign.left,
                       ),
                       TextFormField(
+                        enabled: !controller.isGoogleSignUp.value,
                         validator: (value) {
+                          if(controller.isGoogleSignUp.value){
+                            return null;
+                          }
                           if (value == null || value.isEmpty) {
                             return "Please re-enter your password";
                           }
@@ -195,7 +205,7 @@ class SignUpPage1 extends StatelessWidget {
                         decoration: InputDecoration(
                           contentPadding: EdgeInsets.symmetric(vertical: 4),
                           filled: true,
-                          fillColor: Color.fromARGB(255, 245, 247, 251),
+                          fillColor: controller.isGoogleSignUp.value ? const Color.fromARGB(255, 199, 199, 199) : Color.fromARGB(255, 245, 247, 251),
                           border: OutlineInputBorder(
                             borderSide: BorderSide.none,
                             borderRadius: BorderRadius.circular(100),

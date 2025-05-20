@@ -968,7 +968,7 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
     FlightDetails details,
   ) {
     return Container(
-      height: height * 0.16,
+      height: height * 0.165,
       decoration: BoxDecoration(
         color: AppColors.primary,
         borderRadius: BorderRadius.circular(16),
