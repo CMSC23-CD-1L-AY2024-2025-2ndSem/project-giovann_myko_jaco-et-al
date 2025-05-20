@@ -112,45 +112,35 @@ class _ProfilePageState extends State<ProfilePage> {
       itemBuilder: (context, index) {
         final item = profileItems[index];
 
-        return GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ProfileDetailPage(item: item),
+        return Column(
+          children: [
+            Container(
+              margin: EdgeInsets.symmetric(vertical: height * 0.01),
+              padding: EdgeInsets.symmetric(
+                horizontal: width * 0.03,
+                vertical: height * 0.01,
               ),
-            );
-          },
-          child: Column(
-            children: [
-              Container(
-                margin: EdgeInsets.symmetric(vertical: height * 0.01),
-                padding: EdgeInsets.symmetric(
-                  horizontal: width * 0.05,
-                  vertical: height * 0.02,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12), // Rounded borders
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey[400]!.withValues(), // Light shadow
-                      spreadRadius: 2,
-                      blurRadius: 5,
-                      offset: Offset(0, 3), // Shadow position
-                    ),
-                  ],
-                ),
-                child: ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  leading: Icon(item.icon, color: AppColors.primary),
-                  title: Text(item.title),
-                  subtitle: Text(item.subtitle),
-                  trailing: Icon(Icons.arrow_forward, color: AppColors.primary),
-                ),
+              decoration: BoxDecoration(
+                
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12), // Rounded borders
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey[400]!.withValues(), // Light shadow
+                    spreadRadius: 2,
+                    blurRadius: 5,
+                    offset: Offset(0, 3), // Shadow position
+                  ),
+                ],
               ),
-            ],
-          ),
+              child: ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: Icon(item.icon, color: AppColors.primary),
+                title: Text(item.title),
+                subtitle: Text(item.subtitle),
+              ),
+            ),
+          ],
         );
       },
     );
