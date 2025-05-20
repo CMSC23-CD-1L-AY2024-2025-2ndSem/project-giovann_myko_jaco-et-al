@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:image_picker/image_picker.dart';
@@ -25,7 +27,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final lastNameController = TextEditingController();
   final phoneNumberController = TextEditingController();
 
-  File? _imageFile;
+  final ImagePicker _picker = ImagePicker();
 
   // Temporary variables habang wala pa data model + database
   // ifefetch yung current details para mapalitan
@@ -148,15 +150,66 @@ class _EditProfilePageState extends State<EditProfilePage> {
               ListTile(
                 leading: Icon(Icons.camera_alt),
                 title: Text('Use Camera'),
-                onTap: () {
-                  Get.back(); // Placeholder action
+                onTap: () async {
+                  Get.back();
+                  XFile? image = await _picker.pickImage(source: ImageSource.camera);
+
+                  if (image != null) {
+                    final file = File(image.path);
+
+                    final compressedBytes = await FlutterImageCompress.compressWithFile(
+                      file.absolute.path,
+                      minWidth: 400,
+                      minHeight: 400,
+                      quality: 70,
+                    );
+
+                    if (compressedBytes != null) {
+                      final base64Profile = base64Encode(compressedBytes);
+
+                      final userDetails = UserController.instance.user;
+                      final user = userDetails.value.copyWith(
+                        avatar: base64Profile,
+                      );
+
+                      final controller = UserController.instance;
+                      controller.editUserProfile(user);
+                    }
+                  }
                 },
               ),
               ListTile(
                 leading: Icon(Icons.photo_library),
                 title: Text('Choose from gallery'),
-                onTap: () {
-                  Get.back(); // Placeholder action
+                onTap: () async {
+                  Get.back();
+                  XFile? image = await _picker.pickImage(
+                    source: ImageSource.gallery,
+                  );
+
+                  if (image != null) {
+                    final file = File(image.path);
+
+                    final compressedBytes =
+                        await FlutterImageCompress.compressWithFile(
+                          file.absolute.path,
+                          minWidth: 400,
+                          minHeight: 400,
+                          quality: 70,
+                        );
+
+                    if (compressedBytes != null) {
+                      final base64Profile = base64Encode(compressedBytes);
+
+                      final userDetails = UserController.instance.user;
+                      final user = userDetails.value.copyWith(
+                        avatar: base64Profile,
+                      );
+
+                      final controller = UserController.instance;
+                      controller.editUserProfile(user);
+                    }
+                  }
                 },
               ),
             ],
@@ -174,6 +227,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         child: ClipOval(
           child: Image.memory(
             AppConvert.base64toImage(UserController.instance.user.value.avatar),
+            fit: BoxFit.cover,
           ),
         ),
       ),

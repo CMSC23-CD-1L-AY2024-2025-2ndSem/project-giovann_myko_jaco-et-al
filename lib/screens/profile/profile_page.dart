@@ -254,7 +254,8 @@ class _ProfilePageState extends State<ProfilePage> {
               child: Image.memory(
                 AppConvert.base64toImage(
                   UserController.instance.user.value.avatar,
-                ), // temp only
+                ),
+                fit: BoxFit.cover,
               ),
             ),
           ),
