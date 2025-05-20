@@ -1,11 +1,13 @@
 import 'dart:convert';
 import 'dart:math';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:planago/components/custom_app_bar.dart';
 import 'package:planago/controllers/firestore/travel_plan_database.dart';
+import 'package:planago/controllers/user_controller.dart';
 import 'package:planago/models/travel_plan_model.dart';
 import 'package:planago/screens/travel-plan/create_travel_plan_page.dart';
 import 'package:planago/screens/travel-plan/qr_code_scanner.dart';
@@ -39,6 +41,7 @@ class _TravelPlanPageState extends State<TravelPlanPage>
         child: OutlinedButton(
           //Implement creating a travel plan here
           onPressed: () {
+            print(UserController.instance.user.value);
             Get.to(() => CreatePlanPage());
           },
           style: OutlinedButton.styleFrom(

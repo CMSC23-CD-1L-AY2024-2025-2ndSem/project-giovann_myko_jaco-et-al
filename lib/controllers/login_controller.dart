@@ -56,6 +56,7 @@ class LoginController extends GetxController {
             AuthenticationController.instance.errorMessage.value;
       }else{
         await UserController.instance.fetchUserData();
+        print(UserController.instance.user.value.uid);
         TravelPlanDatabase.instance.listenToTravelPlans();
         await AppLoader.stopLoading();
         await AuthenticationController.instance.screenRedirect();

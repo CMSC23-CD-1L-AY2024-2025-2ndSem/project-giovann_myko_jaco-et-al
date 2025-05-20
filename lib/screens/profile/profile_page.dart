@@ -1,10 +1,11 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:planago/controllers/authentication_controller.dart';
+import 'package:planago/controllers/firestore/user_database.dart';
 import 'package:planago/controllers/user_controller.dart';
+import 'package:planago/models/user_model.dart';
 import 'package:planago/navigation_menu.dart';
 import 'package:planago/screens/profile/edit_profile_page.dart';
 import 'package:planago/screens/profile/profile_detail_page.dart';
@@ -14,20 +15,21 @@ import 'package:planago/utils/helper/converter.dart';
 import 'package:planago/utils/loader/app_loader.dart';
 
 // Temporary model
-class ProfileInfo
-{
+class ProfileInfo {
   final String title;
   final String subtitle;
   final IconData icon;
 
-  ProfileInfo({required this.title, required this.subtitle, required this.icon});
+  ProfileInfo({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+  });
 }
 
-class ProfilePage extends StatefulWidget 
-{
+class ProfilePage extends StatefulWidget {
   ProfilePage({super.key});
-
-  
+  UserModel currUser = UserController.instance.user.value;
   @override
   State<ProfilePage> createState() => _ProfilePageState();
 }
@@ -42,18 +44,38 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   void initState() {
-    super.initState();
     profileItems = [
-      ProfileInfo(icon: Icons.phone, title: 'Phone', subtitle: controller.user.value.phoneNumber),
-      ProfileInfo(icon: Icons.email, title: 'Email', subtitle: controller.user.value.email),
-      ProfileInfo(icon: Icons.favorite, title: 'Interests', subtitle: controller.user.value.interests.isNotEmpty ? controller.user.value.interests.join(', ') : 'No Interests'),
-      ProfileInfo(icon: Icons.flight_takeoff, title: 'Travel Styles', subtitle: controller.user.value.travelStyle.isNotEmpty ? controller.user.value.travelStyle.join(', ') : 'No Travel Styles'),
+      ProfileInfo(
+        icon: Icons.phone,
+        title: 'Phone',
+        subtitle: widget.currUser.phoneNumber,
+      ),
+      ProfileInfo(
+        icon: Icons.email,
+        title: 'Email',
+        subtitle: controller.user.value.email,
+      ),
+      ProfileInfo(
+        icon: Icons.favorite,
+        title: 'Interests',
+        subtitle:
+            controller.user.value.interests.isNotEmpty
+                ? controller.user.value.interests.join(', ')
+                : 'No Interests',
+      ),
+      ProfileInfo(
+        icon: Icons.flight_takeoff,
+        title: 'Travel Styles',
+        subtitle:
+            controller.user.value.travelStyle.isNotEmpty
+                ? controller.user.value.travelStyle.join(', ')
+                : 'No Travel Styles',
+      ),
     ];
   }
 
   @override
-  Widget build(BuildContext context) 
-  {
+  Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
@@ -75,9 +97,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 editProfile(screenWidth, screenHeight),
                 signOutButton(screenHeight, screenHeight),
                 profileInfo(screenWidth, screenHeight),
-                Container(
-                  height: screenHeight * 0.1,
-                )
+                Container(height: screenHeight * 0.1),
               ],
             ),
           ),
@@ -86,18 +106,15 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget profileInfo(double width, double height) 
-  {
+  Widget profileInfo(double width, double height) {
     return ListView.builder(
       shrinkWrap: true,
       itemCount: profileItems.length,
-      itemBuilder: (context, index) 
-      {
+      itemBuilder: (context, index) {
         final item = profileItems[index];
 
         return GestureDetector(
-          onTap: () 
-          {
+          onTap: () {
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -106,16 +123,17 @@ class _ProfilePageState extends State<ProfilePage> {
             );
           },
           child: Column(
-            children: 
-            [
+            children: [
               Container(
                 margin: EdgeInsets.symmetric(vertical: height * 0.01),
-                padding: EdgeInsets.symmetric(horizontal: width * 0.05, vertical: height * 0.02),
+                padding: EdgeInsets.symmetric(
+                  horizontal: width * 0.05,
+                  vertical: height * 0.02,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12), // Rounded borders
-                  boxShadow: 
-                  [
+                  boxShadow: [
                     BoxShadow(
                       color: Colors.grey[400]!.withValues(), // Light shadow
                       spreadRadius: 2,
@@ -139,12 +157,9 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-
-  Widget headButtons(double width, double height) 
-  {
+  Widget headButtons(double width, double height) {
     final WidgetStateProperty<Icon> thumbIcon =
-        WidgetStateProperty<Icon>.fromMap(<WidgetStatesConstraint, Icon>
-        {
+        WidgetStateProperty<Icon>.fromMap(<WidgetStatesConstraint, Icon>{
           WidgetState.selected: Icon(Iconsax.lock5, color: AppColors.black),
           WidgetState.any: Icon(
             Iconsax.global,
@@ -153,40 +168,32 @@ class _ProfilePageState extends State<ProfilePage> {
         });
 
     final WidgetStateProperty<Color?> overlayColor =
-        WidgetStateProperty.resolveWith((states) 
-        {
-          if (states.contains(WidgetState.selected))
-          {
+        WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
             return Color.fromRGBO(122, 215, 240, 0.6);
           }
           return Color.fromRGBO(30, 30, 30, 0.4);
         });
 
     final WidgetStateProperty<Color?> thumbColor =
-        WidgetStateProperty.resolveWith((states) 
-        {
-          if (states.contains(WidgetState.selected)) 
-          {
+        WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
             return AppColors.primary;
           }
           return AppColors.black;
         });
 
     final WidgetStateProperty<Color?> trackColor =
-        WidgetStateProperty.resolveWith((states) 
-        {
-          if (states.contains(WidgetState.selected)) 
-          {
+        WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
             return AppColors.black;
           }
           return AppColors.primary;
         });
 
     final WidgetStateProperty<Color?> trackOutlineColor =
-        WidgetStateProperty.resolveWith((states) 
-        {
-          if (states.contains(WidgetState.selected)) 
-          {
+        WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
             return AppColors.black;
           }
           return AppColors.primary;
@@ -197,24 +204,33 @@ class _ProfilePageState extends State<ProfilePage> {
       height: height * 0.0585,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: 
-        [
+        children: [
           Transform.scale(
             // make slider bigger
             scale: 1.2,
             child: Switch(
-              value: isPrivate,
+              value: widget.currUser.isPrivate,
               trackOutlineColor: trackOutlineColor,
               trackColor: trackColor,
               overlayColor: overlayColor,
               thumbColor: thumbColor,
               thumbIcon: thumbIcon,
-              onChanged: (value) 
-              {
-                setState(() 
-                {
-                  isPrivate = value;
-                });
+              onChanged: (value) async {
+                try {
+                  final updatedUser = widget.currUser.copyWith(
+                    isPrivate: value,
+                  );
+                  await UserDatabase.instance.updateUserData(updatedUser);
+
+                  setState(() {
+                    widget.currUser = updatedUser;
+                  });
+
+                  UserController.instance.user.value = updatedUser;
+                } catch (e, stackTrace) {
+                  print("Error in switch toggle: $e");
+                  print(stackTrace);
+                }
               },
             ),
           ),
@@ -235,8 +251,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget profilePicture(double width, double height) 
-  {
+  Widget profilePicture(double width, double height) {
     return SizedBox(
       width: width * 0.88,
       height: height * 0.1828, //updated height val
@@ -245,10 +260,12 @@ class _ProfilePageState extends State<ProfilePage> {
           SizedBox.square(
             dimension: height * 0.1169, //102
             child: ClipOval(
-              child:
-                  Image.memory(AppConvert.base64toImage(UserController.instance.user.value.avatar), // temp only
+              child: Image.memory(
+                AppConvert.base64toImage(
+                  UserController.instance.user.value.avatar,
+                ), // temp only
+              ),
             ),
-          ),
           ),
           // spacing between profile pic and texts
           SizedBox(width: width * 0.88, height: height * 0.01),
@@ -274,21 +291,22 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   //Sign out button
-  Widget signOutButton(double width, double height) 
-  {
+  Widget signOutButton(double width, double height) {
     return SizedBox(
       width: width * 0.44,
       height: height * 0.0218,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: 
-        [
+        children: [
           Icon(Iconsax.logout, color: AppColors.primary, size: height * 0.0195),
           TextButton(
             style: TextButton.styleFrom(padding: EdgeInsets.zero),
             onPressed: () async {
               //Start loading animation
-              AppLoader.openLoadingDialog("Logging you out...", AppImages.docerAnimation);
+              AppLoader.openLoadingDialog(
+                "Logging you out...",
+                AppImages.docerAnimation,
+              );
               await AuthenticationController.instance.signOut();
               AppLoader.stopLoading();
               await AuthenticationController.instance.screenRedirect();
@@ -310,15 +328,13 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget editProfile(double width, double height) 
-  {
+  Widget editProfile(double width, double height) {
     return SizedBox(
       width: width * 0.44,
       height: height * 0.0218,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: 
-        [
+        children: [
           Icon(Iconsax.edit, color: AppColors.primary, size: height * 0.0195),
           TextButton(
             style: TextButton.styleFrom(padding: EdgeInsets.zero),

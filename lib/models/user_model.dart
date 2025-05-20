@@ -37,13 +37,13 @@ class UserModel
   final bool isPrivate;
   final String username;
   final String firstName;
-final String lastName;
-final String phoneNumber;
-final String email;
-final List<String> interests;
-final List<String> travelStyle;
-final List<String> following;
-final int followers;
+  final String lastName;
+  final String phoneNumber;
+  final String email;
+  final List<String> interests;
+  final List<String> travelStyle;
+  final List<String> following;
+  final int followers;
 
 UserModel({
   required this.uid,
@@ -64,19 +64,21 @@ UserModel({
 Map<String, dynamic> toJson() 
 {
   return {
-    "FirstName": firstName,
+    "firstName": firstName,
     "isPrivate": isPrivate,
-    "LastName": lastName,
-    "Username": username,
-    "Email": email,
-    "PhoneNumber": phoneNumber,
-    "Interests": interests,
-    "TravelStyle": travelStyle,
-    "Following": following,
-    "Followers": followers,
-    "Avatar": avatar,
+    "lastName": lastName,
+    "username": username,
+    "email": email,
+    "phoneNumber": phoneNumber,
+    "interests": interests,
+    "travelStyle": travelStyle,
+    "following": following,
+    "followers": followers,
+    "avatar": avatar,
   };
+
 }
+
   factory UserModel.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> document) {
     final data = document.data();
     if (data == null) {
@@ -113,6 +115,37 @@ Map<String, dynamic> toJson()
       phoneNumber: '',
       following: [],
       followers: 0,
+    );
+  }
+
+  //Create copywith for updating user data
+  UserModel copyWith({
+    String? uid,
+    String? avatar,
+    bool? isPrivate,
+    String? username,
+    String? firstName,
+    String? lastName,
+    String? phoneNumber,
+    String? email,
+    List<String>? interests,
+    List<String>?travelStyle,
+    List<String>? following,
+    int? followers,
+  }){
+    return UserModel(
+      uid: uid ?? this.uid,
+      avatar: avatar ?? this.avatar,
+      username: username ?? this.username,
+      email: email ?? this.email,
+      interests: interests ?? this.interests,
+      travelStyle: travelStyle ?? this.travelStyle,
+      firstName: firstName ?? this.firstName,
+      lastName: lastName ?? this.lastName,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      following: following ?? this.following,
+      followers: followers ?? this.followers,
+      isPrivate: isPrivate ?? this.isPrivate,
     );
   }
 }

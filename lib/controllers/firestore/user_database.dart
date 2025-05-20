@@ -208,9 +208,9 @@ class UserDatabase extends GetxController {
   }
 
   //Function for updating user data
-  Future<void> updateUserData(UserModel user) async {
+  Future<void> updateUserData(UserModel updatedUser) async {
     try {
-      await _db.collection("Users").doc(user.uid).update(user.toJson());
+      await _db.collection("Users").doc(updatedUser.uid).update(updatedUser.toJson());
     } on FirebaseException catch (e) {
       throw "Error: ${e}";
     }

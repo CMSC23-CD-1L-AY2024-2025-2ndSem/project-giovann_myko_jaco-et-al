@@ -36,18 +36,6 @@ class AnimationLoader extends StatelessWidget {
               letterSpacing: -0.5
             ),
           ),
-          const SizedBox(height: 30),
-          showaction ? SizedBox(
-            width: 250,
-            child: OutlinedButton(
-              style: OutlinedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              onPressed: onPressed, child: Text(actionText!, style: TextStyle(fontFamily: "Cal Sans", fontSize: 22, color: AppColors.mutedWhite),),),
-          ): const SizedBox()
         ],
       ),
     );
