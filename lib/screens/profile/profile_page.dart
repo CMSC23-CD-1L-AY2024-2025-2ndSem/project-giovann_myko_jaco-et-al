@@ -278,13 +278,41 @@ class _ProfilePageState extends State<ProfilePage> {
             controller.user.value.username,
             style: TextStyle(
               color: Color.fromARGB(255, 82, 82, 82),
-              fontSize: height * 0.0105, //temporarily 105
+              fontSize: height * 0.0155, //adjusted
               fontWeight: FontWeight.w400,
             ),
           ),
         ],
       ),
     );
+  }
+
+  Future<bool> showConfirmSignOutDialog(BuildContext context) async {
+    return await showDialog<bool>(
+          context: context,
+          builder:
+              (context) => AlertDialog(
+                title: const Text("Confirm Logout"),
+                content: const Text("Are you sure you want to sign out?"),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(false),
+                    child: const Text(
+                      "Cancel",
+                      style: TextStyle(color: AppColors.secondary),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(true),
+                    child: const Text(
+                      "Sign Out",
+                      style: TextStyle(color: AppColors.secondary, fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                ],
+              ),
+        ) ??
+        false; // false if dialog is closed
   }
 
   //Sign out button
@@ -301,6 +329,9 @@ class _ProfilePageState extends State<ProfilePage> {
               padding: EdgeInsets.symmetric(horizontal: width * 0.02),
             ),
             onPressed: () async {
+              final confirmed = await showConfirmSignOutDialog(context);
+              if (!confirmed) return;
+
               //Start loading animation
               AppLoader.openLoadingDialog(
                 "Logging you out...",
