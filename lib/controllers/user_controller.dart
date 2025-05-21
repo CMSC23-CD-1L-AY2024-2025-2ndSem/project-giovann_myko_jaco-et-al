@@ -26,7 +26,7 @@ class UserController extends GetxController {
 
   Future<void> fetchSimilarUsers() async {
     try {
-      final fetchedSimilarUsers = await userRepo.findSimilarUsers(user.value);
+      final fetchedSimilarUsers = await userRepo.getMatchingUsers();
       similarUsers.assignAll(fetchedSimilarUsers);
       print("Fetched ${similarUsers.length} similar users.");
     } catch (e) {

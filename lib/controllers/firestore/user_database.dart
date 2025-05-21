@@ -195,6 +195,9 @@ class UserDatabase extends GetxController {
                 AuthenticationController.instance.authUser?.email) {
               return false;
             }
+            if(user.isPrivate == true){ //checks if private acc too
+              return false;
+            }
             final fullName = '${user.firstName} ${user.lastName}'.toLowerCase();
             final username = user.username.toLowerCase();
             return fullName.contains(lowerQuery) ||

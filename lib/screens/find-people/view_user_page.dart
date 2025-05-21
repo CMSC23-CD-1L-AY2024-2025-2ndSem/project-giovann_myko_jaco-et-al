@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
@@ -12,6 +11,7 @@ import 'package:planago/screens/profile/edit_profile_page.dart';
 import 'package:planago/screens/profile/profile_detail_page.dart';
 import 'package:planago/screens/profile/profile_page.dart';
 import 'package:planago/utils/constants/colors.dart';
+import 'package:planago/utils/helper/converter.dart';
 
 class ViewUserPage extends StatefulWidget {
   UserModel viewedUser;
@@ -212,9 +212,20 @@ class _ViewUserPageState extends State<ViewUserPage> {
           SizedBox.square(
             dimension: height * 0.1169, //102
             child: ClipOval(
-              child:
-                    Image.memory(base64Decode(image), 
-                    fit: BoxFit.cover,)
+              child: AppConvert.isBase64(image)
+                                ? Image.memory(
+                                  base64Decode(image),
+                                  fit: BoxFit.cover,
+                                )
+                                : Image.network(
+                                  image,
+                                  fit: BoxFit.cover,
+                                  errorBuilder:
+                                      (_, __, ___) => Image.asset(
+                                        'assets/images/default_profile.png',
+                                        fit: BoxFit.cover,
+                                      ),
+                                ),
             ),
           ),
           // spacing between profile pic and texts
