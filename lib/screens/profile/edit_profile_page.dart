@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
@@ -128,10 +130,20 @@ class _EditProfilePageState extends State<EditProfilePage> {
       child: SizedBox.square(
         dimension: height * 0.1169, //102
         child: ClipOval(
-          child: Image.memory(
-            AppConvert.base64toImage(UserController.instance.user.value.avatar),
-            fit: BoxFit.cover,
-          ),
+          child: AppConvert.isBase64(UserController.instance.user.value.avatar)
+                                ? Image.memory(
+                                  base64Decode(UserController.instance.user.value.avatar),
+                                  fit: BoxFit.cover,
+                                )
+                                : Image.network(
+                                  UserController.instance.user.value.avatar,
+                                  fit: BoxFit.cover,
+                                  errorBuilder:
+                                      (_, __, ___) => Image.asset(
+                                        'assets/images/default_profile.png',
+                                        fit: BoxFit.cover,
+                                      ),
+                                ),
         ),
       ),
     );

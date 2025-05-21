@@ -1,0 +1,13 @@
+#https://www.youtube.com/watch?v=U1BErwaE3zo&t=366s
+
+flutter_native_splash:
+  android: true
+  ios: true
+  web: false
+
+  color: "#FFFFFF"
+  image: "assets/images/PlanaGo-Logo.png"
+
+  android_12:
+    color: "FFFFFF"
+    image: "assets/images/PlanaGo-Logo-Android.png"
