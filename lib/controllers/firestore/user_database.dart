@@ -288,4 +288,16 @@ class UserDatabase extends GetxController {
     throw "Error fetching avatar: ${e.message}";
   }
 }
+
+  Future<List<String>> getAvatars(String creator, List<String>? people) async {
+  // Ensure the creator is always first
+  final uids = [creator, ...?people?.where((id) => id != creator)];
+
+  List<String> avatars = [];
+  for (String uid in uids) {
+    final avatar = await UserDatabase().getAvatarByUid(uid);
+    avatars.add(avatar!);
+  }
+  return avatars;
+}
 }

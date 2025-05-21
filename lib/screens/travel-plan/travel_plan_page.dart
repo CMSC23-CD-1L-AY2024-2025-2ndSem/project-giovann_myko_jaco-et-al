@@ -7,13 +7,16 @@ import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:planago/components/custom_app_bar.dart';
 import 'package:planago/controllers/firestore/travel_plan_database.dart';
+import 'package:planago/controllers/firestore/user_database.dart';
 import 'package:planago/controllers/user_controller.dart';
 import 'package:planago/models/travel_plan_model.dart';
+import 'package:planago/models/user_model.dart';
 import 'package:planago/screens/travel-plan/create_travel_plan_page.dart';
 import 'package:planago/screens/travel-plan/qr_code_scanner.dart';
 import 'package:planago/screens/travel-plan/travel_overview_page.dart';
 import 'package:planago/utils/constants/colors.dart';
 import 'package:planago/utils/constants/image_strings.dart';
+import 'package:planago/utils/helper/converter.dart';
 
 class TravelPlanPage extends StatefulWidget {
   const TravelPlanPage({super.key});
@@ -22,131 +25,144 @@ class TravelPlanPage extends StatefulWidget {
   State<TravelPlanPage> createState() => _TravelPlanPageState();
 }
 
-class _TravelPlanPageState extends State<TravelPlanPage> 
-{
+class _TravelPlanPageState extends State<TravelPlanPage> {
   // assuming profilePicture is in base64 string
   String? profilePicture;
   String username = "Myko Jefferson";
 
   @override
-  Widget build(BuildContext context) 
-  {
+  Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    return Obx(() => Scaffold(
-      floatingActionButton: SizedBox(
-        width: screenWidth * 0.88,
-        height: screenHeight * 0.065,
-        child: OutlinedButton(
-          //Implement creating a travel plan here
-          onPressed: () {
-            print(UserController.instance.user.value);
-            Get.to(() => CreatePlanPage());
-          },
-          style: OutlinedButton.styleFrom(
-            backgroundColor: Color.fromRGBO(227, 247, 255, 1),
-            side: BorderSide(color: Colors.transparent),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                "Start planning your trip",
-                style: TextStyle(
-                  fontSize: screenHeight * 0.0222,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primary,
-                  letterSpacing: -0.5,
-                ),
-              ),
-              Stack(
-                children: 
-                [
-                  Icon(
-                    Icons.add_rounded,
+    return Obx(
+      () => Scaffold(
+        floatingActionButton: SizedBox(
+          width: screenWidth * 0.88,
+          height: screenHeight * 0.065,
+          child: OutlinedButton(
+            //Implement creating a travel plan here
+            onPressed: () {
+              print(UserController.instance.user.value);
+              Get.to(() => CreatePlanPage());
+            },
+            style: OutlinedButton.styleFrom(
+              backgroundColor: Color.fromRGBO(227, 247, 255, 1),
+              side: BorderSide(color: Colors.transparent),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "Start planning your trip",
+                  style: TextStyle(
+                    fontSize: screenHeight * 0.0222,
+                    fontWeight: FontWeight.w600,
                     color: AppColors.primary,
-                    size: screenWidth * 0.065,
+                    letterSpacing: -0.5,
                   ),
-                  Positioned(
-                    left: 0.8,
-                    top: 0.8,
-                    child: Icon(
+                ),
+                Stack(
+                  children: [
+                    Icon(
                       Icons.add_rounded,
                       color: AppColors.primary,
                       size: screenWidth * 0.065,
                     ),
+                    Positioned(
+                      left: 0.8,
+                      top: 0.8,
+                      child: Icon(
+                        Icons.add_rounded,
+                        color: AppColors.primary,
+                        size: screenWidth * 0.065,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        body: Padding(
+          padding: EdgeInsets.only(
+            left: screenWidth * 0.06,
+            right: screenWidth * 0.06,
+            top: screenHeight * 0.02,
+          ),
+          child: Column(
+            children: [
+              CustomAppBar(),
+              // PADDING
+              SizedBox(width: screenWidth * 0.88, height: screenHeight * 0.025),
+              // TRAVEL PLANS TEXT
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Travel Plans",
+                    style: TextStyle(
+                      fontSize: screenHeight * 0.0333,
+                      fontFamily: "Cal Sans",
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.black,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      //Navigate to QR scanner page
+                      Get.to(() => QRScannerScreen());
+                    },
+                    icon: Container(
+                      width: screenWidth * 0.12,
+                      height: screenWidth * 0.12,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(40)),
+                        color: AppColors.mutedPrimary,
+                      ),
+                      child: Icon(Icons.qr_code),
+                    ),
                   ),
                 ],
               ),
+              // PADDING
+              SizedBox(width: screenWidth * 0.88, height: screenHeight * 0.02),
+              TravelPlanDatabase.instance.plans.isEmpty
+                  ? Center(
+                    child: Text(
+                      "You haven’t planned any trips yet  :<",
+                      style: TextStyle(
+                        fontSize: Get.width * 0.05,
+                        color: AppColors.mutedBlack,
+                        letterSpacing: -0.3,
+                      ),
+                    ),
+                  )
+                  : Expanded(
+                    child: ListView.separated(
+                      itemCount: TravelPlanDatabase.instance.plans.length,
+                      itemBuilder:
+                          (context, index) => travelListTile(
+                            screenWidth,
+                            screenHeight,
+                            TravelPlanDatabase.instance.plans[index],
+                          ),
+                      separatorBuilder:
+                          (context, index) =>
+                              SizedBox(height: screenHeight * 0.02),
+                    ),
+                  ),
+              SizedBox(height: screenHeight * 0.09), //spacer
             ],
           ),
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      body: Padding(
-        padding: EdgeInsets.only(
-          left: screenWidth * 0.06,
-          right: screenWidth * 0.06,
-          top: screenHeight * 0.02,
-        ),
-        child: Column(
-          children: [
-            CustomAppBar(),
-            // PADDING
-            SizedBox(width: screenWidth * 0.88, height: screenHeight * 0.025),
-            // TRAVEL PLANS TEXT
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "Travel Plans",
-                  style: TextStyle(
-                    fontSize: screenHeight * 0.0333,
-                    fontFamily: "Cal Sans",
-                    fontWeight: FontWeight.w400,
-                    color: AppColors.black,
-                    letterSpacing: -0.5,
-                  ),
-                ),
-                IconButton(onPressed: (){
-                  //Navigate to QR scanner page
-                  Get.to(()=> QRScannerScreen());
-                }, icon: Container(
-                  width: screenWidth * 0.12,
-                  height: screenWidth * 0.12,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(40)),
-                    color: AppColors.mutedPrimary,
-                  ),child: Icon(Icons.qr_code),
-                ))
-              ],
-            ),
-            // PADDING
-            SizedBox(width: screenWidth * 0.88, height: screenHeight * 0.02),
-            TravelPlanDatabase.instance.plans.isEmpty ? Center(child: Text("You haven’t planned any trips yet  :<", style: TextStyle(fontSize: Get.width * 0.05, color: AppColors.mutedBlack, letterSpacing: -0.3),)) :
-            Expanded(
-              child: ListView.separated(
-                itemCount: TravelPlanDatabase.instance.plans.length,
-                itemBuilder:
-                    (context, index) => travelListTile(
-                      screenWidth,
-                      screenHeight,
-                      TravelPlanDatabase.instance.plans[index],
-                    ),
-                separatorBuilder:
-                    (context, index) => SizedBox(height: screenHeight * 0.02),
-              ),
-            ),
-            SizedBox(height: screenHeight * 0.09) //spacer
-          ],
-        ),
-      ),
-    ));
+    );
   }
 
-  Widget header(double width, double height) 
-  {
+  Widget header(double width, double height) {
     return SizedBox(
       width: width * 0.88,
       child: Row(
@@ -174,8 +190,7 @@ class _TravelPlanPageState extends State<TravelPlanPage>
               // TEXTS BESIDE PROFILE PICTURE
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: 
-                [
+                children: [
                   Text(
                     "Good day!",
                     style: TextStyle(
@@ -221,11 +236,13 @@ class _TravelPlanPageState extends State<TravelPlanPage>
     );
   }
 
-  Widget travelListTile(double width, double height, TravelPlan plan) 
-  {
+  Widget travelListTile(double width, double height, TravelPlan plan) {
     return GestureDetector(
       onTap: () {
-        Get.to(() => TravelOverviewPage(plan: plan), arguments: [profilePicture]);
+        Get.to(
+          () => TravelOverviewPage(plan: plan),
+          arguments: [profilePicture],
+        );
       },
       child: Container(
         padding: EdgeInsets.all(width * 0.03),
@@ -246,7 +263,6 @@ class _TravelPlanPageState extends State<TravelPlanPage>
                         fit: BoxFit.cover,
                       )
                       : Image.asset(
-                        // HARD CODED IMAGE
                         AppImages.places[plan.imageIndex!],
                         width: width * 0.28,
                         height: height * 0.0977,
@@ -274,8 +290,7 @@ class _TravelPlanPageState extends State<TravelPlanPage>
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: 
-                [
+                children: [
                   Text(
                     plan.tripTitle,
                     style: TextStyle(
@@ -286,8 +301,7 @@ class _TravelPlanPageState extends State<TravelPlanPage>
                   ),
                   SizedBox(height: height * 0.0036),
                   Row(
-                    children: 
-                    [
+                    children: [
                       Icon(Icons.location_on, size: height * 0.017177),
                       SizedBox(width: width * 0.008),
                       Text(
@@ -298,8 +312,7 @@ class _TravelPlanPageState extends State<TravelPlanPage>
                   ),
                   SizedBox(height: height * 0.0014),
                   Row(
-                    children: 
-                    [
+                    children: [
                       Icon(Icons.calendar_today, size: height * 0.017177),
                       SizedBox(width: width * 0.008),
                       Text(
@@ -309,27 +322,58 @@ class _TravelPlanPageState extends State<TravelPlanPage>
                     ],
                   ),
                   SizedBox(height: height * 0.008),
-                  Row(
-                    // di ko sure ano purpose nung mga avatar, kaya
-                    // nag generate na lang ako
-                    // change later if necessary
-                    children: List.generate(
-                      3,
-                      (index) => Padding(
-                        padding: EdgeInsets.only(right: width * 0.012),
-                        child: CircleAvatar(
-                          radius: width * 0.024,
-                          backgroundImage: AssetImage(
-                            'assets/images/default_profile.png',
-                          ),
-                        ),
-                      ),
+
+                  FutureBuilder<List<String>>(
+                    future: UserDatabase.instance.getAvatars(
+                      plan.creator,
+                      plan.people,
                     ),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return SizedBox(); // Or loading indicator if desired
+                      }
+
+                      final avatars = snapshot.data!;
+                      final extraCount =
+                          avatars.length > 3 ? avatars.length - 3 : 0;
+                      final displayed = avatars.take(3).toList();
+
+                      return Row(
+                        children: [
+                          ...displayed.map(
+                            (avatar) => Padding(
+                              padding: EdgeInsets.only(right: width * 0.012),
+                              child: CircleAvatar(
+                                radius: width * 0.024,
+                                backgroundImage:
+                                    avatar.startsWith("http")
+                                        ? NetworkImage(avatar)
+                                        : MemoryImage(base64Decode(avatar))
+                                            as ImageProvider,
+                                backgroundColor: Colors.grey[200],
+                              ),
+                            ),
+                          ),
+                          if (extraCount > 0)
+                            CircleAvatar(
+                              radius: width * 0.024,
+                              backgroundColor: Colors.grey.shade300,
+                              child: Text(
+                                '+$extraCount',
+                                style: TextStyle(
+                                  fontSize: width * 0.025,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                        ],
+                      );
+                    },
                   ),
                 ],
               ),
             ),
-
             // BARCODE
             Column(
               children: [
