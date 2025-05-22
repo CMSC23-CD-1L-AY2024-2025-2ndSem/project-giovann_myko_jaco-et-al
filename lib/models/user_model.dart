@@ -40,7 +40,7 @@ class UserModel {
   final List<String> interests;
   final List<String> travelStyle;
   final List<String> following;
-  final int followers;
+  final List<String> followers;
 
   UserModel({
     required this.uid,
@@ -69,7 +69,7 @@ class UserModel {
     String? lastName,
     String? phoneNumber,
     List<String>? following,
-    int? followers,
+    List<String>? followers,
     bool? isPrivate,
   }) {
     return UserModel(
@@ -124,7 +124,7 @@ class UserModel {
       lastName: data["LastName"] ?? "",
       phoneNumber: data["PhoneNumber"] ?? "",
       following: List<String>.from(data["Following"] ?? []),
-      followers: data["Followers"] ?? 0,
+      followers: List<String>.from(data["Followers"] ?? []),
     );
   }
 
@@ -142,7 +142,7 @@ class UserModel {
       lastName: '',
       phoneNumber: '',
       following: [],
-      followers: 0,
+      followers: [],
     );
   }
 
