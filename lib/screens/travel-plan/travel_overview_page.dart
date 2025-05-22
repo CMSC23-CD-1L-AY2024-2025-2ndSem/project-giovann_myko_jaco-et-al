@@ -218,27 +218,29 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                   SizedBox.square(
                     dimension: width * 0.07,
                     child:
-                        pfp != null
-                            ? AppConvert.isBase64(pfp)
-                                ? Image.memory(
-                                  base64Decode(pfp),
-                                  fit: BoxFit.cover,
-                                )
-                                : Image.network(
-                                  pfp,
-                                  fit: BoxFit.cover,
-                                  errorBuilder:
-                                      (_, __, ___) => Image.asset(
-                                        'assets/images/default_profile.png',
-                                        fit: BoxFit.cover,
-                                      ),
-                                )
-                            : Image.asset(
-                              // HARD CODED IMAGE
-                              'assets/images/default_profile.png',
-                              width: width * 0.02,
-                              fit: BoxFit.cover,
-                            ),
+                        ClipOval(
+                          child: pfp != null
+                              ? AppConvert.isBase64(pfp)
+                                  ? Image.memory(
+                                    base64Decode(pfp),
+                                    fit: BoxFit.cover,
+                                  )
+                                  : Image.network(
+                                    pfp,
+                                    fit: BoxFit.cover,
+                                    errorBuilder:
+                                        (_, __, ___) => Image.asset(
+                                          'assets/images/default_profile.png',
+                                          fit: BoxFit.cover,
+                                        ),
+                                  )
+                              : Image.asset(
+                                // HARD CODED IMAGE
+                                'assets/images/default_profile.png',
+                                width: width * 0.02,
+                                fit: BoxFit.cover,
+                              ),
+                        ),
                   ),
                   SizedBox(
                     width: width * 0.16519,

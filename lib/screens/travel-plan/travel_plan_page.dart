@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:planago/components/custom_app_bar.dart';
+import 'package:planago/controllers/authentication_controller.dart';
 import 'package:planago/controllers/firestore/travel_plan_database.dart';
 import 'package:planago/controllers/firestore/user_database.dart';
 import 'package:planago/controllers/user_controller.dart';
@@ -17,6 +18,7 @@ import 'package:planago/screens/travel-plan/travel_overview_page.dart';
 import 'package:planago/utils/constants/colors.dart';
 import 'package:planago/utils/constants/image_strings.dart';
 import 'package:planago/utils/helper/converter.dart';
+import 'package:planago/utils/helper/validator.dart';
 
 class TravelPlanPage extends StatefulWidget {
   const TravelPlanPage({super.key});
@@ -236,6 +238,298 @@ class _TravelPlanPageState extends State<TravelPlanPage> {
     );
   }
 
+  Future<void> editTravelTile(TravelPlan plan) {
+    bool isCreator =
+        plan.creator == AuthenticationController.instance.authUser?.uid;
+    return showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+      ),
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              isCreator
+                  ? ListTile(
+                    leading: Icon(Icons.edit),
+                    title: Text('Edit'),
+                    onTap: () {
+                      Get.back();
+                      showEditBottomSheet(plan);
+                    },
+                  )
+                  : Container(),
+              ListTile(
+                leading: Icon(Icons.info),
+                title: Text('Info'),
+                onTap: () {
+                  Get.back();
+                  showInfoBottomSheet(plan);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  final TextEditingController tripTitleController = TextEditingController();
+  DateTimeRange? selectedDateRange;
+
+  Future<void> showInfoBottomSheet(TravelPlan plan) async {
+    final creator = await UserController.instance.fetchCreator(plan.creator);
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+            top: Get.height * 0.025,
+            left: Get.width * 0.06,
+            right: Get.width * 0.06,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+
+              Padding(
+                padding: EdgeInsets.only(bottom: Get.height * 0.012),
+                child: Text(
+                  "Creator",
+                  style: TextStyle(
+                    color: AppColors.secondary,
+                    fontWeight: FontWeight.w600,
+                    fontSize: Get.height * 0.0222,
+                  ),
+                ),
+              ),
+              Row(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(100),
+                    child: SizedBox.square(
+                      dimension: Get.height * 0.056,
+                      child:
+                          AppConvert.isBase64(creator.avatar)
+                              ? Image.memory(
+                                base64Decode(creator.avatar),
+                                fit: BoxFit.cover,
+                              )
+                              : Image.network(
+                                creator.avatar,
+                                fit: BoxFit.cover,
+                                errorBuilder:
+                                    (_, __, ___) => Image.asset(
+                                      'assets/images/default_profile.png',
+                                      fit: BoxFit.cover,
+                                    ),
+                              ),
+                    ),
+                  ),
+                  SizedBox(width: Get.width * 0.04),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "${creator.firstName} ${creator.lastName}",
+                        style: TextStyle(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w600,
+                          fontSize: Get.height * 0.018,
+                        ),
+                      ),
+                      Text(
+                        "@${creator.username}",
+                        style: TextStyle(
+                          color: AppColors.gray,
+                          fontWeight: FontWeight.w400,
+                          fontSize: Get.height * 0.015,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              SizedBox(height: Get.height * 0.04),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void showEditBottomSheet(TravelPlan plan) {
+    selectedDateRange = DateTimeRange(
+      start: plan.startDate!,
+      end: plan.endDate!,
+    );
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+      ),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+                left: Get.width * 0.06,
+                right: Get.width * 0.06,
+                top: Get.height * 0.03,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Edit Travel Plan',
+                    style: TextStyle(
+                      fontFamily: "Cal Sans",
+                      color: AppColors.secondary,
+                      fontSize: Get.height * 0.0222,
+                    ),
+                  ),
+                  TextFormField(
+                    controller: tripTitleController,
+                    cursorColor: AppColors.black,
+                    cursorHeight: context.height * 0.02,
+                    decoration: InputDecoration(
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(
+                          color: AppColors.black,
+                        ), // color when focused
+                      ),
+                      labelStyle: TextStyle(
+                        fontSize: context.height * 0.015,
+                        fontWeight: FontWeight.w400,
+                        color: AppColors.black,
+                      ),
+                      labelText: 'Trip title',
+                      prefixIcon: Icon(
+                        Icons.landscape_rounded,
+                        color: AppColors.black,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: Get.height * 0.02),
+                  ListTile(
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: context.width * 0.027,
+                    ),
+                    leading: Icon(Icons.date_range, color: AppColors.black),
+                    title: Text(
+                      selectedDateRange == null
+                          ? 'Select Date Range'
+                          : '${DateFormat.MMMd().format(selectedDateRange!.start)} - ${DateFormat.MMMd().format(selectedDateRange!.end)}',
+                      style: TextStyle(
+                        fontSize: context.height * 0.015,
+                        fontWeight: FontWeight.w400,
+                        color: AppColors.black,
+                      ),
+                    ),
+                    onTap: () async {
+                      final picked = await showDateRangePicker(
+                        initialDateRange: selectedDateRange,
+                        context: context,
+                        firstDate: DateTime.now(),
+                        lastDate: DateTime.now().add(Duration(days: 365)),
+                      );
+                      if (picked != null) {
+                        setModalState(() {
+                          selectedDateRange = picked;
+                        });
+                      }
+                    },
+                  ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                    ),
+                    onPressed: () async {
+                      if (tripTitleController.text.isNotEmpty &&
+                          selectedDateRange != null) {
+                        final updated = plan.copyWith(
+                          tripTitle: tripTitleController.text,
+                          startDate: selectedDateRange!.start,
+                          endDate: selectedDateRange!.end,
+                        );
+
+                        final controller = TravelPlanDatabase.instance;
+                        await controller.updateTravelPlan(updated);
+                        controller.listenToTravelPlans();
+                        tripTitleController.clear();
+                        Get.back();
+                      } else {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text(
+                                "Missing Fields",
+                                style: TextStyle(
+                                  fontFamily: "Cal Sans",
+                                  fontSize: Get.height * 0.03002,
+                                ),
+                              ),
+                              content: Text(
+                                "Please fill out trip title.",
+                                style: TextStyle(
+                                  fontSize: Get.height * 0.015,
+                                  fontWeight: FontWeight.w400,
+                                  color: AppColors.black,
+                                ),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: Text(
+                                    "Close",
+                                    style: TextStyle(
+                                      fontSize: context.height * 0.015,
+                                      fontWeight: FontWeight.w400,
+                                      color: AppColors.black,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      }
+                    },
+                    child: Text(
+                      'Save',
+                      style: TextStyle(color: AppColors.mutedWhite),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   Widget travelListTile(double width, double height, TravelPlan plan) {
     return GestureDetector(
       onTap: () {
@@ -243,6 +537,9 @@ class _TravelPlanPageState extends State<TravelPlanPage> {
           () => TravelOverviewPage(plan: plan),
           arguments: [profilePicture],
         );
+      },
+      onLongPress: () {
+        editTravelTile(plan);
       },
       child: Container(
         padding: EdgeInsets.all(width * 0.03),
@@ -394,4 +691,3 @@ class _TravelPlanPageState extends State<TravelPlanPage> {
     );
   }
 }
-  

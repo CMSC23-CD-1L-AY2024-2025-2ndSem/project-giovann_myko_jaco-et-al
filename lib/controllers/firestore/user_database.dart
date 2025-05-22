@@ -195,7 +195,8 @@ class UserDatabase extends GetxController {
                 AuthenticationController.instance.authUser?.email) {
               return false;
             }
-            if(user.isPrivate == true){ //checks if private acc too
+            if (user.isPrivate == true) {
+              //checks if private acc too
               return false;
             }
             final fullName = '${user.firstName} ${user.lastName}'.toLowerCase();
@@ -213,7 +214,10 @@ class UserDatabase extends GetxController {
   //Function for updating user data
   Future<void> updateUserData(UserModel updatedUser) async {
     try {
-      await _db.collection("Users").doc(updatedUser.uid).update(updatedUser.toJson());
+      await _db
+          .collection("Users")
+          .doc(updatedUser.uid)
+          .update(updatedUser.toJson());
     } on FirebaseException catch (e) {
       throw "Error: ${e}";
     }
@@ -228,76 +232,103 @@ class UserDatabase extends GetxController {
     }
   }
 
-
   //Function fror getting matched users
   Future<List<UserModel>> getMatchingUsers() async {
-  try {
-    final currentUserId = AuthenticationController.instance.authUser?.uid;
-    final currentUser = UserController.instance.user.value;
+    try {
+      final currentUserId = AuthenticationController.instance.authUser?.uid;
+      final currentUser = UserController.instance.user.value;
 
-    // Get users with matching interests
-    final interestQuery = await _db
-        .collection("Users")
-        .where("Interests", arrayContainsAny: currentUser.interests)
-        .get();
-    // Get users with matching travel style
-    final travelStyleQuery = await _db
-        .collection("Users")
-        .where("TravelStyle", arrayContainsAny: currentUser.travelStyle)
-        .get();
+      // Get users with matching interests
+      final interestQuery =
+          await _db
+              .collection("Users")
+              .where("Interests", arrayContainsAny: currentUser.interests)
+              .get();
+      // Get users with matching travel style
+      final travelStyleQuery =
+          await _db
+              .collection("Users")
+              .where("TravelStyle", arrayContainsAny: currentUser.travelStyle)
+              .get();
 
-    final Map<String, UserModel> matchMap = {}; //initialize map for matched Users
-    for (final doc in [...interestQuery.docs, ...travelStyleQuery.docs]) {
-      if (doc.id == currentUserId) continue; //skip if current user
+      final Map<String, UserModel> matchMap =
+          {}; //initialize map for matched Users
+      for (final doc in [...interestQuery.docs, ...travelStyleQuery.docs]) {
+        if (doc.id == currentUserId) continue; //skip if current user
 
-      final user = UserModel.fromSnapshot(doc);
-      if (!user.isPrivate) { //check if user is private
-        matchMap[doc.id] = user; //if not store the user in the matchMap with id as key
+        final user = UserModel.fromSnapshot(doc);
+        if (!user.isPrivate) {
+          //check if user is private
+          matchMap[doc.id] =
+              user; //if not store the user in the matchMap with id as key
+        }
       }
+      // Compute match scores
+      final List<MapEntry<UserModel, int>> scoredUsers =
+          matchMap.values.map((user) {
+            final interestMatches =
+                user.interests
+                    .where((i) => currentUser.interests.contains(i))
+                    .length;
+            final styleMatches =
+                user.travelStyle
+                    .where((t) => currentUser.travelStyle.contains(t))
+                    .length;
+            final totalMatches =
+                interestMatches + styleMatches; //add count of matches
+            return MapEntry(user, totalMatches);
+          }).toList();
+
+      // Sort by match score descending
+      scoredUsers.sort((a, b) => b.value.compareTo(a.value));
+
+      // Return only users list
+      return scoredUsers.map((entry) => entry.key).toList();
+    } on FirebaseException catch (e) {
+      throw "Error fetching matching users: $e";
     }
-    // Compute match scores
-    final List<MapEntry<UserModel, int>> scoredUsers = matchMap.values.map((user) {
-      final interestMatches = user.interests.where((i) => currentUser.interests.contains(i)).length;
-      final styleMatches = user.travelStyle.where((t) => currentUser.travelStyle.contains(t)).length;
-      final totalMatches = interestMatches + styleMatches; //add count of matches
-      return MapEntry(user, totalMatches);
-    }).toList();
-
-    // Sort by match score descending
-    scoredUsers.sort((a, b) => b.value.compareTo(a.value));
-
-    // Return only users list
-    return scoredUsers.map((entry) => entry.key).toList();
-  } on FirebaseException catch (e) {
-    throw "Error fetching matching users: $e";
-  }
   }
 
   //Function for retrieving avatar given a uid
   Future<String?> getAvatarByUid(String uid) async {
-  try {
-    final doc = await _db.collection("Users").doc(uid).get();
-    if (doc.exists) {
-      final data = doc.data();
-      if (data != null && data.containsKey("Avatar")) {
-        return data["Avatar"] as String;
+    try {
+      final doc = await _db.collection("Users").doc(uid).get();
+      if (doc.exists) {
+        final data = doc.data();
+        if (data != null && data.containsKey("Avatar")) {
+          return data["Avatar"] as String;
+        }
       }
+      return null; // No avatar found
+    } on FirebaseException catch (e) {
+      throw "Error fetching avatar: ${e.message}";
     }
-    return null; // No avatar found
-  } on FirebaseException catch (e) {
-    throw "Error fetching avatar: ${e.message}";
   }
-}
 
   Future<List<String>> getAvatars(String creator, List<String>? people) async {
-  // Ensure the creator is always first
-  final uids = [creator, ...?people?.where((id) => id != creator)];
+    // Ensure the creator is always first
+    final uids = [creator, ...?people?.where((id) => id != creator)];
 
-  List<String> avatars = [];
-  for (String uid in uids) {
-    final avatar = await UserDatabase().getAvatarByUid(uid);
-    avatars.add(avatar!);
+    List<String> avatars = [];
+    for (String uid in uids) {
+      final avatar = await UserDatabase().getAvatarByUid(uid);
+      avatars.add(avatar!);
+    }
+    return avatars;
   }
-  return avatars;
-}
+
+  Future<UserModel> getPlanCreator(String creatorId) async {
+    try {
+      final doc = await _db.collection("Users").doc(creatorId).get();
+
+      if (doc.exists && doc.data() != null) {
+        return UserModel.fromSnapshot(doc);
+      } else {
+        throw Exception("User not found");
+      }
+    } catch (e) {
+      print("Error fetching plan creator: $e");
+      rethrow; // Optional: rethrow to handle higher up
+    }
+  }
 }
