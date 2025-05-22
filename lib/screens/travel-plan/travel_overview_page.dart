@@ -318,7 +318,8 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
               width: width * 0.24119,
               height: height * 0.02715,
               child: OutlinedButton(
-                onPressed: () {
+                onPressed: () async{
+                  await TravelPlanDatabase.instance.getTripSuggestions(plan);
                   showSearch(
                     context: context,
                     delegate: SearchTripmateDelegate(

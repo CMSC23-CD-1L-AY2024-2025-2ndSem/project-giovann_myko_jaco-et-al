@@ -76,8 +76,6 @@ class SearchTripmateDelegate extends SearchDelegate {
 
   @override
   Widget buildResults(BuildContext context) {
-    TravelPlanDatabase.instance.getTripSuggestions(plan);
-
     return Obx(() {
       final suggestions =
           TravelPlanDatabase.instance.tripmateSuggestion
@@ -110,8 +108,6 @@ class SearchTripmateDelegate extends SearchDelegate {
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    TravelPlanDatabase.instance.getTripSuggestions(plan);
-
     return Obx(() {
       final suggestions =
           TravelPlanDatabase.instance.tripmateSuggestion
@@ -223,10 +219,7 @@ class SearchTripmateDelegate extends SearchDelegate {
                     reactivePeople.add(user.uid);
                   }
 
-                  // Optionally sync back to plan.people if you want them consistent
                   plan.people = reactivePeople.toList();
-
-                  // Refresh the tripmateSuggestion list after update
                   await TravelPlanDatabase.instance.getTripSuggestions(plan);
                 },
                 child: AnimatedContainer(
