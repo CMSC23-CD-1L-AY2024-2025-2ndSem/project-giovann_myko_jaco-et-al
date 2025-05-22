@@ -323,6 +323,7 @@ class _TravelPlanPageState extends State<TravelPlanPage> {
                   ),
                   SizedBox(height: height * 0.008),
 
+                  //AVATARS
                   FutureBuilder<List<String>>(
                     future: UserDatabase.instance.getAvatars(
                       plan.creator,
@@ -330,7 +331,7 @@ class _TravelPlanPageState extends State<TravelPlanPage> {
                     ),
                     builder: (context, snapshot) {
                       if (!snapshot.hasData) {
-                        return SizedBox(); // Or loading indicator if desired
+                        return SizedBox();
                       }
 
                       final avatars = snapshot.data!;
@@ -393,3 +394,4 @@ class _TravelPlanPageState extends State<TravelPlanPage> {
     );
   }
 }
+  
