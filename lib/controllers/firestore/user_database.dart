@@ -205,6 +205,10 @@ class UserDatabase extends GetxController {
                 username.contains(lowerQuery);
           }).toList();
 
+      filteredUsers.sort(
+        (a, b) => a.username.toLowerCase().compareTo(b.username.toLowerCase()),
+      );
+
       return filteredUsers;
     } on FirebaseException catch (e) {
       throw Exception("Firebase error [${e.code}]: ${e.message}");
