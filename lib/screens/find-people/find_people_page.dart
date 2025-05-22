@@ -96,7 +96,6 @@ class _SearchBar extends StatelessWidget {
             delegate: SearchUserDelegate(
               screenHeight: screenHeight,
               screenWidth: screenWidth,
-              isSearchOnly: true,
             ),
           );
         },
