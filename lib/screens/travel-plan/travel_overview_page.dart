@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:planago/components/custom_dotted_line.dart';
+import 'package:planago/components/search_tripmate_delegate.dart';
 import 'package:planago/components/search_user_delegate.dart';
 import 'package:planago/components/travel_app_bar.dart';
 import 'package:planago/controllers/authentication_controller.dart';
@@ -50,7 +51,9 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
   }
 
   Future<void> _loadAvatar() async {
-    final avatar = await UserDatabase.instance.getAvatarByUid(widget.plan.creator);
+    final avatar = await UserDatabase.instance.getAvatarByUid(
+      widget.plan.creator,
+    );
     setState(() {
       profilePicture = avatar;
     });
@@ -217,9 +220,9 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                 children: [
                   SizedBox.square(
                     dimension: width * 0.07,
-                    child:
-                        ClipOval(
-                          child: pfp != null
+                    child: ClipOval(
+                      child:
+                          pfp != null
                               ? AppConvert.isBase64(pfp)
                                   ? Image.memory(
                                     base64Decode(pfp),
@@ -240,7 +243,7 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                                 width: width * 0.02,
                                 fit: BoxFit.cover,
                               ),
-                        ),
+                    ),
                   ),
                   SizedBox(
                     width: width * 0.16519,
@@ -316,14 +319,12 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
               height: height * 0.02715,
               child: OutlinedButton(
                 onPressed: () {
-                  // TEMP PUT ONLY
-                  Get.put(SearchTripController());
                   showSearch(
                     context: context,
-                    delegate: SearchUserDelegate(
+                    delegate: SearchTripmateDelegate(
                       screenHeight: height,
                       screenWidth: width,
-                      isSearchOnly: false,
+                      plan: plan,
                     ),
                   );
                 },
@@ -490,12 +491,12 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                         final picked = await showDateRangePicker(
                           initialDateRange: selectedDateRange,
                           context: context,
-                
+
                           // wala pala tracker for what year ang travel plan
                           // for now, set ko muna for 1 year yung selection range
                           firstDate: DateTime.now(),
                           lastDate: DateTime.now().add(Duration(days: 365)),
-                
+
                           // di ko na naedit colors for range picker
                           // di ko mahanap properties
                         );
@@ -784,7 +785,8 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                       items:
                           ["First", "Business", "Economy"]
                               .map(
-                                (e) => DropdownMenuItem(value: e, child: Text(e)),
+                                (e) =>
+                                    DropdownMenuItem(value: e, child: Text(e)),
                               )
                               .toList(),
                       onChanged: (value) {
@@ -799,7 +801,10 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
                     ),
                     SizedBox(height: context.height * 0.006),
                     ListTile(
-                      leading: Icon(Icons.flight_takeoff, color: AppColors.black),
+                      leading: Icon(
+                        Icons.flight_takeoff,
+                        color: AppColors.black,
+                      ),
                       title: Text(
                         fromCountry?.name ?? 'Select Departure Country',
                       ),
