@@ -117,7 +117,7 @@ class NotificationService
       payload: plan.id,
     );
   }
-  
+
   // Cancel a scheduled notification
   Future<void> cancelNotification(int id) async 
   {

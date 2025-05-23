@@ -4,88 +4,93 @@ import 'package:planago/models/travel_plan_model.dart';
 import 'package:planago/screens/travel-plan/notification_service.dart';
 import 'package:planago/utils/constants/colors.dart';
 
-class NotificationSettingsScreen extends StatefulWidget 
-{
+class NotificationSettingsScreen extends StatefulWidget {
   final TravelPlan plan;
 
   const NotificationSettingsScreen({super.key, required this.plan});
 
   @override
-  State<NotificationSettingsScreen> createState() => _NotificationSettingsScreenState();
+  State<NotificationSettingsScreen> createState() =>
+      _NotificationSettingsScreenState();
 }
 
-class _NotificationSettingsScreenState extends State<NotificationSettingsScreen> 
-{
+class _NotificationSettingsScreenState
+    extends State<NotificationSettingsScreen> {
   final NotificationService _notificationService = NotificationService();
   int _selectedDays = 1; // Default: 1 day before trip if applicable
   bool _notificationsEnabled = true;
   String? _customDaysError;
 
-  List<Map<String, dynamic>> _getDynamicDayOptions() 
-  {
+  List<Map<String, dynamic>> _getDynamicDayOptions() {
     final now = DateTime.now();
     final startDate = widget.plan.startDate;
     if (startDate == null) return [];
 
     final daysUntilTrip = startDate.difference(now).inDays;
 
-    if (daysUntilTrip < 1) return [];
-
-    if (daysUntilTrip == 1) 
-    {
-      return 
-      [
-        {'days': 1, 'label': 'Today (9:00 PM)'},
+    if (daysUntilTrip < 1) {
+      return [
+        {'days': 0, 'label': 'Remind me today'},
       ];
-    } 
-    
-    else if (daysUntilTrip <= 7) 
-    {
-      // For trips within a week, show all possible days before
-      return List.generate(daysUntilTrip, (i) => 
-      {
-        'days': i + 1,
-        'label': '${i + 1} day${i == 0 ? '' : 's'} before',
-      }).reversed.toList();
-    } 
-    
-    else if (daysUntilTrip <= 31) 
-    {
+    }
+
+    if (daysUntilTrip == 1) {
+      return [
+        {'days': 1, 'label': 'Today (10:00 PM)'},
+        {'days': 0, 'label': 'Remind me today'},
+      ];
+    } else if (daysUntilTrip <= 7) {
+      // For trips within a week, show all possible days before + today
+      final options = List.generate(
+        daysUntilTrip,
+        (i) => {
+          'days': i + 1,
+          'label': '${i + 1} day${i == 0 ? '' : 's'} before',
+        },
+      );
+      options.add({'days': 0, 'label': 'Remind me today'});
+      return options.reversed.toList();
+    } else if (daysUntilTrip <= 31) {
       // For trips within a month, show week options
       List<Map<String, dynamic>> options = [];
-      for (int w = 1; w <= (daysUntilTrip ~/ 7); w++) 
-      {
-        options.add({'days': w * 7, 'label': '$w week${w > 1 ? 's' : ''} before'});
+      options.add({'days': 0, 'label': 'Remind me today'});
+      for (int w = 1; w <= (daysUntilTrip ~/ 7); w++) {
+        options.add({
+          'days': w * 7,
+          'label': '$w week${w > 1 ? 's' : ''} before',
+        });
       }
       options.add({'days': 1, 'label': '1 day before'});
       return options.reversed.toList();
-    } 
-    
-    else if (daysUntilTrip <= 365) 
-    {
+    } else if (daysUntilTrip <= 365) {
       // For trips within a year, show month options
       List<Map<String, dynamic>> options = [];
-      for (int m = 1; m <= (daysUntilTrip ~/ 30); m++) 
-      {
-        options.add({'days': m * 30, 'label': '$m month${m > 1 ? 's' : ''} before'});
+      options.add({'days': 0, 'label': 'Remind me today'});
+      for (int m = 1; m <= (daysUntilTrip ~/ 30); m++) {
+        options.add({
+          'days': m * 30,
+          'label': '$m month${m > 1 ? 's' : ''} before',
+        });
       }
       options.add({'days': 7, 'label': '1 week before'});
       options.add({'days': 1, 'label': '1 day before'});
       return options.reversed.toList();
-    } 
-    
-    else 
-    {
+    } else {
       // For trips more than a year away
       List<Map<String, dynamic>> options = [];
-      for (int y = 1; y <= (daysUntilTrip ~/ 365); y++) 
-      {
-        options.add({'days': y * 365, 'label': '$y year${y > 1 ? 's' : ''} before'});
+      options.add({'days': 0, 'label': 'Remind me today'});
+      for (int y = 1; y <= (daysUntilTrip ~/ 365); y++) {
+        options.add({
+          'days': y * 365,
+          'label': '$y year${y > 1 ? 's' : ''} before',
+        });
       }
-      
-      for (int m = 1; m <= 3; m++) 
-      {
-        options.add({'days': m * 30, 'label': '$m month${m > 1 ? 's' : ''} before'});
+
+      for (int m = 1; m <= 3; m++) {
+        options.add({
+          'days': m * 30,
+          'label': '$m month${m > 1 ? 's' : ''} before',
+        });
       }
       options.add({'days': 7, 'label': '1 week before'});
       options.add({'days': 1, 'label': '1 day before'});
@@ -94,14 +99,14 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
   }
 
   @override
-  Widget build(BuildContext context) 
-  {
+  Widget build(BuildContext context) {
     final width = Get.width;
     final height = Get.height;
     final availableOptions = _getDynamicDayOptions();
-    final daysUntilTrip = widget.plan.startDate != null
-        ? widget.plan.startDate!.difference(DateTime.now()).inDays
-        : 0;
+    final daysUntilTrip =
+        widget.plan.startDate != null
+            ? widget.plan.startDate!.difference(DateTime.now()).inDays
+            : 0;
 
     return Scaffold(
       appBar: AppBar(
@@ -146,9 +151,12 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                   ),
                   SizedBox(height: height * 0.01),
                   Row(
-                    children: 
-                    [
-                      Icon(Icons.location_on, size: height * 0.02, color: AppColors.primary),
+                    children: [
+                      Icon(
+                        Icons.location_on,
+                        size: height * 0.02,
+                        color: AppColors.primary,
+                      ),
                       SizedBox(width: width * 0.01),
                       Text(
                         widget.plan.destination,
@@ -172,23 +180,19 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
               ),
               subtitle: Text(
                 "Remind me before the trip",
-                style: TextStyle(
-                  fontSize: height * 0.016,
-                  color: Colors.grey,
-                ),
+                style: TextStyle(fontSize: height * 0.016, color: Colors.grey),
               ),
               value: _notificationsEnabled,
               activeColor: AppColors.primary,
-              onChanged: (value) 
-              {
-                setState(() 
-                {
+              onChanged: (value) {
+                setState(() {
                   _notificationsEnabled = value;
                 });
 
-                if (!value) 
-                {
-                  _notificationService.cancelNotification(widget.plan.id.hashCode);
+                if (!value) {
+                  _notificationService.cancelNotification(
+                    widget.plan.id.hashCode,
+                  );
                 }
               },
             ),
@@ -211,16 +215,20 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
               Container(
                 padding: EdgeInsets.symmetric(horizontal: width * 0.04),
                 child: Column(
-                  children: availableOptions.isNotEmpty
-                      ? availableOptions
-                          .map((opt) => _buildDayOption(opt['days'], opt['label']))
-                          .toList()
-                      : [
-                          Text(
-                            "No notification options available for this trip date.",
-                            style: TextStyle(color: Colors.grey),
-                          )
-                        ],
+                  children:
+                      availableOptions.isNotEmpty
+                          ? availableOptions
+                              .map(
+                                (opt) =>
+                                    _buildDayOption(opt['days'], opt['label']),
+                              )
+                              .toList()
+                          : [
+                            Text(
+                              "No notification options available for this trip date.",
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          ],
                 ),
               ),
               SizedBox(height: height * 0.04),
@@ -251,43 +259,25 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                               ),
                               errorText: _customDaysError,
                             ),
-                            onChanged: (value) 
-                            {
+                            onChanged: (value) {
                               int? days = int.tryParse(value);
-                              setState(() 
-                              {
-                                if (value.isEmpty) 
-                                {
+                              setState(() {
+                                if (value.isEmpty) {
                                   _customDaysError = null;
-                                } 
-                                
-                                else if (days == null) 
-                                {
+                                } else if (days == null) {
                                   _customDaysError = "Valid number only";
-                                } 
-                                
-                                else if (days > daysUntilTrip && !(daysUntilTrip < 1)) 
-                                {
+                                } else if (days > daysUntilTrip &&
+                                    !(daysUntilTrip < 1)) {
                                   _customDaysError = "1 to $daysUntilTrip only";
-                                }
-
-                                else if (days > daysUntilTrip && daysUntilTrip < 1) 
-                                {
+                                } else if (days > daysUntilTrip &&
+                                    daysUntilTrip < 1) {
                                   _customDaysError = "N/A";
-                                } 
-                                
-                                else if (days == 0) 
-                                {
+                                } else if (days == 0) {
                                   _customDaysError = "0 is not a valid option";
-                                } 
-                                
-                                else if (days < 0) 
-                                {
-                                  _customDaysError = "Negative numbers are not valid";
-                                }
-                                
-                                else 
-                                {
+                                } else if (days < 0) {
+                                  _customDaysError =
+                                      "Negative numbers are not valid";
+                                } else {
                                   _selectedDays = days;
                                   _customDaysError = null;
                                 }
@@ -318,20 +308,22 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
               width: double.infinity,
               height: height * 0.06,
               child: ElevatedButton(
-                onPressed: () async 
-                {
-                  if (_notificationsEnabled && _customDaysError == null) 
-                  {
-                    await _notificationService.scheduleTravelPlanReminder(
-                      widget.plan,
-                      _selectedDays,
-                    );
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Notification set for $_selectedDays days before trip'),
-                        backgroundColor: AppColors.primary,
-                      ),
-                    );
+                onPressed: () async {
+                  if (_notificationsEnabled && _customDaysError == null) {
+                    if (_selectedDays == 0) {
+                      await _notificationService.showImmediateNotification(
+                        widget.plan,
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Notification set for $_selectedDays days before trip',
+                          ),
+                          backgroundColor: AppColors.primary,
+                        ),
+                      );
+                    }
                   }
                   Get.back();
                 },
@@ -357,17 +349,14 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
   }
 
   // List tile for days
-  Widget _buildDayOption(int days, String label) 
-  {
+  Widget _buildDayOption(int days, String label) {
     return RadioListTile<int>(
       title: Text(label),
       value: days,
       groupValue: _selectedDays,
       activeColor: AppColors.primary,
-      onChanged: (value) 
-      {
-        setState(() 
-        {
+      onChanged: (value) {
+        setState(() {
           _selectedDays = value!;
           _customDaysError = null;
         });
