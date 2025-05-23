@@ -39,7 +39,6 @@ class _QRViewExampleState extends State<QRScannerScreen>
   @override
   Widget build(BuildContext context) 
   {
-    final width = Get.width;
     final height = Get.height;
     return Scaffold(
             appBar: AppBar(
@@ -59,7 +58,8 @@ class _QRViewExampleState extends State<QRScannerScreen>
         ),
       ),
       body: Column(
-        children: <Widget>[
+        children: <Widget>
+        [
           Expanded(flex: 4, child: _buildQrView(context)),
           Expanded(
             flex: 1,
@@ -147,7 +147,8 @@ class _QRViewExampleState extends State<QRScannerScreen>
     );
   }
 
-  Widget _buildQrView(BuildContext context) {
+  Widget _buildQrView(BuildContext context) 
+  {
     // For this example we check how width or tall the device is and change the scanArea and overlay accordingly.
     var scanArea = (MediaQuery.of(context).size.width < 400 ||
             MediaQuery.of(context).size.height < 400)
@@ -170,7 +171,8 @@ class _QRViewExampleState extends State<QRScannerScreen>
 
   void _onQRViewCreated(QRViewController controller) 
   {
-    setState(() {
+    setState(() 
+    {
       this.controller = controller;
     });
     controller.scannedDataStream.listen((scanData) async 
@@ -204,9 +206,11 @@ class _QRViewExampleState extends State<QRScannerScreen>
     });
   }
 
-  void _onPermissionSet(BuildContext context, QRViewController ctrl, bool p) {
+  void _onPermissionSet(BuildContext context, QRViewController ctrl, bool p) 
+  {
     log('${DateTime.now().toIso8601String()}_onPermissionSet $p');Get.snackbar("TRAVEL ID", result!.code!);
-    if (!p) {
+    if (!p) 
+    {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('no Permission')),
       );
