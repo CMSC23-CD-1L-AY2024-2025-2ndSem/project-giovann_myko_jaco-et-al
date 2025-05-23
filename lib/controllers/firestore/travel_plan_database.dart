@@ -4,7 +4,8 @@ import 'package:get/get.dart';
 import 'package:planago/controllers/authentication_controller.dart';
 import 'package:planago/models/travel_plan_model.dart';
 
-class TravelPlanDatabase extends GetxController {
+class TravelPlanDatabase extends GetxController 
+{
   static TravelPlanDatabase get instance => Get.find();
 
   final plans = <TravelPlan>[].obs;
@@ -104,6 +105,51 @@ class TravelPlanDatabase extends GetxController {
       return "Successfully deleted plan!";
     } catch (e) {
       return "Error: $e";
+    }
+  }
+
+  // Adds the travel plan ID to the user's shared plans if not already present
+  Future<String> sharePlanWithUserByUsername(String username, String planId) async 
+  {
+    try 
+    {
+      // Find user by username
+      final userSnap = await FirebaseFirestore.instance
+          .collection('Users')
+          .where('Username', isEqualTo: username)
+          .limit(1)
+          .get();
+
+      if (userSnap.docs.isEmpty) 
+      {
+        return "User not found";
+      }
+
+      final userDoc = userSnap.docs.first;
+      final userId = userDoc.id;
+
+      // Get the user's sharedPlans (or create if not present)
+      final sharedPlans = List<String>.from(userDoc.data()['SharedPlans'] ?? []);
+
+      if (sharedPlans.contains(planId)) 
+      {
+        return "Plan already shared with this user";
+      }
+
+      sharedPlans.add(planId);
+
+      // Update user document
+      await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(userId)
+          .update({'SharedPlans': sharedPlans});
+
+      return "Travel plan shared with $username";
+    } 
+    
+    catch (e) 
+    {
+      return "Error sharing plan: $e";
     }
   }
 }

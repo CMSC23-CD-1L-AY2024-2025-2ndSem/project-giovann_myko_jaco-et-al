@@ -7,6 +7,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:planago/controllers/firestore/travel_plan_database.dart';
 import 'package:planago/controllers/user_controller.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
@@ -100,7 +101,7 @@ class _QRCodeScreenState extends State<QRCodeScreen>
 
   // Share with a friend by username
   // TODO: must implement backend logic to share travel plan with existing user in the database
-  void _shareWithFriend() 
+  void _shareWithFriend() async 
   {
     if (_username == null || _username!.isEmpty) 
     {
@@ -125,18 +126,24 @@ class _QRCodeScreenState extends State<QRCodeScreen>
               child: Text('Cancel'),
             ),
             TextButton(
-              onPressed: () 
+              onPressed: () async 
               {
                 setState(() 
                 {
                   _username = _usernameController.text;
                 });
                 Navigator.pop(context);
-                //TODO: implement sharing logic here (backend)
+
+                // Call backend to share
+                final result = await TravelPlanDatabase.instance
+                    .sharePlanWithUserByUsername(_username!, widget.plan.id!);
+
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('Travel plan shared with $_username'),
-                    backgroundColor: AppColors.primary,
+                    content: Text(result),
+                    backgroundColor: result.contains("already shared")
+                        ? Colors.orange
+                        : AppColors.primary,
                   ),
                 );
               },
@@ -149,16 +156,20 @@ class _QRCodeScreenState extends State<QRCodeScreen>
     
     else 
     {
-      // Include in user model the shared travel plan via travel plan id
+      // Call backend to share
+      final result = await TravelPlanDatabase.instance
+          .sharePlanWithUserByUsername(_username!, widget.plan.id!);
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Travel plan shared with $_username'),
-          backgroundColor: AppColors.primary,
+          content: Text(result),
+          backgroundColor: result.contains("already shared")
+              ? Colors.orange
+              : AppColors.primary,
         ),
       );
     }
   }
-
   @override
   Widget build(BuildContext context) 
   {
@@ -341,7 +352,7 @@ class _QRCodeScreenState extends State<QRCodeScreen>
                   ),
                   icon: Icon(Icons.person_add, color: AppColors.primary),
                   label: Text(
-                    "Share with a friend",
+                    "Share with a followed User",
                     style: TextStyle(fontSize: height * 0.018),
                   ),
                 ),
