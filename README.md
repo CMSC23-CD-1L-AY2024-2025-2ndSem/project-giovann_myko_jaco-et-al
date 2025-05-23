@@ -1,74 +1,104 @@
-# CMSC 23 CD1L Travel Mobile App
+# <img src="assets/images/PlanaGo-Logo.png" width=100/> **PlanAgo**
+**Your Personalized Travel Planner**
 
-## Please Take Time to Read
+**PlanAgo** is a _beautifully crafted_ travel planning app built with **Flutter** and **Firebase**. Whether you’re a solo traveler or an adventure squad, PlanAgo helps you create, share, and manage your perfect trips—effortlessly.
 
-### Notes:
-- _**DO NOT PUSH IN THE MAIN BRANCH**_. Create/update into a new branch for any updates.
+---
 
-## Commit Messages Conventions
+## 📱 About the App
 
-#### For easier, well-documented, and more manageable tracking of changes, please follow these commit message conventions when making a commit.
+PlanAgo allows users to:
 
-- `feat` - commits that add or remove a new feature to the API or UI
-- `fix` - commits that fix an API or UI bug of a preceded `feat` commit
-- `refactor` - commits that rewrite/restructure your code, however do not change any API or UI behaviour
-  - `perf` - commits that are special `refactor` commits, which improve performance
-- `style` - commits that do not affect the meaning (white-space, formatting, missing semi-colons, etc)
-- `test` - commits that add missing tests or correcting existing tests
-- `docs` - commits, that affect documentation only
-- `build` - commits that affect build components like build tool, ci pipeline, dependencies, project version, etc.
-- `ops` - commits that affect operational components like infrastructure, deployment, backup, recovery, etc.
-- `chore` - miscellaneous commits e.g. modifying .gitignore
+- ✨ Create and manage travel plans with locations, dates, and additional details
+- 🧳 Add flights, accommodations, checklists, and daily itineraries  
+- 🔍 Find fellow travelers with similar travel styles and interests  
+- 📸 Customize their profile with pictures, interests, and travel styles  
+- 🤝 Share travel plans via QR code or username  
+- 🔔 Get notified before a trip (push notifications)
 
-### Examples
+---
 
-- ```
-  feat: added email notifications for new announcements
-  ```
-- ```
-  feat(job postings): added 'Add Job' button
-  ```
-- ```
-  fix: prevent creating announcement for empty content
-  ```
-- ```
-  fix(newsletters): resolved issue where newsletter images were not loading
-  ```
-- ```
-  refactor(auth): restructured authentication flow for better maintainability
-  ```
-- ```
-  perf: improved job listing load time by implementing pagination
-  ```
-- ```
-  perf(events): optimized RSVP list rendering to reduce re-renders
-  ```
-- ```
-  style(ui): updated button colors to match brand guidelines
-  ```
-- ```
-  style(typography): fixed inconsistent font sizes in event details page
-  ```
-- ```
-  test(auth): added unit tests for login and registration functions
-  ```
-- ```
-  docs(readme): updated project setup instructions
-  ```
-- ```
-  docs: added documentation for new job postings API endpoint
-  ```
-- ```
-  build: upgraded Firebase SDK to latest version
-  ```
-- ```
-  ops: implemented Firestore backup strategy for alumni data
-  ```
-- ```
-  chore(gitignore): ignored .env files for security reasons
-  ```
-- ```
-  chore: formatted code with Prettier
-  ```
+## 🔐 Features
 
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/_xlxIeVs)
+### Travel Plan Management
+- Create **personalized** trips with a **custom title**, **flexible date range**, and **precise location selection** using **Google Maps integration**
+- Add **comprehensive** travel details including **flight information**, **comfortable accommodations**, **actionable checklists**, and **important notes**
+- Build **detailed daily itineraries** featuring **specific locations**, **planned activities**, and **estimated expenses** for a well-organized travel experience
+- Share travel plans effortlessly through a **secure QR code** or by direct sharing to a **follower**
+
+### Social Discovery
+- Discover users with similar travel interests or styles
+- View public user profiles
+- Follow fellow travelers
+- Privacy controls to manage profile visibility
+
+### Profile Customization
+- Upload and update profile pictures
+- Edit personal information such as name, phone number, interests, and travel styles
+
+### Notifications
+- Push notifications to remind users of upcoming trips
+
+
+---
+
+## 🚀 Installation Guide
+
+### Download via APK (for Android Devices)
+Follow this link to be redirected to the APK installer of the app:
+[APK Installer 🩵✨]()
+
+### Download through GitHub
+1. Clone the repo  
+   ```bash
+   git clone https://github.com/CMSC23-CD-1L-AY2024-2025-2ndSem/project-giovann_myko_jaco-et-al.git
+   cd project-giovann_myko_jaco-et-al
+   ```
+
+2. Install Flutter dependencies  
+   ```bash
+   flutter pub get
+   ```
+
+3. Configure Firebase  
+   - Follow Firebase setup for Android and iOS
+   - Add your `google-services.json` and `GoogleService-Info.plist`  
+
+4. Connect your device
+   - Enable developer options in your personal device
+   - Ensure that USB debugging and allow install over USB options are toggled
+   - Select in VSCode the device where you want the app to be installed
+
+5. Run the app  
+   ```bash
+   flutter run
+   ```
+
+---
+
+## 🛠️ Technologies Used
+
+- **Flutter** for cross-platform mobile development  
+- **Firebase Auth** for login/signup  
+- **Cloud Firestore** for database  
+- **GetX** for state and route management
+
+---
+
+## 📸 Screenshots  
+_(*Include cute mockups or real screenshots here!*)_
+
+
+---
+
+## 🩵 Acknowledgments
+
+This project is developed as part of an academic course. Special thanks to the our course inctructors Mr. Aldrin Hao and Ms. Abigail Nadua~! 🩵 
+
+---
+
+## 🩵 License
+
+This project is for educational purposes only and is not intended for commercial use. All of the images and resources used in this project are license-free and open for non-commercial use.
+
+
