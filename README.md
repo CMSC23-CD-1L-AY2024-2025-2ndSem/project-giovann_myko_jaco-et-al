@@ -105,16 +105,96 @@ Follow this link to be redirected to the APK installer of the app:
 <table align="center">
   <tr>
     <td align="center">
-      <img src="assets/screenshots/splash-screen.png" alt="Splash Screen" width="200"/><br/>
-      <strong>Splash Screen</strong>
+      <img src="assets/screenshots/signup-screen1.png" alt="Sign Up Screen 1" width="200"/><br/>
+      <strong>Sign Up Screen 1</strong>
     </td>
     <td align="center">
-      <img src="assets/screenshots/login-screen.png" alt="Login Screen" width="200"/><br/>
-      <strong>Login Screen</strong>
+      <img src="assets/screenshots/signup-screen2.png" alt="Sign Up Screen 2" width="200"/><br/>
+      <strong>Sign Up Screen 2</strong>
     </td>
     <td align="center">
-      <img src="assets/screenshots/google-login.png" alt="Google Login" width="200"/><br/>
-      <strong>Google Login</strong>
+      <img src="assets/screenshots/signup-screen3.png" alt="Sign Up Screen 3" width="200"/><br/>
+      <strong>Sign Up Screen 3</strong>
+    </td>
+  </tr>
+</table>
+<table align="center">
+  <tr>
+    <td align="center">
+      <img src="assets/screenshots/avatar-screen.png" alt="Avatar Selection" width="200"/><br/>
+      <strong>Avatar Selection</strong>
+    </td>
+    <td align="center">
+      <img src="assets/screenshots/travel-plans.png" alt="Travel Plan Screen" width="200"/><br/>
+      <strong>Travel Plan Screen</strong>
+    </td>
+    <td align="center">
+      <img src="assets/screenshots/travel-plan-overview.png" alt="Travel Plan Overview" width="200"/><br/>
+      <strong>Travel Plan Overview</strong>
+    </td>
+  </tr>
+</table>
+<table align="center">
+  <tr>
+    <td align="center">
+      <img src="assets/screenshots/share-plan.png" alt="QR Code Sharing" width="200"/><br/>
+      <strong>QR Code Sharing</strong>
+    </td>
+    <td align="center">
+      <img src="assets/screenshots/qr-scanner.png" alt="QR Code Scanner" width="200"/><br/>
+      <strong>QR Code Scanner</strong>
+    </td>
+    <td align="center">
+      <img src="assets/screenshots/itinerary-screen.png" alt="Itinerary Screen" width="200"/><br/>
+      <strong>Itinerary Screen</strong>
+    </td>
+  </tr>
+</table>
+<table align="center">
+  <tr>
+    <td align="center">
+      <img src="assets/screenshots/plan-new-trip.png" alt="Create a Plan" width="200"/><br/>
+      <strong>Create a Plan</strong>
+    </td>
+    <td align="center">
+      <img src="assets/screenshots/location-picker.png" alt="Location Picker" width="200"/><br/>
+      <strong>Location Picker</strong>
+    </td>
+    <td align="center">
+      <img src="assets/screenshots/date-picker.png" alt="Date Picker" width="200"/><br/>
+      <strong>Date Picker</strong>
+    </td>
+  </tr>
+</table>
+<table align="center">
+  <tr>
+    <td align="center">
+      <img src="assets/screenshots/find-similar-people.png" alt="Find Similar People" width="200"/><br/>
+      <strong>Find Similar People</strong>
+    </td>
+    <td align="center">
+      <img src="assets/screenshots/view-profile.png" alt="View Other Profile" width="200"/><br/>
+      <strong>View Other Profile</strong>
+    </td>
+    <td align="center">
+      <img src="assets/screenshots/search-users.png" alt="Search Users" width="200"/><br/>
+      <strong>Search Users</strong>
+    </td>
+  </tr>
+</table>
+<table align="center">
+  <tr>
+    <td align="center">
+      <img src="assets/screenshots/profile-page.png" alt="Profile Page" width="200"/><br/>
+      <strong>Profile Page</strong>
+    </td>
+    <td align="center">
+      <img src="assets/screenshots/edit-profile.png" alt="Edit Profile Page" width="200"/><br/>
+      <strong>Edit Profile Page</strong>
+    </td>
+    <td align="center">
+      <img src="assets/screenshots/splash-woop.png" alt="PlanAgo" width="200"/><br/>
+      <strong>PlanAgo</strong>
     </td>
   </tr>
 </table>
