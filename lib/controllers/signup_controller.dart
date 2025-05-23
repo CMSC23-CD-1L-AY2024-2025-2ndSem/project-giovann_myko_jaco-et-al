@@ -125,7 +125,7 @@ class SignupController extends GetxController
         lastName: lastName.text.trim(),
         phoneNumber: phoneNumber.text.trim(),
         following: [],
-        followers: 0,
+        followers: [],
       );
 
       // Save user in Firestore without Firebase Auth registration step
@@ -151,7 +151,7 @@ class SignupController extends GetxController
         lastName: lastName.text.trim(),
         phoneNumber: phoneNumber.text.trim(),
         following: [],
-        followers: 0,
+        followers: [],
       );
 
       UserController.instance.user(newUser);

@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:planago/components/custom_dotted_line.dart';
+import 'package:planago/components/search_tripmate_delegate.dart';
 import 'package:planago/components/search_user_delegate.dart';
 import 'package:planago/components/travel_app_bar.dart';
 import 'package:planago/controllers/authentication_controller.dart';
@@ -50,7 +51,9 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
   }
 
   Future<void> _loadAvatar() async {
-    final avatar = await UserDatabase.instance.getAvatarByUid(widget.plan.creator);
+    final avatar = await UserDatabase.instance.getAvatarByUid(
+      widget.plan.creator,
+    );
     setState(() {
       profilePicture = avatar;
     });
@@ -321,15 +324,14 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
               width: width * 0.24119,
               height: height * 0.02715,
               child: OutlinedButton(
-                onPressed: () {
-                  // TEMP PUT ONLY
-                  Get.put(SearchTripController());
+                onPressed: () async{
+                  await TravelPlanDatabase.instance.getTripSuggestions(plan);
                   showSearch(
                     context: context,
-                    delegate: SearchUserDelegate(
+                    delegate: SearchTripmateDelegate(
                       screenHeight: height,
                       screenWidth: width,
-                      isSearchOnly: false,
+                      plan: plan,
                     ),
                   );
                 },
@@ -420,152 +422,157 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
     showModalBottomSheet(
       context: context,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
       ),
       builder: (_) {
         return StatefulBuilder(
           builder: (context, setState) {
             return Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.width * 0.06,
-                vertical: context.height * 0.04,
+              padding: EdgeInsets.only(
+                left: context.width * 0.06,
+                right: context.width * 0.06,
+                top: context.height * 0.04,
+                bottom: MediaQuery.of(context).viewInsets.bottom,
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: nameController,
-                    cursorColor: AppColors.black,
-                    cursorHeight: context.height * 0.02,
-                    decoration: InputDecoration(
-                      focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(
+              child: SingleChildScrollView(
+                physics: NeverScrollableScrollPhysics(),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: nameController,
+                      cursorColor: AppColors.black,
+                      cursorHeight: context.height * 0.02,
+                      decoration: InputDecoration(
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(
+                            color: AppColors.black,
+                          ), // color when focused
+                        ),
+                        labelStyle: TextStyle(
+                          fontSize: context.height * 0.015,
+                          fontWeight: FontWeight.w400,
                           color: AppColors.black,
-                        ), // color when focused
-                      ),
-                      labelStyle: TextStyle(
-                        fontSize: context.height * 0.015,
-                        fontWeight: FontWeight.w400,
-                        color: AppColors.black,
-                      ),
-                      labelText: 'Hotel Name',
-                      prefixIcon: Icon(Icons.hotel, color: AppColors.black),
-                    ),
-                  ),
-                  TextField(
-                    controller: roomController,
-                    cursorColor: AppColors.black,
-                    cursorHeight: context.height * 0.02,
-                    decoration: InputDecoration(
-                      focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: AppColors.black),
-                      ),
-                      labelStyle: TextStyle(
-                        fontSize: context.height * 0.015,
-                        fontWeight: FontWeight.w400,
-                        color: AppColors.black,
-                      ),
-                      labelText: 'Room Number',
-                      prefixIcon: Icon(
-                        Icons.meeting_room,
-                        color: AppColors.black,
+                        ),
+                        labelText: 'Hotel Name',
+                        prefixIcon: Icon(Icons.hotel, color: AppColors.black),
                       ),
                     ),
-                  ),
-                  SizedBox(height: context.height * 0.006),
-                  ListTile(
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: context.width * 0.027,
-                    ),
-                    leading: Icon(Icons.date_range, color: AppColors.black),
-                    title: Text(
-                      selectedDateRange == null
-                          ? 'Select Date Range'
-                          : '${DateFormat.MMMd().format(selectedDateRange!.start)} - ${DateFormat.MMMd().format(selectedDateRange!.end)}',
-                      style: TextStyle(
-                        fontSize: context.height * 0.015,
-                        fontWeight: FontWeight.w400,
-                        color: AppColors.black,
+                    TextField(
+                      controller: roomController,
+                      cursorColor: AppColors.black,
+                      cursorHeight: context.height * 0.02,
+                      decoration: InputDecoration(
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: AppColors.black),
+                        ),
+                        labelStyle: TextStyle(
+                          fontSize: context.height * 0.015,
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.black,
+                        ),
+                        labelText: 'Room Number',
+                        prefixIcon: Icon(
+                          Icons.meeting_room,
+                          color: AppColors.black,
+                        ),
                       ),
                     ),
-                    onTap: () async {
-                      final picked = await showDateRangePicker(
-                        initialDateRange: selectedDateRange,
-                        context: context,
-
-                        // wala pala tracker for what year ang travel plan
-                        // for now, set ko muna for 1 year yung selection range
-                        firstDate: DateTime.now(),
-                        lastDate: DateTime.now().add(Duration(days: 365)),
-
-                        // di ko na naedit colors for range picker
-                        // di ko mahanap properties
-                      );
-                      if (picked != null) {
-                        setState(() => selectedDateRange = picked);
-                      }
-                    },
-                  ),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                    ),
-                    onPressed: () {
-                      if (nameController.text.isNotEmpty &&
-                          roomController.text.isNotEmpty &&
-                          selectedDateRange != null) {
-                        final details = AccommodationDetails(
-                          name: nameController.text,
-                          room: roomController.text,
-                          startDate: selectedDateRange!.start,
-                          endDate: selectedDateRange!.end,
-                        );
-                        Navigator.pop(context);
-                        onSave(details);
-                      } else {
-                        showDialog(
+                    SizedBox(height: context.height * 0.006),
+                    ListTile(
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: context.width * 0.027,
+                      ),
+                      leading: Icon(Icons.date_range, color: AppColors.black),
+                      title: Text(
+                        selectedDateRange == null
+                            ? 'Select Date Range'
+                            : '${DateFormat.MMMd().format(selectedDateRange!.start)} - ${DateFormat.MMMd().format(selectedDateRange!.end)}',
+                        style: TextStyle(
+                          fontSize: context.height * 0.015,
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.black,
+                        ),
+                      ),
+                      onTap: () async {
+                        final picked = await showDateRangePicker(
+                          initialDateRange: selectedDateRange,
                           context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: Text(
-                                "Missing Fields",
-                                style: TextStyle(
-                                  fontFamily: "Cal Sans",
-                                  fontSize: context.height * 0.03002,
-                                ),
-                              ),
-                              content: Text(
-                                "Please fill out all fields and select a date range.",
-                                style: TextStyle(
-                                  fontSize: context.height * 0.015,
-                                  fontWeight: FontWeight.w400,
-                                  color: AppColors.black,
-                                ),
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context),
-                                  child: Text(
-                                    "Close",
-                                    style: TextStyle(
-                                      fontSize: context.height * 0.015,
-                                      fontWeight: FontWeight.w400,
-                                      color: AppColors.black,
-                                    ),
+
+                          // wala pala tracker for what year ang travel plan
+                          // for now, set ko muna for 1 year yung selection range
+                          firstDate: DateTime.now(),
+                          lastDate: DateTime.now().add(Duration(days: 365)),
+
+                          // di ko na naedit colors for range picker
+                          // di ko mahanap properties
+                        );
+                        if (picked != null) {
+                          setState(() => selectedDateRange = picked);
+                        }
+                      },
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                      ),
+                      onPressed: () {
+                        if (nameController.text.isNotEmpty &&
+                            roomController.text.isNotEmpty &&
+                            selectedDateRange != null) {
+                          final details = AccommodationDetails(
+                            name: nameController.text,
+                            room: roomController.text,
+                            startDate: selectedDateRange!.start,
+                            endDate: selectedDateRange!.end,
+                          );
+                          Navigator.pop(context);
+                          onSave(details);
+                        } else {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text(
+                                  "Missing Fields",
+                                  style: TextStyle(
+                                    fontFamily: "Cal Sans",
+                                    fontSize: context.height * 0.03002,
                                   ),
                                 ),
-                              ],
-                            );
-                          },
-                        );
-                      }
-                    },
-                    child: Text(
-                      'Save',
-                      style: TextStyle(color: AppColors.mutedWhite),
+                                content: Text(
+                                  "Please fill out all fields and select a date range.",
+                                  style: TextStyle(
+                                    fontSize: context.height * 0.015,
+                                    fontWeight: FontWeight.w400,
+                                    color: AppColors.black,
+                                  ),
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    child: Text(
+                                      "Close",
+                                      style: TextStyle(
+                                        fontSize: context.height * 0.015,
+                                        fontWeight: FontWeight.w400,
+                                        color: AppColors.black,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        }
+                      },
+                      child: Text(
+                        'Save',
+                        style: TextStyle(color: AppColors.mutedWhite),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             );
           },
@@ -745,204 +752,214 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
       context: context,
       isScrollControlled: true,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
       ),
       builder: (_) {
         return StatefulBuilder(
           builder: (context, setState) {
             return Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.width * 0.06,
-                vertical: context.height * 0.04,
+              padding: EdgeInsets.only(
+                left: context.width * 0.06,
+                right: context.width * 0.06,
+                top: context.height * 0.04,
+                bottom: MediaQuery.of(context).viewInsets.bottom,
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: airlineController,
-                    cursorColor: AppColors.black,
-                    cursorHeight: context.height * 0.02,
-                    decoration: InputDecoration(
-                      focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: AppColors.black),
+              child: SingleChildScrollView(
+                physics: NeverScrollableScrollPhysics(),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: airlineController,
+                      cursorColor: AppColors.black,
+                      cursorHeight: context.height * 0.02,
+                      decoration: InputDecoration(
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: AppColors.black),
+                        ),
+                        labelStyle: TextStyle(
+                          fontSize: context.height * 0.015,
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.black,
+                        ),
+                        labelText: 'Airline Name',
+                        prefixIcon: Icon(Icons.flight, color: AppColors.black),
                       ),
-                      labelStyle: TextStyle(
-                        fontSize: context.height * 0.015,
-                        fontWeight: FontWeight.w400,
+                    ),
+                    SizedBox(height: context.height * 0.006),
+                    DropdownButtonFormField<String>(
+                      value: selectedClass,
+                      items:
+                          ["First", "Business", "Economy"]
+                              .map(
+                                (e) =>
+                                    DropdownMenuItem(value: e, child: Text(e)),
+                              )
+                              .toList(),
+                      onChanged: (value) {
+                        if (value != null) {
+                          setState(() => selectedClass = value);
+                        }
+                      },
+                      decoration: InputDecoration(
+                        labelText: "Class",
+                        prefixIcon: Icon(Icons.airline_seat_recline_extra),
+                      ),
+                    ),
+                    SizedBox(height: context.height * 0.006),
+                    ListTile(
+                      leading: Icon(
+                        Icons.flight_takeoff,
                         color: AppColors.black,
                       ),
-                      labelText: 'Airline Name',
-                      prefixIcon: Icon(Icons.flight, color: AppColors.black),
-                    ),
-                  ),
-                  SizedBox(height: context.height * 0.006),
-                  DropdownButtonFormField<String>(
-                    value: selectedClass,
-                    items:
-                        ["First", "Business", "Economy"]
-                            .map(
-                              (e) => DropdownMenuItem(value: e, child: Text(e)),
-                            )
-                            .toList(),
-                    onChanged: (value) {
-                      if (value != null) {
-                        setState(() => selectedClass = value);
-                      }
-                    },
-                    decoration: InputDecoration(
-                      labelText: "Class",
-                      prefixIcon: Icon(Icons.airline_seat_recline_extra),
-                    ),
-                  ),
-                  SizedBox(height: context.height * 0.006),
-                  ListTile(
-                    leading: Icon(Icons.flight_takeoff, color: AppColors.black),
-                    title: Text(
-                      fromCountry?.name ?? 'Select Departure Country',
-                    ),
-                    onTap: () {
-                      picker.showCountryPicker(
-                        context: context,
-                        showPhoneCode: false,
-                        onSelect: (country) {
-                          setState(() {
-                            fromCountry = country;
-                            fromAlpha3 =
-                                utils.Countries.byCode(
-                                  country.countryCode,
-                                ).alpha3Code;
-                          });
-                        },
-                      );
-                    },
-                  ),
-                  ListTile(
-                    leading: Icon(Icons.flight_land, color: AppColors.black),
-                    title: Text(toCountry?.name ?? 'Select Arrival Country'),
-                    onTap: () {
-                      picker.showCountryPicker(
-                        context: context,
-                        showPhoneCode: false,
-                        onSelect: (country) {
-                          setState(() {
-                            toCountry = country;
-                            toAlpha3 =
-                                utils.Countries.byCode(
-                                  country.countryCode,
-                                ).alpha3Code;
-                          });
-                        },
-                      );
-                    },
-                  ),
-                  ListTile(
-                    leading: Icon(Icons.access_time, color: AppColors.black),
-                    title: Text(
-                      fromTime != null
-                          ? 'From Time: ${fromTime!.format(context)}'
-                          : 'Select Departure Time',
-                    ),
-                    onTap: () async {
-                      final picked = await showTimePicker(
-                        context: context,
-                        initialTime:
-                            initialDetails == null
-                                ? TimeOfDay.now()
-                                : initialDetails.destFromTime!,
-                      );
-                      if (picked != null) {
-                        setState(() => fromTime = picked);
-                      }
-                    },
-                  ),
-                  ListTile(
-                    leading: Icon(
-                      Icons.access_time_filled,
-                      color: AppColors.black,
-                    ),
-                    title: Text(
-                      toTime != null
-                          ? 'To Time: ${toTime!.format(context)}'
-                          : 'Select Arrival Time',
-                    ),
-                    onTap: () async {
-                      final picked = await showTimePicker(
-                        context: context,
-                        initialTime:
-                            initialDetails == null
-                                ? TimeOfDay.now()
-                                : initialDetails.destToTime!,
-                      );
-                      if (picked != null) {
-                        setState(() => toTime = picked);
-                      }
-                    },
-                  ),
-                  SizedBox(height: context.height * 0.006),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                    ),
-                    onPressed: () {
-                      if (airlineController.text.isNotEmpty &&
-                          fromAlpha3 != null &&
-                          toAlpha3 != null &&
-                          fromTime != null &&
-                          toTime != null) {
-                        final details = FlightDetails(
-                          airlineName: airlineController.text,
-                          travelClass: selectedClass,
-                          destFrom: fromAlpha3!,
-                          destFromTime: fromTime!,
-                          destTo: toAlpha3!,
-                          destToTime: toTime!,
-                        );
-                        Navigator.pop(context);
-                        onSave(details);
-                      } else {
-                        showDialog(
+                      title: Text(
+                        fromCountry?.name ?? 'Select Departure Country',
+                      ),
+                      onTap: () {
+                        picker.showCountryPicker(
                           context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: Text(
-                                "Missing Fields",
-                                style: TextStyle(
-                                  fontFamily: "Cal Sans",
-                                  fontSize: context.height * 0.03002,
-                                ),
-                              ),
-                              content: Text(
-                                "Please complete all fields to save flight details.",
-                                style: TextStyle(
-                                  fontSize: context.height * 0.015,
-                                  fontWeight: FontWeight.w400,
-                                  color: AppColors.black,
-                                ),
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context),
-                                  child: Text(
-                                    "Close",
-                                    style: TextStyle(
-                                      fontSize: context.height * 0.015,
-                                      fontWeight: FontWeight.w400,
-                                      color: AppColors.black,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            );
+                          showPhoneCode: false,
+                          onSelect: (country) {
+                            setState(() {
+                              fromCountry = country;
+                              fromAlpha3 =
+                                  utils.Countries.byCode(
+                                    country.countryCode,
+                                  ).alpha3Code;
+                            });
                           },
                         );
-                      }
-                    },
-                    child: Text(
-                      'Save',
-                      style: TextStyle(color: AppColors.mutedWhite),
+                      },
                     ),
-                  ),
-                ],
+                    ListTile(
+                      leading: Icon(Icons.flight_land, color: AppColors.black),
+                      title: Text(toCountry?.name ?? 'Select Arrival Country'),
+                      onTap: () {
+                        picker.showCountryPicker(
+                          context: context,
+                          showPhoneCode: false,
+                          onSelect: (country) {
+                            setState(() {
+                              toCountry = country;
+                              toAlpha3 =
+                                  utils.Countries.byCode(
+                                    country.countryCode,
+                                  ).alpha3Code;
+                            });
+                          },
+                        );
+                      },
+                    ),
+                    ListTile(
+                      leading: Icon(Icons.access_time, color: AppColors.black),
+                      title: Text(
+                        fromTime != null
+                            ? 'From Time: ${fromTime!.format(context)}'
+                            : 'Select Departure Time',
+                      ),
+                      onTap: () async {
+                        final picked = await showTimePicker(
+                          context: context,
+                          initialTime:
+                              initialDetails == null
+                                  ? TimeOfDay.now()
+                                  : initialDetails.destFromTime!,
+                        );
+                        if (picked != null) {
+                          setState(() => fromTime = picked);
+                        }
+                      },
+                    ),
+                    ListTile(
+                      leading: Icon(
+                        Icons.access_time_filled,
+                        color: AppColors.black,
+                      ),
+                      title: Text(
+                        toTime != null
+                            ? 'To Time: ${toTime!.format(context)}'
+                            : 'Select Arrival Time',
+                      ),
+                      onTap: () async {
+                        final picked = await showTimePicker(
+                          context: context,
+                          initialTime:
+                              initialDetails == null
+                                  ? TimeOfDay.now()
+                                  : initialDetails.destToTime!,
+                        );
+                        if (picked != null) {
+                          setState(() => toTime = picked);
+                        }
+                      },
+                    ),
+                    SizedBox(height: context.height * 0.006),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                      ),
+                      onPressed: () {
+                        if (airlineController.text.isNotEmpty &&
+                            fromAlpha3 != null &&
+                            toAlpha3 != null &&
+                            fromTime != null &&
+                            toTime != null) {
+                          final details = FlightDetails(
+                            airlineName: airlineController.text,
+                            travelClass: selectedClass,
+                            destFrom: fromAlpha3!,
+                            destFromTime: fromTime!,
+                            destTo: toAlpha3!,
+                            destToTime: toTime!,
+                          );
+                          Navigator.pop(context);
+                          onSave(details);
+                        } else {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text(
+                                  "Missing Fields",
+                                  style: TextStyle(
+                                    fontFamily: "Cal Sans",
+                                    fontSize: context.height * 0.03002,
+                                  ),
+                                ),
+                                content: Text(
+                                  "Please complete all fields to save flight details.",
+                                  style: TextStyle(
+                                    fontSize: context.height * 0.015,
+                                    fontWeight: FontWeight.w400,
+                                    color: AppColors.black,
+                                  ),
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    child: Text(
+                                      "Close",
+                                      style: TextStyle(
+                                        fontSize: context.height * 0.015,
+                                        fontWeight: FontWeight.w400,
+                                        color: AppColors.black,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        }
+                      },
+                      child: Text(
+                        'Save',
+                        style: TextStyle(color: AppColors.mutedWhite),
+                      ),
+                    ),
+                    SizedBox(height: context.height * 0.006),
+                  ],
+                ),
               ),
             );
           },

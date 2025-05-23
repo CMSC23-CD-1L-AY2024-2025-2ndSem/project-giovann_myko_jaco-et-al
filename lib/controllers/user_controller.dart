@@ -90,4 +90,8 @@ class UserController extends GetxController {
       print("Update failed: $e");
     }
   }
+
+  Future<UserModel> fetchCreator(String creatorId) async {
+    return await userRepo.getPlanCreator(creatorId);
+  }
 }

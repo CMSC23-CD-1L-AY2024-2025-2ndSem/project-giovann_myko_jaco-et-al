@@ -1,19 +1,22 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:planago/controllers/firestore/travel_plan_database.dart';
 import 'package:planago/controllers/user_controller.dart';
+import 'package:planago/models/travel_plan_model.dart';
 import 'package:planago/models/user_model.dart';
 import 'package:planago/screens/find-people/view_user_page.dart';
 import 'package:planago/utils/constants/colors.dart';
 import 'package:planago/utils/helper/converter.dart';
 
-class SearchUserDelegate extends SearchDelegate {
+class SearchTripmateDelegate extends SearchDelegate {
   final double screenHeight;
   final double screenWidth;
 
-  SearchUserDelegate({
+  SearchTripmateDelegate({
     required this.screenHeight,
     required this.screenWidth,
+    required this.plan,
   });
 
   @override
@@ -73,43 +76,60 @@ class SearchUserDelegate extends SearchDelegate {
 
   @override
   Widget buildResults(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-
-    UserController.instance.onSearchChanged(query);
-
     return Obx(() {
-      final results = UserController.instance.searchResults;
-      if (results.isEmpty) {
+      final suggestions =
+          TravelPlanDatabase.instance.tripmateSuggestion
+              .where(
+                (user) =>
+                    user.firstName.toLowerCase().contains(
+                      query.toLowerCase(),
+                    ) ||
+                    user.lastName.toLowerCase().contains(query.toLowerCase()) ||
+                    user.username.toLowerCase().contains(query.toLowerCase()),
+              )
+              .toList();
+
+      if (suggestions.isEmpty) {
         return Center(child: Text("No users found"));
       }
+
       return ListView.builder(
-        itemCount: results.length,
+        padding: EdgeInsets.only(top: screenHeight * 0.013),
+        itemCount: suggestions.length,
         itemBuilder: (context, index) {
-          final user = results[index];
+          final user = suggestions[index];
           return userComponent(user, screenWidth, screenHeight);
         },
       );
     });
   }
 
+  final TravelPlan plan;
+
   @override
   Widget buildSuggestions(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-
-    UserController.instance.onSearchChanged(query);
-
     return Obx(() {
-      final results = UserController.instance.searchResults;
-      if (results.isEmpty) {
+      final suggestions =
+          TravelPlanDatabase.instance.tripmateSuggestion
+              .where(
+                (user) =>
+                    user.firstName.toLowerCase().contains(
+                      query.toLowerCase(),
+                    ) ||
+                    user.lastName.toLowerCase().contains(query.toLowerCase()) ||
+                    user.username.toLowerCase().contains(query.toLowerCase()),
+              )
+              .toList();
+
+      if (suggestions.isEmpty) {
         return Center(child: Text("No users found"));
       }
+
       return ListView.builder(
         padding: EdgeInsets.only(top: screenHeight * 0.013),
-        itemCount: results.length,
+        itemCount: suggestions.length,
         itemBuilder: (context, index) {
-          final user = results[index];
+          final user = suggestions[index];
           return userComponent(user, screenWidth, screenHeight);
         },
       );
@@ -118,6 +138,10 @@ class SearchUserDelegate extends SearchDelegate {
 
   // same with find people page w/o follow button
   userComponent(UserModel user, double screenWidth, double screenHeight) {
+    final RxList<String> reactivePeople = RxList<String>.from(
+      plan.people ?? [],
+    );
+
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () => Get.to(() => ViewUserPage(viewedUser: user)),
@@ -135,22 +159,23 @@ class SearchUserDelegate extends SearchDelegate {
                   dimension: screenHeight * 0.056,
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(25),
-                    child: AppConvert.isBase64(user.avatar)
-                                ? Image.memory(
-                                  base64Decode(user.avatar),
-                                  fit: BoxFit.cover,
-                                )
-                                : Image.network(
-                                  user.avatar,
-                                  fit: BoxFit.cover,
-                                  errorBuilder:
-                                      (_, __, ___) => Image.asset(
-                                        'assets/images/default_profile.png',
-                                        fit: BoxFit.cover,
-                                      ),
-                                ),
-                    ),
+                    child:
+                        AppConvert.isBase64(user.avatar)
+                            ? Image.memory(
+                              base64Decode(user.avatar),
+                              fit: BoxFit.cover,
+                            )
+                            : Image.network(
+                              user.avatar,
+                              fit: BoxFit.cover,
+                              errorBuilder:
+                                  (_, __, ___) => Image.asset(
+                                    'assets/images/default_profile.png',
+                                    fit: BoxFit.cover,
+                                  ),
+                            ),
                   ),
+                ),
                 SizedBox(width: screenWidth * 0.015),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -175,6 +200,57 @@ class SearchUserDelegate extends SearchDelegate {
                 ),
               ],
             ),
+            Obx(() {
+              final isInPlan = reactivePeople.contains(user.uid);
+
+              return GestureDetector(
+                onTap: () async {
+                  if (isInPlan) {
+                    await TravelPlanDatabase.instance.removePersonFromPlan(
+                      plan.id!,
+                      user.uid,
+                    );
+                    reactivePeople.remove(user.uid);
+                  } else {
+                    await TravelPlanDatabase.instance.addPersonToPlan(
+                      plan.id!,
+                      user.uid,
+                    );
+                    reactivePeople.add(user.uid);
+                  }
+
+                  plan.people = reactivePeople.toList();
+                  await TravelPlanDatabase.instance.getTripSuggestions(plan);
+                },
+                child: AnimatedContainer(
+                  height: screenHeight * 0.036,
+                  width: screenWidth * 0.23,
+                  duration: Duration(milliseconds: 300),
+                  decoration: BoxDecoration(
+                    color:
+                        isInPlan ? AppColors.primary : AppColors.mutedPrimary,
+                    borderRadius: BorderRadius.circular(5),
+                    border: Border.all(
+                      color:
+                          isInPlan
+                              ? Colors.transparent
+                              : AppColors.mutedPrimary,
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      isInPlan ? 'Remove' : 'Add',
+                      style: TextStyle(
+                        color:
+                            isInPlan
+                                ? AppColors.mutedWhite
+                                : AppColors.mutedBlack,
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }),
           ],
         ),
       ),

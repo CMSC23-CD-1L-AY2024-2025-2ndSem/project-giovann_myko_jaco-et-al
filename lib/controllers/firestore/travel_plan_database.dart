@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:planago/controllers/authentication_controller.dart';
 import 'package:planago/models/travel_plan_model.dart';
+import 'package:planago/models/user_model.dart';
 
 class TravelPlanDatabase extends GetxController {
   static TravelPlanDatabase get instance => Get.find();
@@ -14,7 +15,7 @@ class TravelPlanDatabase extends GetxController {
 
   /// Call this after login
   void listenToTravelPlans() {
-    _subscription?.cancel(); // Cancel old listener if it exists  
+    _subscription?.cancel(); // Cancel old listener if it exists
     final currentUser = AuthenticationController.instance.authUser;
     if (currentUser == null) {
       plans.value = [];
@@ -23,35 +24,32 @@ class TravelPlanDatabase extends GetxController {
     final userId = currentUser.uid;
 
     // Live updates of plans where user is creator or invited
-    _subscription = _db.collection('TravelPlans').snapshots().listen((
-      snapshot,
-    ) {
-      final userPlans =
-          snapshot.docs
-              .map((doc) {
-                final data = doc.data();
-                final plan = TravelPlan.fromJson(
-                  data,
-                  id: doc.id,
-                );
-                final isCreator = plan.creator == userId;
-                final isInvited = plan.people?.contains(userId) ?? false;
-                return (isCreator || isInvited) ? plan : null;
-              })
-              .whereType<TravelPlan>()
-              .toList();
-    plans.value = userPlans;
-  },
-  onError: (error, stackTrace) {
-    print('Error fetching travel plans: $error');
-  },
-  );
+    _subscription = _db
+        .collection('TravelPlans')
+        .snapshots()
+        .listen(
+          (snapshot) {
+            final userPlans =
+                snapshot.docs
+                    .map((doc) {
+                      final data = doc.data();
+                      final plan = TravelPlan.fromJson(data, id: doc.id);
+                      final isCreator = plan.creator == userId;
+                      final isInvited = plan.people?.contains(userId) ?? false;
+                      return (isCreator || isInvited) ? plan : null;
+                    })
+                    .whereType<TravelPlan>()
+                    .toList();
+            plans.value = userPlans;
+          },
+          onError: (error, stackTrace) {
+            print('Error fetching travel plans: $error');
+          },
+        );
   }
 
   Future<TravelPlan> addTravelPlan(TravelPlan plan) async {
-    final doc = await _db
-        .collection('TravelPlans')
-        .add(plan.toJson());
+    final doc = await _db.collection('TravelPlans').add(plan.toJson());
     return plan.copyWith(id: doc.id);
   }
 
@@ -60,8 +58,7 @@ class TravelPlanDatabase extends GetxController {
     await _db.collection('TravelPlans').doc(plan.id).update(plan.toJson());
   }
 
-  Future<TravelPlan?> getPlanById(String id) async 
-  {
+  Future<TravelPlan?> getPlanById(String id) async {
     final doc = await _db.collection('TravelPlans').doc(id).get();
     if (doc.exists && doc.data() != null) {
       return TravelPlan.fromJson(doc.data()!, id: doc.id);
@@ -69,8 +66,10 @@ class TravelPlanDatabase extends GetxController {
     return null;
   }
 
-
-  Future<void> updateChecklist(TravelPlan plan, List<Checklist> updatedChecklist) async {
+  Future<void> updateChecklist(
+    TravelPlan plan,
+    List<Checklist> updatedChecklist,
+  ) async {
     final updatedPlan = plan.copyWith(checklist: updatedChecklist);
     await TravelPlanDatabase.instance.updateTravelPlan(updatedPlan);
   }
@@ -85,9 +84,9 @@ class TravelPlanDatabase extends GetxController {
   Future<String> addPeople(String id, String uid) async {
     final plan = await getPlanById(id); //finds document
     //check is null
-    if(plan != null){
+    if (plan != null) {
       final people = plan.people ?? [];
-      if(people.contains(uid)){
+      if (people.contains(uid)) {
         return "Already in this Plan";
       }
       people.add(uid);
@@ -98,12 +97,78 @@ class TravelPlanDatabase extends GetxController {
   }
 
   //Function for delete a travel plan given an id
-  Future<String> deletePlan (String id) async {
+  Future<String> deletePlan(String id) async {
     try {
       await _db.collection("TravelPlans").doc(id).delete();
       return "Successfully deleted plan!";
     } catch (e) {
       return "Error: $e";
+    }
+  }
+
+  final RxList<UserModel> tripmateSuggestion = <UserModel>[].obs;
+
+  Future<void> getTripSuggestions(TravelPlan plan) async {
+    try {
+      final currentUserId = AuthenticationController.instance.authUser?.uid;
+      if (currentUserId == null) {
+        tripmateSuggestion.clear();
+        return;
+      }
+
+      final userDoc = await _db.collection("Users").doc(currentUserId).get();
+      final userData = userDoc.data();
+      if (userData == null) {
+        tripmateSuggestion.clear();
+        return;
+      }
+
+      final followers = List<String>.from(userData["Followers"] ?? []);
+      print(followers);
+      final planPeopleIds = plan.people ?? [];
+
+      final Set<String> userIds = {...followers, ...planPeopleIds};
+      userIds.remove(currentUserId);
+
+      final List<UserModel> users = [];
+      for (final uid in userIds) {
+        final userSnap = await _db.collection("Users").doc(uid).get();
+        if (userSnap.exists) {
+          users.add(UserModel.fromSnapshot(userSnap));
+        }
+      }
+
+      users.sort(
+        (a, b) => a.username.toLowerCase().compareTo(b.username.toLowerCase()),
+      );
+
+      tripmateSuggestion.assignAll(users);
+    } on FirebaseException catch (e) {
+      throw Exception("Firebase error [${e.code}]: ${e.message}");
+    }
+  }
+
+  Future<void> addPersonToPlan(String planId, String uid) async {
+    try {
+      final planRef = _db.collection("TravelPlans").doc(planId);
+
+      await planRef.update({
+        "people": FieldValue.arrayUnion([uid]),
+      });
+    } on FirebaseException catch (e) {
+      throw Exception("Error adding person to plan: ${e.message}");
+    }
+  }
+
+  Future<void> removePersonFromPlan(String planId, String uid) async {
+    try {
+      final planRef = _db.collection("TravelPlans").doc(planId);
+
+      await planRef.update({
+        "people": FieldValue.arrayRemove([uid]),
+      });
+    } on FirebaseException catch (e) {
+      throw Exception("Error removing person from plan: ${e.message}");
     }
   }
 }
