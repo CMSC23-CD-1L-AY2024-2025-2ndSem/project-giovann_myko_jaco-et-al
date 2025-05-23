@@ -158,27 +158,28 @@ class DestinationsTab extends StatelessWidget
   
   Widget _buildDaySelector() 
   {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.grey[200],
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: 
-        [
-          Obx(() => Text(
-            'Day ${controller.selectedDayIndex.value + 1}',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-            ),
-          )),
-          InkWell(
-            onTap: _showDayPicker,
-            child: Icon(Icons.keyboard_arrow_down),
-          ),
-        ],
+    return InkWell(
+      onTap: _showDayPicker,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.grey[200],
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: 
+          [
+            Obx(() => Text(
+              'Day ${controller.selectedDayIndex.value + 1}',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            )),
+            Icon(Icons.keyboard_arrow_down),
+          ],
+        ),
       ),
     );
   }
