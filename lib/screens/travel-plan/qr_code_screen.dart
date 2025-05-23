@@ -392,7 +392,7 @@ class _QRCodeScreenState extends State<QRCodeScreen>
                   ),
                   icon: Icon(Icons.person_add, color: AppColors.primary),
                   label: Text(
-                    "Share with a followed User",
+                    "Share with a follower",
                     style: TextStyle(fontSize: height * 0.018),
                   ),
                 ),
