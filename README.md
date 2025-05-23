@@ -1,4 +1,4 @@
-# <img src="assets/images/PlanaGo-Logo.png" width=100/> **PlanAgo**
+# <img src="assets/images/PlanaGo-Logo.png" width=50/> **PlanAgo**
 **Your Personalized Travel Planner**
 
 **PlanAgo** is a _beautifully crafted_ travel planning app built with **Flutter** and **Firebase**. Whether you’re a solo traveler or an adventure squad, PlanAgo helps you create, share, and manage your perfect trips—effortlessly.
@@ -93,8 +93,8 @@ Follow this link to be redirected to the APK installer of the app:
 </p>
 
 <p align="center">
-  <strong>Splash Screen</strong> &nbsp;&nbsp;&nbsp;&nbsp;
-  <strong>Login Screen</strong> &nbsp;&nbsp;&nbsp;&nbsp;
+  <strong>Splash Screen</strong> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <strong>Login Screen</strong> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <strong>Google Login</strong>
 </p>
 
