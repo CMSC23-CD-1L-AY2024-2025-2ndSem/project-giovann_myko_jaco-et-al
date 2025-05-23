@@ -70,25 +70,71 @@ class TravelPlanDatabase extends GetxController
     return null;
   }
 
+  Future<String?> getUserIdByUsername(String username) async 
+  {
+    // First, check 'Following' array
+    var query = await _db
+        .collection('Users')
+        .where('Following', arrayContains: username)
+        .limit(1)
+        .get();
 
-  Future<void> updateChecklist(TravelPlan plan, List<Checklist> updatedChecklist) async {
+    if (query.docs.isNotEmpty) 
+    {
+      return query.docs.first.id;
+    }
+
+    // If not found, check 'Followers' array
+    query = await _db
+        .collection('Users')
+        .where('Followers', arrayContains: username)
+        .limit(1)
+        .get();
+
+    if (query.docs.isNotEmpty) 
+    {
+      return query.docs.first.id;
+    }
+
+    //temporary testing
+    // query = await _db
+    //     .collection('Users')
+    //     .where('Username', isEqualTo: username)
+    //     .limit(1)
+    //     .get();
+
+    // if (query.docs.isNotEmpty) 
+    // {
+    //   return query.docs.first.id;
+    // }
+
+    // Not found in either array
+    return null;
+  }
+
+  Future<void> updateChecklist(TravelPlan plan, List<Checklist> updatedChecklist) async 
+  {
     final updatedPlan = plan.copyWith(checklist: updatedChecklist);
     await TravelPlanDatabase.instance.updateTravelPlan(updatedPlan);
   }
 
   @override
-  void onClose() {
+  void onClose() 
+  {
     _subscription?.cancel();
     super.onClose();
   }
 
   //Function for adding user on a travel plan
-  Future<String> addPeople(String id, String uid) async {
+  Future<String> addPeople(String id, String uid) async 
+  {
     final plan = await getPlanById(id); //finds document
     //check is null
-    if(plan != null){
+    if(plan != null)
+    {
       final people = plan.people ?? [];
-      if(people.contains(uid)){
+      if(people.contains(uid))
+      {
         return "Already in this Plan";
       }
       people.add(uid);
@@ -99,7 +145,8 @@ class TravelPlanDatabase extends GetxController
   }
 
   //Function for delete a travel plan given an id
-  Future<String> deletePlan (String id) async {
+  Future<String> deletePlan (String id) async 
+  {
     try {
       await _db.collection("TravelPlans").doc(id).delete();
       return "Successfully deleted plan!";
@@ -108,48 +155,4 @@ class TravelPlanDatabase extends GetxController
     }
   }
 
-  // Adds the travel plan ID to the user's shared plans if not already present
-  Future<String> sharePlanWithUserByUsername(String username, String planId) async 
-  {
-    try 
-    {
-      // Find user by username
-      final userSnap = await FirebaseFirestore.instance
-          .collection('Users')
-          .where('Username', isEqualTo: username)
-          .limit(1)
-          .get();
-
-      if (userSnap.docs.isEmpty) 
-      {
-        return "User not found";
-      }
-
-      final userDoc = userSnap.docs.first;
-      final userId = userDoc.id;
-
-      // Get the user's sharedPlans (or create if not present)
-      final sharedPlans = List<String>.from(userDoc.data()['SharedPlans'] ?? []);
-
-      if (sharedPlans.contains(planId)) 
-      {
-        return "Plan already shared with this user";
-      }
-
-      sharedPlans.add(planId);
-
-      // Update user document
-      await FirebaseFirestore.instance
-          .collection('Users')
-          .doc(userId)
-          .update({'SharedPlans': sharedPlans});
-
-      return "Travel plan shared with $username";
-    } 
-    
-    catch (e) 
-    {
-      return "Error sharing plan: $e";
-    }
-  }
 }
