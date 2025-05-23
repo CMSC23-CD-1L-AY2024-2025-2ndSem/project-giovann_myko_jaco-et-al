@@ -12,6 +12,7 @@ import 'package:planago/components/travel_app_bar.dart';
 import 'package:planago/controllers/authentication_controller.dart';
 import 'package:planago/controllers/firestore/travel_plan_database.dart';
 import 'package:planago/controllers/firestore/user_database.dart';
+import 'package:planago/controllers/itinerary_controller.dart';
 import 'package:planago/controllers/user_controller.dart';
 import 'package:planago/main.dart';
 import 'package:planago/models/acommodation_details_model.dart';
@@ -288,8 +289,9 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
               width: width * 0.24119,
               height: height * 0.02715,
               child: OutlinedButton(
-                onPressed: () {
-                  //fix this. dapat hindi gagawa ng panibagong instantance ng itinerary if pipindutin ulit ang existing itinerary.
+                onPressed: ()
+                {
+                  Get.put(ItineraryController(), tag: plan.id);
                   Get.to(() => ItineraryScreen(plan: plan));
                 },
                 style: OutlinedButton.styleFrom(

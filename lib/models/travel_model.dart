@@ -165,8 +165,8 @@ class Itinerary
 
   factory Itinerary.fromJson(Map<String, dynamic> json) => Itinerary(
     day: json['day'],
-    expenses: (json['expenses'] as List).map((e) => Expense.fromJson(e)).toList(),
-    destinations: (json['destinations'] as List).map((d) => Destination.fromJson(d)).toList(),
-    activities: (json['activities'] as List).map((a) => Activity.fromJson(a)).toList(),
+    expenses: (json['expenses'] as List? ?? []).map((e) => Expense.fromJson(e)).toList(),
+    destinations: (json['destinations'] as List? ?? []).map((d) => Destination.fromJson(d)).toList(),
+    activities: (json['activities'] as List? ?? []).map((a) => Activity.fromJson(a)).toList(),
   );
 }

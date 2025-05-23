@@ -18,7 +18,6 @@ class ItineraryController extends GetxController
   final travelers = 1.obs;
   final currency = "PHP".obs;
 
-  // The single itinerary list, each element is for one day
   final itinerary = <Itinerary>[].obs;
 
   // Text controllers for expenses
@@ -37,13 +36,14 @@ class ItineraryController extends GetxController
   final destinationTimeController = TextEditingController();
   final destinationTypeController = TextEditingController();
 
-  String? travelPlanId;
+  String? travelPlanId ;
 
   Future<void> loadItinerary(String planId) async 
   {
     travelPlanId = planId;
     final loaded = await ItineraryDatabase.instance.getItinerary(planId);
-    if (loaded.isNotEmpty) {
+    if (loaded.isNotEmpty) 
+    {
       duration.value = loaded.length;
       itinerary.value = loaded;
     }
@@ -51,17 +51,14 @@ class ItineraryController extends GetxController
 
   Future<void> saveItinerary() async 
   {
-    if (travelPlanId == null) return;
+    if (travelPlanId == null) 
+    {
+      // print('travelPlanId is null!');
+      return;
+    }
+    // print('Saving itinerary: ${itinerary.map((e) => e.toJson()).toList()}');
     await ItineraryDatabase.instance.setItinerary(travelPlanId!, itinerary);
   }
-
-  // Set state from List<Itinerary>
-  void setItinerary(List<Itinerary> itineraryList) 
-  {
-    duration.value = itineraryList.length;
-    itinerary.value = itineraryList;
-  }
-
   void setDurationFromDates(DateTime start, DateTime end) 
   {
     final int days = end.difference(start).inDays + 1;
@@ -75,10 +72,14 @@ class ItineraryController extends GetxController
 
   void setTravelersFromPlan(TravelPlan plan) 
   {
-    print("Setting travelers from plan: ${plan.people}");
-    if (plan.people == null || plan.people!.isEmpty) {
+    // print("Setting travelers from plan: ${plan.people}");
+    if (plan.people == null || plan.people!.isEmpty) 
+    {
       travelers.value = 1;
-    } else {
+    } 
+    
+    else 
+    {
       travelers.value = plan.people!.length + 1;
     }
   }
@@ -86,7 +87,8 @@ class ItineraryController extends GetxController
   double get currentDayTotalExpenses 
   {
     double sum = 0.0;
-    for (var expense in currentDayExpenses) {
+    for (var expense in currentDayExpenses) 
+    {
       sum += expense.amount;
     }
     return sum;
@@ -118,7 +120,8 @@ class ItineraryController extends GetxController
 
   void selectDay(int index) 
   {
-    if (index >= 0 && index < duration.value) {
+    if (index >= 0 && index < duration.value) 
+    {
       selectedDayIndex.value = index;
     }
   }
@@ -129,9 +132,10 @@ class ItineraryController extends GetxController
   List<Destination> get currentDayDestinations => itinerary.isNotEmpty ? itinerary[selectedDayIndex.value].destinations : [];
 
   // Expense methods
-  Future<void> addExpense() async {
-    if (expenseDescriptionController.text.isEmpty || 
-        expenseAmountController.text.isEmpty || 
+  Future<void> addExpense() async 
+  {
+    if (expenseDescriptionController.text.isEmpty ||
+        expenseAmountController.text.isEmpty ||
         expenseCategoryController.text.isEmpty) 
     {
       Get.snackbar(
@@ -165,7 +169,8 @@ class ItineraryController extends GetxController
     await saveItinerary();
   }
 
-  Future<void> deleteExpense(String id) async {
+  Future<void> deleteExpense(String id) async 
+  {
     final day = selectedDayIndex.value;
     final updatedExpenses = itinerary[day].expenses.where((e) => e.id != id).toList();
     itinerary[day] = itinerary[day].copyWith(expenses: updatedExpenses);
@@ -173,8 +178,11 @@ class ItineraryController extends GetxController
   }
 
   // Activity methods
-  Future<void> addActivity() async {
-    if (activityDescriptionController.text.isEmpty || activityTimeController.text.isEmpty || activityTypeController.text.isEmpty) 
+  Future<void> addActivity() async 
+  {
+    if (activityDescriptionController.text.isEmpty ||
+        activityTimeController.text.isEmpty ||
+        activityTypeController.text.isEmpty) 
     {
       Get.snackbar(
         'Error',
@@ -222,8 +230,12 @@ class ItineraryController extends GetxController
   }
 
   // Destination methods
-  Future<void> addDestination() async {
-    if (destinationNameController.text.isEmpty || destinationDescriptionController.text.isEmpty || destinationTimeController.text.isEmpty || destinationTypeController.text.isEmpty) 
+  Future<void> addDestination() async 
+  {
+    if (destinationNameController.text.isEmpty ||
+        destinationDescriptionController.text.isEmpty ||
+        destinationTimeController.text.isEmpty ||
+        destinationTypeController.text.isEmpty) 
     {
       Get.snackbar(
         'Error',
@@ -255,7 +267,8 @@ class ItineraryController extends GetxController
     await saveItinerary();
   }
 
-  Future<void> deleteDestination(String id) async {
+  Future<void> deleteDestination(String id) async 
+  {
     final day = selectedDayIndex.value;
     final updatedDestinations = itinerary[day].destinations.where((d) => d.id != id).toList();
     itinerary[day] = itinerary[day].copyWith(destinations: updatedDestinations);

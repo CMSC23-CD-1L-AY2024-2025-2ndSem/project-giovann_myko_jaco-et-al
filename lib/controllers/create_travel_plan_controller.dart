@@ -46,7 +46,6 @@ class CreateTravelPlanController extends GetxController{
         startDate: selectedDateRange.value!.start,
         endDate: selectedDateRange.value!.end,
         imageIndex: randomIndex,
-        itinerary: itinerary,
       );
       
       print(newPlan);

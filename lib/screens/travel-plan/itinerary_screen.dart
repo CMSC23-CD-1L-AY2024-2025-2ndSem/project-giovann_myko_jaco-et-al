@@ -16,27 +16,31 @@ class ItineraryScreen extends StatefulWidget {
   State<ItineraryScreen> createState() => _ItineraryScreenState();
 }
 
-class _ItineraryScreenState extends State<ItineraryScreen> {
-  final ItineraryController controller = Get.put(ItineraryController());
+class _ItineraryScreenState extends State<ItineraryScreen> 
+{
+  late final ItineraryController controller;
 
   @override
-  void initState() 
-  {
+  void initState() {
     super.initState();
+    controller = Get.find<ItineraryController>(tag: widget.plan.id);
+
     controller.setTravelersFromPlan(widget.plan);
 
-    ItineraryDatabase.instance.getItinerary(widget.plan.id!).then((itinerary) {
-      if (itinerary.isNotEmpty) {
-        controller.setItinerary(itinerary);
-      } else if (widget.plan.startDate != null && widget.plan.endDate != null) {
-        // Only set duration and initialize if there is no existing itinerary
+    controller.loadItinerary(widget.plan.id!).then((_) 
+    {
+      if (controller.itinerary.isEmpty &&
+          widget.plan.startDate != null &&
+          widget.plan.endDate != null) 
+      {
         controller.setDurationFromDates(widget.plan.startDate!, widget.plan.endDate!);
       }
     });
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) 
+  {
     return DefaultTabController(
       length: 3,
       child: Scaffold(
