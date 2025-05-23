@@ -34,7 +34,8 @@ import 'itinerary_screen.dart';
 
 // Remove duplicate AccommodationDetails class definition; use the one from the model instead.
 
-class TravelOverviewPage extends StatefulWidget {
+class TravelOverviewPage extends StatefulWidget 
+{
   final TravelPlan plan;
   const TravelOverviewPage({super.key, required this.plan});
 
@@ -42,7 +43,8 @@ class TravelOverviewPage extends StatefulWidget {
   State<TravelOverviewPage> createState() => _TravelOverviewPageState();
 }
 
-class _TravelOverviewPageState extends State<TravelOverviewPage> {
+class _TravelOverviewPageState extends State<TravelOverviewPage> 
+{
   String? profilePicture;
   @override
   void initState() {
@@ -58,7 +60,8 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) 
+  {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
@@ -114,7 +117,9 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
     );
   }
 
-  Widget header(double width, double height, TravelPlan plan, String? pfp) {
+  Widget header(double width, double height, TravelPlan plan, String? pfp) 
+  {
+    final isTripToday = widget.plan.startDate != null && DateTime.now().year == widget.plan.startDate!.year && DateTime.now().month == widget.plan.startDate!.month && DateTime.now().day == widget.plan.startDate!.day;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -365,18 +370,19 @@ class _TravelOverviewPageState extends State<TravelOverviewPage> {
               width: width * 0.24119,
               height: height * 0.02715,
               child: OutlinedButton(
-                onPressed: () {
-                  // Navigate to notification settings
+                onPressed: isTripToday ? null : () 
+                {
                   Get.to(() => NotificationSettingsScreen(plan: plan));
                 },
                 style: OutlinedButton.styleFrom(
                   padding: EdgeInsets.zero,
-                  backgroundColor: AppColors.primary,
+                  backgroundColor: isTripToday ? Colors.grey : AppColors.primary,
                   side: BorderSide(color: Colors.transparent),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
+                  children: 
+                  [
                     Icon(
                       Icons.notifications_active_outlined,
                       color: AppColors.mutedWhite,
