@@ -37,7 +37,7 @@ class UserController extends GetxController {
 
   Future<void> followUser(UserModel otherUser) async {
     try {
-      await userRepo.followUser(otherUser.username);
+      await userRepo.followUser(otherUser);
       // para mag refresh
       await fetchUserData();
       await fetchSimilarUsers();
@@ -49,7 +49,7 @@ class UserController extends GetxController {
 
   Future<void> unfollowUser(UserModel otherUser) async {
     try {
-      await userRepo.unfollowUser(otherUser.username);
+      await userRepo.unfollowUser(otherUser);
       // para mag refresh
       await fetchUserData();
       await fetchSimilarUsers();

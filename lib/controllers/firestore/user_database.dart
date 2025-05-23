@@ -153,32 +153,44 @@ class UserDatabase extends GetxController {
   }
 
   //Follow - create operation
-  Future<void> followUser(String targetUsername) async {
+  Future<void> followUser(UserModel otherUser) async {
     try {
       final uid = AuthenticationController.instance.authUser?.uid;
       if (uid == null) throw Exception("No authenticated user");
-
       final userRef = _db.collection("Users").doc(uid);
+      final otherUserRef = _db.collection("Users").doc(otherUser.uid);
 
       await userRef.update({
-        "Following": FieldValue.arrayUnion([targetUsername]),
+        "Following": FieldValue.arrayUnion([otherUser.username]),
       });
+
+      await otherUserRef.update({
+        "Followers": FieldValue.arrayUnion([UserController.instance.user.value.username])
+      });
+
     } on FirebaseException catch (e) {
       throw Exception("Error following user: ${e.message}");
     }
   }
 
   //Unfollow - delete operation
-  Future<void> unfollowUser(String targetUsername) async {
+  Future<void> unfollowUser(UserModel otherUser) async {
     try {
       final uid = AuthenticationController.instance.authUser?.uid;
       if (uid == null) throw Exception("No authenticated user");
 
       final userRef = _db.collection("Users").doc(uid);
+      final otherUserRef = _db.collection("Users").doc(otherUser.uid);
 
       await userRef.update({
-        "Following": FieldValue.arrayRemove([targetUsername]),
+        "Following": FieldValue.arrayRemove([otherUser.username]),
       });
+
+      await otherUserRef.update(
+        {
+          "Followers": FieldValue.arrayRemove([UserController.instance.user.value.username])
+        }
+      );
     } on FirebaseException catch (e) {
       throw Exception("Error unfollowing user: ${e.message}");
     }

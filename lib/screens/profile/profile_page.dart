@@ -215,18 +215,6 @@ class _ProfilePageState extends State<ProfilePage> {
               },
             ),
           ),
-          SizedBox.square(
-            dimension: height * 0.0504,
-            child: OutlinedButton(
-              style: OutlinedButton.styleFrom(
-                padding: EdgeInsets.zero,
-                side: BorderSide(color: Colors.transparent),
-                backgroundColor: AppColors.primary,
-              ),
-              onPressed: () {},
-              child: Icon(Iconsax.notification5, color: AppColors.mutedWhite),
-            ),
-          ),
         ],
       ),
     );
