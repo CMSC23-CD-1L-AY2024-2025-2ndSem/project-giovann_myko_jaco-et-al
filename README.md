@@ -116,4 +116,27 @@ This project is developed as part of an academic course. Special thanks to the o
 
 This project is for educational purposes only and is not intended for commercial use. All of the images and resources used in this project are license-free and open for non-commercial use.
 
+## Contributors
+
+<ul>
+  <li>
+    <a href="https://github.com/mmjavier" target="_blank">
+      <img src="https://github.com/mmjavier.png" width="60" style="vertical-align: middle; border-radius: 50%;" />
+      <strong>@mmjavier</strong> — <em>BS Computer Science Student | UPLB</em>
+    </a>
+  </li>
+  <li>
+    <a href="https://github.com/GiovannApolinar" target="_blank">
+      <img src=https://github.com/GiovannApolinar.png" width="60" style="vertical-align: middle; border-radius: 50%;" />
+      <strong>@GiovannApolinar</strong> — <em>BS Computer Science Student | UPLB</em>
+    </a>
+  </li>
+  <li>
+    <a href="https://github.com/ALRnoche" target="_blank">
+      <img src="https://github.com/ALRnoche.png" width="60" style="vertical-align: middle; border-radius: 50%;" />
+      <strong>@ALRnoche/strong> — <em>BS Computer Science Student | UPLB</em>
+    </a>
+  </li>
+</ul>
+
 
