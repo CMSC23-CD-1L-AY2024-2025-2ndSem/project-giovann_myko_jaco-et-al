@@ -25,7 +25,8 @@ class DestinationsTab extends StatelessWidget
   }
 
   final ItineraryController controller;
-  DestinationsTab({required this.controller, Key? key}) : super(key: key);
+  final bool isOwner;
+  const DestinationsTab({required this.controller, required this.isOwner, super.key});
   @override
   Widget build(BuildContext context) 
   {
@@ -47,14 +48,14 @@ class DestinationsTab extends StatelessWidget
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 16.0),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: 
               [
                 _buildInfoColumn(
                   '${controller.duration.value} ${controller.duration.value > 1 ? "Days" : "Day"}',
                   'Duration',
                 ),
-
+                SizedBox(width: 60),
                 _buildInfoColumn(
                   '${controller.travelers.value} ${controller.travelers.value > 1 ? "Adults" : "Adult"}',
                   'Travellers',
@@ -70,11 +71,11 @@ class DestinationsTab extends StatelessWidget
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 16.0),
             child: ElevatedButton.icon(
-              onPressed: _showAddDestinationDialog,
+              onPressed: isOwner ? _showAddDestinationDialog : null,
               icon: Icon(Icons.add, color: AppColors.mutedWhite),
               label: Text('Add a Place'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
+                backgroundColor: isOwner ? AppColors.primary : Colors.grey,
                 foregroundColor: Colors.white,
                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               ),
@@ -95,13 +96,33 @@ class DestinationsTab extends StatelessWidget
                 );
               }
               
+              final sortedDestinations = List<Destination>.from(controller.currentDayDestinations);
+              sortedDestinations.sort((a, b)
+              {
+                final aTime = TimeOfDay(
+                  hour: int.tryParse(a.time.split(":")[0]) ?? 00,
+                  minute: int.tryParse(a.time.split(":")[1].split(" ")[0]) ?? 00,
+                );
+                final bTime = TimeOfDay(
+                  hour: int.tryParse(b.time.split(":")[0]) ?? 00,
+                  minute: int.tryParse(b.time.split(":")[1].split(" ")[0]) ?? 00,
+                );
+
+                bool aPM = a.time.toLowerCase().contains('pm');
+                bool bPM = b.time.toLowerCase().contains('pm');
+                int aHour = aTime.hour % 12 + (aPM ? 12 : 0);
+                int bHour = bTime.hour % 12 + (bPM ? 12 : 0);
+                if (aHour != bHour) return aHour.compareTo(bHour);
+                return aTime.minute.compareTo(bTime.minute);
+              });
+
               return ListView.builder(
-                itemCount: controller.currentDayDestinations.length,
+                itemCount: sortedDestinations.length,
                 itemBuilder: (context, index) 
                 {
-                  final destination = controller.currentDayDestinations[index];
+                  final destination = sortedDestinations[index];
                   final isFirst = index == 0;
-                  final isLast = index == controller.currentDayDestinations.length - 1;
+                  final isLast = index == sortedDestinations.length - 1;
                   
                   return _buildDestinationItem(destination, isFirst, isLast);
                 },
@@ -138,27 +159,28 @@ class DestinationsTab extends StatelessWidget
   
   Widget _buildDaySelector() 
   {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.grey[200],
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: 
-        [
-          Obx(() => Text(
-            'Day ${controller.selectedDayIndex.value + 1}',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-            ),
-          )),
-          InkWell(
-            onTap: _showDayPicker,
-            child: Icon(Icons.keyboard_arrow_down),
-          ),
-        ],
+    return InkWell(
+      onTap: _showDayPicker,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.grey[200],
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: 
+          [
+            Obx(() => Text(
+              'Day ${controller.selectedDayIndex.value + 1}',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            )),
+            Icon(Icons.keyboard_arrow_down),
+          ],
+        ),
       ),
     );
   }
@@ -169,7 +191,7 @@ class DestinationsTab extends StatelessWidget
       context: Get.context!,
       builder: (context) 
       {
-        return Container(
+        return SizedBox(
           height: 300,
           child: Column(
             children: 
@@ -338,7 +360,7 @@ class DestinationsTab extends StatelessWidget
   
   void _showAddDestinationDialog() 
   {
-    final _formKey = GlobalKey<FormState>();
+    final formKey = GlobalKey<FormState>();
 
     controller.destinationNameController.clear();
     controller.destinationDescriptionController.clear();
@@ -351,7 +373,7 @@ class DestinationsTab extends StatelessWidget
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Form(
-            key: _formKey,
+            key: formKey,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -437,10 +459,10 @@ class DestinationsTab extends StatelessWidget
                     ),
                     SizedBox(width: 8),
                     ElevatedButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) 
+                      onPressed: () async {
+                        if (formKey.currentState!.validate()) 
                         {
-                          controller.addDestination();
+                          await controller.addDestination();
                           Get.back();
                         }
                       },
@@ -463,14 +485,14 @@ class DestinationsTab extends StatelessWidget
   
   void _showEditDestinationDialog(Destination destination) 
   {
-    final _formKey = GlobalKey<FormState>();
+    final formKey = GlobalKey<FormState>();
     // Set controllers with existing values
     controller.destinationNameController.text = destination.name;
     controller.destinationDescriptionController.text = destination.description;
     controller.destinationTimeController.text = destination.time;
     controller.destinationTypeController.text = destination.type;
 
-    _formKey.currentState?.reset();  // Resetting the form state
+    formKey.currentState?.reset();  // Resetting the form state
 
     // Open dialog
     Get.dialog(
@@ -479,7 +501,7 @@ class DestinationsTab extends StatelessWidget
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Form(
-            key: _formKey,  // Form key for validation
+            key: formKey,  // Form key for validation
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -570,7 +592,7 @@ class DestinationsTab extends StatelessWidget
                     ElevatedButton(
                       onPressed: () 
                       {
-                        if (_formKey.currentState!.validate()) 
+                        if (formKey.currentState!.validate()) 
                         {
                           controller.deleteDestination(destination.id);
                           controller.addDestination();

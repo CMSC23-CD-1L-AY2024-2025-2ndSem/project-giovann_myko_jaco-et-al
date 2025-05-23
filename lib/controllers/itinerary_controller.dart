@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:planago/controllers/firestore/itinerary_database.dart';
 import 'package:planago/models/travel_plan_model.dart';
 import 'package:uuid/uuid.dart';
 import '/models/travel_model.dart';
@@ -13,50 +14,74 @@ class ItineraryController extends GetxController
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final GlobalKey<FormState> editFormKey = GlobalKey<FormState>();
 
-
-  //Edit hardcoded values as needed
-  //
-  //  
-  // Trip details
-  // initialize values to avoid garbage values
   final duration = 5.obs;
   final travelers = 1.obs;
-  final RxDouble budget = 0.0.obs;
   final currency = "PHP".obs;
-  
-  // Lists for each day
-  final expenses = <List<Expense>>[].obs;
-  final activities = <List<Activity>>[].obs;
-  final destinations = <List<Destination>>[].obs;
-  
+
+  final itinerary = <Itinerary>[].obs;
+
   // Text controllers for expenses
   final expenseDescriptionController = TextEditingController();
   final expenseAmountController = TextEditingController();
   final expenseCategoryController = TextEditingController();
-  
+
   // Text controllers for activities
   final activityDescriptionController = TextEditingController();
   final activityTimeController = TextEditingController();
   final activityTypeController = TextEditingController();
-  
+
   // Text controllers for destinations
   final destinationNameController = TextEditingController();
   final destinationDescriptionController = TextEditingController();
   final destinationTimeController = TextEditingController();
   final destinationTypeController = TextEditingController();
 
+  String? travelPlanId ;
+
+  Future<void> loadItinerary(String planId) async 
+  {
+    travelPlanId = planId;
+    final loaded = await ItineraryDatabase.instance.getItinerary(planId);
+    if (loaded.isNotEmpty) 
+    {
+      duration.value = loaded.length;
+      itinerary.value = loaded;
+    }
+  }
+
+  Future<void> saveItinerary() async 
+  {
+    if (travelPlanId == null) 
+    {
+      // print('travelPlanId is null!');
+      return;
+    }
+    // print('Saving itinerary: ${itinerary.map((e) => e.toJson()).toList()}');
+    await ItineraryDatabase.instance.setItinerary(travelPlanId!, itinerary);
+  }
   void setDurationFromDates(DateTime start, DateTime end) 
   {
     final int days = end.difference(start).inDays + 1;
     duration.value = days;
-    expenses.value = List.generate(days, (_) => []);
-    activities.value = List.generate(days, (_) => []);
-    destinations.value = List.generate(days, (_) => []);
+    itinerary.value = List.generate(
+      days,
+      (i) => Itinerary(day: i + 1, expenses: [], destinations: [], activities: []),
+    );
+    saveItinerary();
   }
-  
+
   void setTravelersFromPlan(TravelPlan plan) 
   {
-    travelers.value = plan.people != null ? plan.people!.length : 1;
+    // print("Setting travelers from plan: ${plan.people}");
+    if (plan.people == null || plan.people!.isEmpty) 
+    {
+      travelers.value = 1;
+    } 
+    
+    else 
+    {
+      travelers.value = plan.people!.length + 1;
+    }
   }
 
   double get currentDayTotalExpenses 
@@ -68,32 +93,31 @@ class ItineraryController extends GetxController
     }
     return sum;
   }
+
   @override
   void onClose() 
   {
-    //temporary muna 'to
-    // Dispose all controllers to remove unused space
     expenseDescriptionController.dispose();
     expenseAmountController.dispose();
     expenseCategoryController.dispose();
-    
+
     activityDescriptionController.dispose();
     activityTimeController.dispose();
     activityTypeController.dispose();
-    
+
     destinationNameController.dispose();
     destinationDescriptionController.dispose();
     destinationTimeController.dispose();
     destinationTypeController.dispose();
-    
+
     super.onClose();
   }
-  
+
   void changeTab(int index) 
   {
     selectedTabIndex.value = index;
   }
-  
+
   void selectDay(int index) 
   {
     if (index >= 0 && index < duration.value) 
@@ -101,17 +125,17 @@ class ItineraryController extends GetxController
       selectedDayIndex.value = index;
     }
   }
-  
+
   // Getters for current day items
-  List<Expense> get currentDayExpenses => expenses[selectedDayIndex.value];
-  List<Activity> get currentDayActivities => activities[selectedDayIndex.value];
-  List<Destination> get currentDayDestinations => destinations[selectedDayIndex.value];
-  
+  List<Expense> get currentDayExpenses => itinerary.isNotEmpty ? itinerary[selectedDayIndex.value].expenses : [];
+  List<Activity> get currentDayActivities => itinerary.isNotEmpty ? itinerary[selectedDayIndex.value].activities : [];
+  List<Destination> get currentDayDestinations => itinerary.isNotEmpty ? itinerary[selectedDayIndex.value].destinations : [];
+
   // Expense methods
-  void addExpense() 
+  Future<void> addExpense() async 
   {
-    if (expenseDescriptionController.text.isEmpty || 
-        expenseAmountController.text.isEmpty || 
+    if (expenseDescriptionController.text.isEmpty ||
+        expenseAmountController.text.isEmpty ||
         expenseCategoryController.text.isEmpty) 
     {
       Get.snackbar(
@@ -121,9 +145,9 @@ class ItineraryController extends GetxController
       );
       return;
     }
-    
+
     final amount = double.tryParse(expenseAmountController.text) ?? 0.0;
-    
+
     final newExpense = Expense(
       id: uuid.v4(),
       description: expenseDescriptionController.text,
@@ -131,34 +155,34 @@ class ItineraryController extends GetxController
       category: expenseCategoryController.text,
       date: DateTime.now(),
     );
-    
-    final dayExpenses = List<Expense>.from(expenses[selectedDayIndex.value]);
-    dayExpenses.add(newExpense);
-    
-    final allExpenses = List<List<Expense>>.from(expenses);
-    allExpenses[selectedDayIndex.value] = dayExpenses;
-    expenses.value = allExpenses;
-    
-    // Clear controllers
+
+    final day = selectedDayIndex.value;
+    final updatedDay = itinerary[day].copyWith(
+      expenses: [...itinerary[day].expenses, newExpense],
+    );
+    itinerary[day] = updatedDay;
+
     expenseDescriptionController.clear();
     expenseAmountController.clear();
     expenseCategoryController.clear();
+
+    await saveItinerary();
   }
-  
-  void deleteExpense(String id) 
+
+  Future<void> deleteExpense(String id) async 
   {
-    final dayExpenses = List<Expense>.from(expenses[selectedDayIndex.value]);
-    dayExpenses.removeWhere((expense) => expense.id == id);
-    
-    final allExpenses = List<List<Expense>>.from(expenses);
-    allExpenses[selectedDayIndex.value] = dayExpenses;
-    expenses.value = allExpenses;
+    final day = selectedDayIndex.value;
+    final updatedExpenses = itinerary[day].expenses.where((e) => e.id != id).toList();
+    itinerary[day] = itinerary[day].copyWith(expenses: updatedExpenses);
+    await saveItinerary();
   }
-  
+
   // Activity methods
-  void addActivity() 
+  Future<void> addActivity() async 
   {
-    if (activityDescriptionController.text.isEmpty || activityTimeController.text.isEmpty || activityTypeController.text.isEmpty) 
+    if (activityDescriptionController.text.isEmpty ||
+        activityTimeController.text.isEmpty ||
+        activityTypeController.text.isEmpty) 
     {
       Get.snackbar(
         'Error',
@@ -167,7 +191,7 @@ class ItineraryController extends GetxController
       );
       return;
     }
-    
+
     final newActivity = Activity(
       id: uuid.v4(),
       description: activityDescriptionController.text,
@@ -175,43 +199,52 @@ class ItineraryController extends GetxController
       type: activityTypeController.text,
       date: DateTime.now(),
     );
-    
-    final dayActivities = List<Activity>.from(activities[selectedDayIndex.value]);
-    dayActivities.add(newActivity);
-    
-    final allActivities = List<List<Activity>>.from(activities);
-    allActivities[selectedDayIndex.value] = dayActivities;
-    activities.value = allActivities;
-    
-    // Clear controllers for now
+
+    final day = selectedDayIndex.value;
+    final updatedDay = itinerary[day].copyWith(
+      activities: [...itinerary[day].activities, newActivity],
+    );
+    itinerary[day] = updatedDay;
+
     activityDescriptionController.clear();
     activityTimeController.clear();
     activityTypeController.clear();
+
+    await saveItinerary();
   }
-  
-  void deleteActivity(String id) 
+
+  Future<void> updateActivity(String id, Activity updatedActivity) async 
   {
-    final dayActivities = List<Activity>.from(activities[selectedDayIndex.value]);
-    dayActivities.removeWhere((activity) => activity.id == id);
-    
-    final allActivities = List<List<Activity>>.from(activities);
-    allActivities[selectedDayIndex.value] = dayActivities;
-    activities.value = allActivities;
+    final day = selectedDayIndex.value;
+    final activities = itinerary[day].activities.map((a) => a.id == id ? updatedActivity : a).toList();
+    itinerary[day] = itinerary[day].copyWith(activities: activities);
+    await saveItinerary();
   }
-  
+
+  Future<void> deleteActivity(String id) async 
+  {
+    final day = selectedDayIndex.value;
+    final updatedActivities = itinerary[day].activities.where((a) => a.id != id).toList();
+    itinerary[day] = itinerary[day].copyWith(activities: updatedActivities);
+    await saveItinerary();
+  }
+
   // Destination methods
-  void addDestination() 
+  Future<void> addDestination() async 
   {
-    if (destinationNameController.text.isEmpty || destinationDescriptionController.text.isEmpty || destinationTimeController.text.isEmpty || destinationTypeController.text.isEmpty) 
+    if (destinationNameController.text.isEmpty ||
+        destinationDescriptionController.text.isEmpty ||
+        destinationTimeController.text.isEmpty ||
+        destinationTypeController.text.isEmpty) 
     {
-        Get.snackbar(
-          'Error',
-          'Please fill all fields',
-          snackPosition: SnackPosition.BOTTOM,
-        );
+      Get.snackbar(
+        'Error',
+        'Please fill all fields',
+        snackPosition: SnackPosition.BOTTOM,
+      );
       return;
     }
-    
+
     final newDestination = Destination(
       id: uuid.v4(),
       name: destinationNameController.text,
@@ -219,28 +252,26 @@ class ItineraryController extends GetxController
       time: destinationTimeController.text,
       type: destinationTypeController.text,
     );
-    
-    final dayDestinations = List<Destination>.from(destinations[selectedDayIndex.value]);
-    dayDestinations.add(newDestination);
-    
-    final allDestinations = List<List<Destination>>.from(destinations);
-    allDestinations[selectedDayIndex.value] = dayDestinations;
-    destinations.value = allDestinations;
-    
-    // Clear controllers for now
+
+    final day = selectedDayIndex.value;
+    final updatedDay = itinerary[day].copyWith(
+      destinations: [...itinerary[day].destinations, newDestination],
+    );
+    itinerary[day] = updatedDay;
+
     destinationNameController.clear();
     destinationDescriptionController.clear();
     destinationTimeController.clear();
     destinationTypeController.clear();
+
+    await saveItinerary();
   }
-  
-  void deleteDestination(String id) 
+
+  Future<void> deleteDestination(String id) async 
   {
-    final dayDestinations = List<Destination>.from(destinations[selectedDayIndex.value]);
-    dayDestinations.removeWhere((destination) => destination.id == id);
-    
-    final allDestinations = List<List<Destination>>.from(destinations);
-    allDestinations[selectedDayIndex.value] = dayDestinations;
-    destinations.value = allDestinations;
+    final day = selectedDayIndex.value;
+    final updatedDestinations = itinerary[day].destinations.where((d) => d.id != id).toList();
+    itinerary[day] = itinerary[day].copyWith(destinations: updatedDestinations);
+    await saveItinerary();
   }
 }

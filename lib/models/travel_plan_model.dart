@@ -1,5 +1,6 @@
 import 'package:planago/models/acommodation_details_model.dart';
 import 'package:planago/models/flight_details_model.dart';
+import 'package:planago/models/travel_model.dart';
 
 class TravelPlan 
 {

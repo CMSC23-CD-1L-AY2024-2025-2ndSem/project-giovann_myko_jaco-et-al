@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:planago/controllers/authentication_controller.dart';
 import 'package:planago/controllers/firestore/travel_plan_database.dart';
+import 'package:planago/models/travel_model.dart';
 import 'package:planago/models/travel_plan_model.dart';
 import 'package:planago/utils/constants/image_strings.dart';
 import 'package:planago/utils/helper/converter.dart';
@@ -27,9 +28,26 @@ class CreateTravelPlanController extends GetxController{
   return true;
 }
 
-  Future<void> createPlan() async { 
+  Future<void> createPlan() async 
+  { 
       final randomIndex = Random().nextInt(AppImages.illustrations.length);
-      var newPlan = TravelPlan(creator: AuthenticationController.instance.authUser!.uid, tripTitle: tripName.text.trim(), destination: location.value, startDate: selectedDateRange.value!.start, endDate: selectedDateRange.value!.end, imageIndex: randomIndex);
+
+      final days = selectedDateRange.value!.end.difference(selectedDateRange.value!.start).inDays + 1;
+
+      final itinerary = List.generate(
+        days,
+        (i) => Itinerary(day: i + 1, expenses: [], destinations: [], activities: []),
+      );
+      
+      var newPlan = TravelPlan(
+        creator: AuthenticationController.instance.authUser!.uid,
+        tripTitle: tripName.text.trim(),
+        destination: location.value,
+        startDate: selectedDateRange.value!.start,
+        endDate: selectedDateRange.value!.end,
+        imageIndex: randomIndex,
+      );
+      
       print(newPlan);
       newPlan = await TravelPlanDatabase.instance.addTravelPlan(newPlan);
       plan.value = newPlan;

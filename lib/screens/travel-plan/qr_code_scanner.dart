@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:planago/controllers/authentication_controller.dart';
 import 'package:planago/controllers/firestore/travel_plan_database.dart';
-import 'package:planago/controllers/user_controller.dart';
 import 'package:planago/navigation_menu.dart';
 import 'package:planago/utils/constants/colors.dart';
 import 'package:qr_code_scanner_plus/qr_code_scanner_plus.dart';
@@ -39,7 +38,6 @@ class _QRViewExampleState extends State<QRScannerScreen>
   @override
   Widget build(BuildContext context) 
   {
-    final width = Get.width;
     final height = Get.height;
     return Scaffold(
             appBar: AppBar(
@@ -59,7 +57,8 @@ class _QRViewExampleState extends State<QRScannerScreen>
         ),
       ),
       body: Column(
-        children: <Widget>[
+        children: <Widget>
+        [
           Expanded(flex: 4, child: _buildQrView(context)),
           Expanded(
             flex: 1,
@@ -70,74 +69,106 @@ class _QRViewExampleState extends State<QRScannerScreen>
                 children: <Widget>[
                   if (result != null)
                     Text(
-                        'Barcode Type: ${describeEnum(result!.format)}   Data: ${result!.code}')
+                      'Barcode Type: ${describeEnum(result!.format)}   Data: ${result!.code}',
+                      style: TextStyle(
+                        fontFamily: "Cal Sans",
+                        color: Colors.black,
+                        fontSize: 10,
+                      ),
+                    )
+
                   else
-                    const Text('Scan a code'),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      Container(
-                        margin: const EdgeInsets.all(8),
-                        child: ElevatedButton(
-                            onPressed: () async {
-                              await controller?.toggleFlash();
-                              setState(() {});
-                            },
-                            child: FutureBuilder(
-                              future: controller?.getFlashStatus(),
-                              builder: (context, snapshot) {
-                                return Text('Flash: ${snapshot.data}');
-                              },
-                            )),
+                    Text(
+                      'Scan a code',
+                      style: TextStyle(
+                        fontFamily: "Cal Sans",
+                        color: Colors.black,
+                        fontSize: 10,
                       ),
-                      Container(
-                        margin: const EdgeInsets.all(8),
-                        child: ElevatedButton(
-                            onPressed: () async {
-                              await controller?.flipCamera();
-                              setState(() {});
-                            },
-                            child: FutureBuilder(
-                              future: controller?.getCameraInfo(),
-                              builder: (context, snapshot) {
-                                if (snapshot.data != null) {
-                                  return Text(
-                                      'Camera facing ${describeEnum(snapshot.data!)}');
-                                } else {
-                                  return const Text('loading');
-                                }
-                              },
-                            )),
-                      )
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      Container(
-                        margin: const EdgeInsets.all(8),
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            await controller?.pauseCamera();
-                          },
-                          child: const Text('pause',
-                              style: TextStyle(fontSize: 20)),
-                        ),
+                    ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>
+                  [
+                    IconButton(
+                      onPressed: () async 
+                      {
+                        await controller?.toggleFlash();
+                        setState(() {});
+                      },
+                      icon: FutureBuilder(
+                        future: controller?.getFlashStatus(),
+                        builder: (context, snapshot) 
+                        {
+                          final isOn = snapshot.data == true || snapshot.data == 'on';
+                          return Icon(
+                            isOn ? Icons.flash_on : Icons.flash_off,
+                            color: AppColors.primary,
+                            size: 15,
+                          );
+                        },
                       ),
-                      Container(
-                        margin: const EdgeInsets.all(8),
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            await controller?.resumeCamera();
-                          },
-                          child: const Text('resume',
-                              style: TextStyle(fontSize: 20)),
-                        ),
-                      )
-                    ],
-                  ),
+                      tooltip: 'Flash',
+                      iconSize: 28,
+                      padding: EdgeInsets.zero,
+                      constraints: BoxConstraints(),
+                    ),
+                    IconButton(
+                      onPressed: () async 
+                      {
+                        await controller?.flipCamera();
+                        setState(() {});
+                      },
+                      icon: FutureBuilder(
+                        future: controller?.getCameraInfo(),
+                        builder: (context, snapshot) 
+                        {
+                          if (snapshot.data != null) 
+                          {
+                            final isBack = describeEnum(snapshot.data!) == 'back';
+                            return Icon(
+                              isBack ? Icons.camera_rear : Icons.camera_front,
+                              color: AppColors.primary,
+                              size: 15,
+                            );
+                          } 
+                          
+                          else 
+                          {
+                            return Icon(Icons.camera, color: AppColors.primary, size: 15);
+                          }
+                        },
+                      ),
+                      tooltip: 'Switch Camera',
+                      iconSize: 28,
+                      padding: EdgeInsets.zero,
+                      constraints: BoxConstraints(),
+                    ),
+                    IconButton(
+                      onPressed: () async 
+                      {
+                        await controller?.pauseCamera();
+                      },
+                      icon: Icon(Icons.pause, color: AppColors.primary, size: 15),
+                      tooltip: 'Pause',
+                      iconSize: 28,
+                      padding: EdgeInsets.zero,
+                      constraints: BoxConstraints(),
+                    ),
+                    IconButton(
+                      onPressed: () async 
+                      {
+                        await controller?.resumeCamera();
+                      },
+                      icon: Icon(Icons.play_arrow, color: AppColors.primary, size: 15),
+                      tooltip: 'Resume',
+                      iconSize: 28,
+                      padding: EdgeInsets.zero,
+                      constraints: BoxConstraints(),
+                    ),
+                  ],
+                ),
                 ],
               ),
             ),
@@ -147,7 +178,8 @@ class _QRViewExampleState extends State<QRScannerScreen>
     );
   }
 
-  Widget _buildQrView(BuildContext context) {
+  Widget _buildQrView(BuildContext context) 
+  {
     // For this example we check how width or tall the device is and change the scanArea and overlay accordingly.
     var scanArea = (MediaQuery.of(context).size.width < 400 ||
             MediaQuery.of(context).size.height < 400)
@@ -170,7 +202,8 @@ class _QRViewExampleState extends State<QRScannerScreen>
 
   void _onQRViewCreated(QRViewController controller) 
   {
-    setState(() {
+    setState(() 
+    {
       this.controller = controller;
     });
     controller.scannedDataStream.listen((scanData) async 
@@ -204,9 +237,11 @@ class _QRViewExampleState extends State<QRScannerScreen>
     });
   }
 
-  void _onPermissionSet(BuildContext context, QRViewController ctrl, bool p) {
+  void _onPermissionSet(BuildContext context, QRViewController ctrl, bool p) 
+  {
     log('${DateTime.now().toIso8601String()}_onPermissionSet $p');Get.snackbar("TRAVEL ID", result!.code!);
-    if (!p) {
+    if (!p) 
+    {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('no Permission')),
       );

@@ -7,7 +7,9 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:planago/controllers/firestore/travel_plan_database.dart';
 import 'package:planago/controllers/user_controller.dart';
+import 'package:planago/navigation_menu.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:planago/models/travel_plan_model.dart';
@@ -98,67 +100,108 @@ class _QRCodeScreenState extends State<QRCodeScreen>
     }
   }
 
-  // Share with a friend by username
-  // TODO: must implement backend logic to share travel plan with existing user in the database
   void _shareWithFriend() 
   {
-    if (_username == null || _username!.isEmpty) 
-    {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('Enter Username'),
-          content: TextField(
-            controller: _usernameController,
-            decoration: InputDecoration(
-              hintText: 'Friend\'s username',
-              border: OutlineInputBorder(),
-            ),
-          ),
-          actions: 
-          [
-            TextButton(
-              onPressed: () 
-              {
-                Navigator.pop(context);
-              },
-              child: Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () 
-              {
-                setState(() 
-                {
-                  _username = _usernameController.text;
-                });
-                Navigator.pop(context);
-                //TODO: implement sharing logic here (backend)
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Travel plan shared with $_username'),
-                    backgroundColor: AppColors.primary,
+    _usernameController.clear();
+    showDialog(
+      context: context,
+      builder: (context) {
+        String? usernameError;
+        return StatefulBuilder(
+          builder: (context, setState) => AlertDialog(
+            title: Text('Follower Username', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: _usernameController,
+                  decoration: InputDecoration(
+                    hintText: 'username_013',
+                    border: OutlineInputBorder(),
+                    errorText: usernameError,
                   ),
-                );
-              },
-              child: Text('Share'),
+                ),
+              ],
             ),
-          ],
-        ),
-      );
-    } 
-    
-    else 
-    {
-      // Include in user model the shared travel plan via travel plan id
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Travel plan shared with $_username'),
-          backgroundColor: AppColors.primary,
-        ),
-      );
-    }
-  }
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text(
+                  'Cancel',
+                  style: TextStyle(color: AppColors.secondary),
+                ),
+              ),
+              TextButton(
+                onPressed: () async 
+                {
+                  if (_usernameController.text.isEmpty) 
+                  {
+                    setState(() 
+                    {
+                      usernameError = 'Please enter a username.';
+                    });
+                    return;
+                  } 
+                  
+                  else 
+                  {
+                    _username = _usernameController.text;
 
+                    final userId = await TravelPlanDatabase.instance.getUserIdByUsername(_username!);
+                    if (userId == null) 
+                    {
+                      setState(() 
+                      {
+                        usernameError = 'Follower not found.';
+                      });
+                      return;
+                    }
+
+                    Navigator.pop(context);
+                    final result = await TravelPlanDatabase.instance.addPeople(
+                      widget.plan.id!,
+                      userId,
+                    );
+
+                    if (result.contains("Already")) 
+                    {
+                      Get.snackbar(
+                        "Fail",
+                        'Travel plan already shared with $_username',
+                        backgroundColor: Colors.amber,
+                        colorText: Colors.black,
+                      );
+                    } 
+                    else 
+                    {
+                      Get.snackbar(
+                        "Success",
+                        'Travel plan shared with $_username',
+                        backgroundColor: AppColors.primary,
+                        colorText: Colors.black,
+                      );
+                    }
+
+                    Get.offUntil(
+                      MaterialPageRoute(builder: (_) => NavigationMenu()),
+                      (route) => route.settings.name == '/navigation',
+                    );
+                  }
+                },
+                style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+                child: Text(
+                  'Share',
+                  style: TextStyle(color: AppColors.mutedWhite),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
   @override
   Widget build(BuildContext context) 
   {
@@ -341,7 +384,7 @@ class _QRCodeScreenState extends State<QRCodeScreen>
                   ),
                   icon: Icon(Icons.person_add, color: AppColors.primary),
                   label: Text(
-                    "Share with a friend",
+                    "Share with a follower",
                     style: TextStyle(fontSize: height * 0.018),
                   ),
                 ),

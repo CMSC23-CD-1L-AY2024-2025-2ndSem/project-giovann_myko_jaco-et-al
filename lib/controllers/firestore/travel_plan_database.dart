@@ -5,7 +5,8 @@ import 'package:planago/controllers/authentication_controller.dart';
 import 'package:planago/models/travel_plan_model.dart';
 import 'package:planago/models/user_model.dart';
 
-class TravelPlanDatabase extends GetxController {
+class TravelPlanDatabase extends GetxController 
+{
   static TravelPlanDatabase get instance => Get.find();
 
   final plans = <TravelPlan>[].obs;
@@ -65,17 +66,65 @@ class TravelPlanDatabase extends GetxController {
     }
     return null;
   }
+  
+  Future<String?> getUserIdByUsername(String username) async 
+  {
+    var query = await _db
+    .collection('Users')
+    .where('Following', arrayContains: username)
+    .get();
 
-  Future<void> updateChecklist(
-    TravelPlan plan,
-    List<Checklist> updatedChecklist,
-  ) async {
+    if (query.docs.isNotEmpty) 
+    {
+      var userQuery = await _db
+          .collection('Users')
+          .where('Username', isEqualTo: username)
+          .limit(1)
+          .get();
+
+      if (userQuery.docs.isNotEmpty) 
+      {
+        return userQuery.docs.first.id;
+      }
+    }
+
+    // // If not found, check 'Followers' array
+    // query = await _db
+    //     .collection('Users')
+    //     .where('Followers', arrayContains: username)
+    //     .limit(1)
+    //     .get();
+
+    // if (query.docs.isNotEmpty) 
+    // {
+    //   return query.docs.first.id;
+    // }
+
+    //temporary testing
+    // query = await _db
+    //     .collection('Users')
+    //     .where('Username', isEqualTo: username)
+    //     .limit(1)
+    //     .get();
+
+    // if (query.docs.isNotEmpty) 
+    // {
+    //   return query.docs.first.id;
+    // }
+
+    // Not found in either array
+    return null;
+  }
+
+  Future<void> updateChecklist(TravelPlan plan, List<Checklist> updatedChecklist) async 
+  {
     final updatedPlan = plan.copyWith(checklist: updatedChecklist);
     await TravelPlanDatabase.instance.updateTravelPlan(updatedPlan);
   }
 
   @override
-  void onClose() {
+  void onClose() 
+  {
     _subscription?.cancel();
     super.onClose();
   }
@@ -90,10 +139,11 @@ class TravelPlanDatabase extends GetxController {
         return "Already in this Plan";
       }
       people.add(uid);
-      plan.copyWith(people: people);
+      final updatedPlan = plan.copyWith(people: people);
+      await updateTravelPlan(updatedPlan);
+      return "Successfully added to Plan!";
     }
-    await updateTravelPlan(plan!);
-    return "Successfully added to Plan!";
+    return "Plan not found";
   }
 
   //Function for delete a travel plan given an id

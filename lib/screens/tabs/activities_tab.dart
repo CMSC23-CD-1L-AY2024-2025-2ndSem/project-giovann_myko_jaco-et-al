@@ -1,4 +1,3 @@
-// lib/screens/itinerary/tabs/activities_tab.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:planago/utils/constants/colors.dart';
@@ -46,8 +45,8 @@ class ActivitiesTab extends StatelessWidget
 {
 
   final ItineraryController controller;
-  ActivitiesTab({required this.controller, Key? key}) : super(key: key);
-
+  final bool isOwner;
+  const ActivitiesTab({required this.controller, required this.isOwner, super.key});
   @override
   Widget build(BuildContext context) 
   {
@@ -69,14 +68,14 @@ class ActivitiesTab extends StatelessWidget
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 16.0),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: 
               [
                 _buildInfoColumn(
                   '${controller.duration.value} ${controller.duration.value > 1 ? "Days" : "Day"}',
                   'Duration',
                 ),
-
+                SizedBox(width: 60),
                 _buildInfoColumn(
                   '${controller.travelers.value} ${controller.travelers.value > 1 ? "Adults" : "Adult"}',
                   'Travellers',
@@ -92,11 +91,11 @@ class ActivitiesTab extends StatelessWidget
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 16.0),
             child: ElevatedButton.icon(
-              onPressed: _showAddActivityDialog,
+              onPressed: isOwner ? _showAddActivityDialog : null,
               icon: Icon(Icons.add, color: AppColors.mutedWhite),
               label: Text('Add Activity'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
+                backgroundColor: isOwner? AppColors.primary : Colors.grey,
                 foregroundColor: Colors.white,
                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               ),
@@ -116,15 +115,36 @@ class ActivitiesTab extends StatelessWidget
                   ),
                 );
               }
-              
+
+              // Sort activities by time before displaying
+              final sortedActivities = List<Activity>.from(controller.currentDayActivities);
+              sortedActivities.sort((a, b) 
+              {
+                final aTime = TimeOfDay(
+                  hour: int.tryParse(a.time.split(":")[0]) ?? 0,
+                  minute: int.tryParse(a.time.split(":")[1].split(" ")[0]) ?? 0,
+                );
+                final bTime = TimeOfDay(
+                  hour: int.tryParse(b.time.split(":")[0]) ?? 0,
+                  minute: int.tryParse(b.time.split(":")[1].split(" ")[0]) ?? 0,
+                );
+                // If AM/PM is present, adjust hour accordingly
+                bool aPM = a.time.toLowerCase().contains('pm');
+                bool bPM = b.time.toLowerCase().contains('pm');
+                int aHour = aTime.hour % 12 + (aPM ? 12 : 0);
+                int bHour = bTime.hour % 12 + (bPM ? 12 : 0);
+                if (aHour != bHour) return aHour.compareTo(bHour);
+                return aTime.minute.compareTo(bTime.minute);
+              });
+
               return ListView.builder(
-                itemCount: controller.currentDayActivities.length,
+                itemCount: sortedActivities.length,
                 itemBuilder: (context, index) 
                 {
-                  final activity = controller.currentDayActivities[index];
+                  final activity = sortedActivities[index];
                   final isFirst = index == 0;
-                  final isLast = index == controller.currentDayActivities.length - 1;
-                  
+                  final isLast = index == sortedActivities.length - 1;
+
                   return _buildActivityItem(activity, isFirst, isLast);
                 },
               );
@@ -160,27 +180,28 @@ class ActivitiesTab extends StatelessWidget
   
   Widget _buildDaySelector() 
   {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.grey[200],
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: 
-        [
-          Obx(() => Text(
-            'Day ${controller.selectedDayIndex.value + 1}',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-            ),
-          )),
-          InkWell(
-            onTap: _showDayPicker,
-            child: Icon(Icons.keyboard_arrow_down),
-          ),
-        ],
+    return InkWell(
+      onTap: _showDayPicker,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.grey[200],
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: 
+          [
+            Obx(() => Text(
+              'Day ${controller.selectedDayIndex.value + 1}',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            )),
+            Icon(Icons.keyboard_arrow_down),
+          ],
+        ),
       ),
     );
   }
@@ -191,7 +212,7 @@ class ActivitiesTab extends StatelessWidget
       context: Get.context!,
       builder: (context) 
       {
-        return Container(
+        return SizedBox(
           height: 300,
           child: Column(
             children: 
@@ -350,7 +371,7 @@ class ActivitiesTab extends StatelessWidget
     controller.activityTimeController.clear();
     controller.activityTypeController.clear();
 
-    final _formKey = GlobalKey<FormState>();
+    final formKey = GlobalKey<FormState>();
 
     Get.dialog(
       Dialog(
@@ -358,7 +379,7 @@ class ActivitiesTab extends StatelessWidget
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Form(
-            key: _formKey,
+            key: formKey,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -436,10 +457,10 @@ class ActivitiesTab extends StatelessWidget
                     SizedBox(width: 8),
                     ElevatedButton(
                       onPressed: () 
-                      {
-                        if (_formKey.currentState!.validate()) 
+                      async {
+                        if (formKey.currentState!.validate()) 
                         {
-                          controller.addActivity();
+                          await controller.addActivity();
                           Get.back();
                         }
                       },
@@ -463,7 +484,7 @@ class ActivitiesTab extends StatelessWidget
     controller.activityTimeController.text = activity.time;
     controller.activityTypeController.text = activity.type;
 
-    final _formKey = GlobalKey<FormState>();
+    final formKey = GlobalKey<FormState>();
 
     Get.dialog(
       Dialog(
@@ -471,7 +492,7 @@ class ActivitiesTab extends StatelessWidget
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Form(
-            key: _formKey,
+            key: formKey,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -550,11 +571,16 @@ class ActivitiesTab extends StatelessWidget
                     SizedBox(width: 8),
                     ElevatedButton(
                       onPressed: () 
-                      {
-                        if (_formKey.currentState!.validate()) 
+                      async {
+                        if (formKey.currentState!.validate()) 
                         {
-                          controller.deleteActivity(activity.id);
-                          controller.addActivity();
+                          await controller.updateActivity(activity.id, Activity(
+                            id: activity.id,
+                            description: controller.activityDescriptionController.text,
+                            time: controller.activityTimeController.text,
+                            type: controller.activityTypeController.text,
+                            date: activity.date,
+                          ));
                           Get.back();
                         }
                       },
