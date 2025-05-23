@@ -158,7 +158,6 @@ class NotificationService
       payload: plan.id,
     );
   }
-
   // Handle notification tap
   Future<void> onNotificationTap(TravelPlan plan) async 
   {
