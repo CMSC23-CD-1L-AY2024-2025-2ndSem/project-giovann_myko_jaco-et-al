@@ -251,9 +251,11 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                               ),
                               errorText: _customDaysError,
                             ),
-                            onChanged: (value) {
+                            onChanged: (value) 
+                            {
                               int? days = int.tryParse(value);
-                              setState(() {
+                              setState(() 
+                              {
                                 if (value.isEmpty) 
                                 {
                                   _customDaysError = null;
@@ -264,10 +266,25 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                                   _customDaysError = "Valid number only";
                                 } 
                                 
-                                else if (days < 1 || days > daysUntilTrip) 
+                                else if (days > daysUntilTrip && !(daysUntilTrip < 1)) 
                                 {
                                   _customDaysError = "1 to $daysUntilTrip only";
+                                }
+
+                                else if (days > daysUntilTrip && daysUntilTrip < 1) 
+                                {
+                                  _customDaysError = "N/A";
                                 } 
+                                
+                                else if (days == 0) 
+                                {
+                                  _customDaysError = "0 is not a valid option";
+                                } 
+                                
+                                else if (days < 0) 
+                                {
+                                  _customDaysError = "Negative numbers are not valid";
+                                }
                                 
                                 else 
                                 {
@@ -277,14 +294,6 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                               });
                             },
                           ),
-                          if (_customDaysError != null)
-                            Padding(
-                              padding: EdgeInsets.only(top: 4.0, left: 4.0),
-                              child: Text(
-                                _customDaysError!,
-                                style: TextStyle(color: Colors.red, fontSize: 12),
-                              ),
-                            ),
                         ],
                       ),
                     ),
@@ -292,7 +301,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                     Padding(
                       padding: const EdgeInsets.only(top: 8.0),
                       child: Text(
-                        "days before",
+                        "day/s before",
                         style: TextStyle(fontSize: height * 0.018),
                       ),
                     ),
