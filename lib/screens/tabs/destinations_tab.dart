@@ -25,7 +25,8 @@ class DestinationsTab extends StatelessWidget
   }
 
   final ItineraryController controller;
-  const DestinationsTab({required this.controller, super.key});
+  final bool isOwner;
+  const DestinationsTab({required this.controller, required this.isOwner, super.key});
   @override
   Widget build(BuildContext context) 
   {
@@ -70,11 +71,11 @@ class DestinationsTab extends StatelessWidget
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 16.0),
             child: ElevatedButton.icon(
-              onPressed: _showAddDestinationDialog,
+              onPressed: isOwner ? _showAddDestinationDialog : null,
               icon: Icon(Icons.add, color: AppColors.mutedWhite),
               label: Text('Add a Place'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
+                backgroundColor: isOwner ? AppColors.primary : Colors.grey,
                 foregroundColor: Colors.white,
                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               ),

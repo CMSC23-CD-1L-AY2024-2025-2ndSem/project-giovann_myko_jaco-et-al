@@ -1,6 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:planago/controllers/firestore/itinerary_database.dart';
 import 'package:planago/models/travel_plan_model.dart';
 import 'package:planago/utils/constants/colors.dart';
 import '/controllers/itinerary_controller.dart';
@@ -8,7 +8,8 @@ import '../tabs/destinations_tab.dart';
 import '../tabs/activities_tab.dart';
 import '../tabs/expenses_tab.dart';
 
-class ItineraryScreen extends StatefulWidget {
+class ItineraryScreen extends StatefulWidget 
+{
   final TravelPlan plan;
   const ItineraryScreen({super.key, required this.plan});
 
@@ -19,9 +20,11 @@ class ItineraryScreen extends StatefulWidget {
 class _ItineraryScreenState extends State<ItineraryScreen> 
 {
   late final ItineraryController controller;
+  final currentUserId = FirebaseAuth.instance.currentUser?.uid ?? '';
 
   @override
-  void initState() {
+  void initState() 
+  {
     super.initState();
     controller = Get.find<ItineraryController>(tag: widget.plan.id);
 
@@ -41,6 +44,9 @@ class _ItineraryScreenState extends State<ItineraryScreen>
   @override
   Widget build(BuildContext context) 
   {
+    final isOwner = (widget.plan.people != null && widget.plan.people!.isNotEmpty)
+        ? widget.plan.people!.first == currentUserId
+        : false;
     return DefaultTabController(
       length: 3,
       child: Scaffold(
@@ -98,9 +104,9 @@ class _ItineraryScreenState extends State<ItineraryScreen>
           physics: NeverScrollableScrollPhysics(),
           children: 
           [
-            DestinationsTab(controller: controller),
-            ActivitiesTab(controller: controller),
-            ExpensesTab(controller: controller),
+            DestinationsTab(controller: controller, isOwner: isOwner),
+            ActivitiesTab(controller: controller, isOwner: isOwner),
+            ExpensesTab(controller: controller, isOwner: isOwner),
           ],
         ),
       ),
