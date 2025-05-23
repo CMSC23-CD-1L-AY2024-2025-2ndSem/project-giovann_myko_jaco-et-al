@@ -1,4 +1,4 @@
-# <img src="assets/images/PlanaGo-Logo.png" width=50/> **PlanAgo**
+# <img src="assets/images/PlanaGo-Logo.png" width=30/> **PlanAgo**
 **Your Personalized Travel Planner**
 
 **PlanAgo** is a _beautifully crafted_ travel planning app built with **Flutter** and **Firebase**. Whether you’re a solo traveler or an adventure squad, PlanAgo helps you create, share, and manage your perfect trips—effortlessly.
@@ -102,6 +102,22 @@ Follow this link to be redirected to the APK installer of the app:
     </td>
   </tr>
 </table>
+<table align="center">
+  <tr>
+    <td align="center">
+      <img src="assets/screenshots/splash-screen.png" alt="Splash Screen" width="200"/><br/>
+      <strong>Splash Screen</strong>
+    </td>
+    <td align="center">
+      <img src="assets/screenshots/login-screen.png" alt="Login Screen" width="200"/><br/>
+      <strong>Login Screen</strong>
+    </td>
+    <td align="center">
+      <img src="assets/screenshots/google-login.png" alt="Google Login" width="200"/><br/>
+      <strong>Google Login</strong>
+    </td>
+  </tr>
+</table>
 
 
 ---
@@ -121,19 +137,19 @@ This project is for educational purposes only and is not intended for commercial
 <ul>
   <li>
     <a href="https://github.com/mmjavier" target="_blank">
-      <img src="https://github.com/mmjavier.png" width="60" style="vertical-align: middle; border-radius: 50%;" />
+      <img src="https://github.com/mmjavier.png" width="20" style="vertical-align: middle; border-radius: 50%;" />
       <strong>@mmjavier</strong> — <em>BS Computer Science Student | UPLB</em>
     </a>
   </li>
   <li>
     <a href="https://github.com/GiovannApolinar" target="_blank">
-      <img src=https://github.com/GiovannApolinar.png" width="60" style="vertical-align: middle; border-radius: 50%;" />
+      <img src=https://github.com/GiovannApolinar.png" width="20" style="vertical-align: middle; border-radius: 50%;" />
       <strong>@GiovannApolinar</strong> — <em>BS Computer Science Student | UPLB</em>
     </a>
   </li>
   <li>
     <a href="https://github.com/ALRnoche" target="_blank">
-      <img src="https://github.com/ALRnoche.png" width="60" style="vertical-align: middle; border-radius: 50%;" />
+      <img src="https://github.com/ALRnoche.png" width="20" style="vertical-align: middle; border-radius: 50%;" />
       <strong>@ALRnoche/strong> — <em>BS Computer Science Student | UPLB</em>
     </a>
   </li>
