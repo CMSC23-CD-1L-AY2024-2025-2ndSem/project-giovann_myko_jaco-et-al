@@ -86,17 +86,22 @@ Follow this link to be redirected to the APK installer of the app:
 ---
 
 ## 📸 Screenshots  
-<p align="center">
-  <img src="assets/screenshots/splash-screen.png" alt="Splash Screen" width="30%" style="margin-right: 10px;">
-  <img src="assets/screenshots/login-screen.png" alt="Login Screen" width="30%" style="margin-right: 10px;">
-  <img src="assets/screenshots/google-login.png" alt="Google Login" width="30%">
-</p>
-
-<p align="center">
-  <strong>Splash Screen</strong> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <strong>Login Screen</strong> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <strong>Google Login</strong>
-</p>
+<table align="center">
+  <tr>
+    <td align="center">
+      <img src="assets/screenshots/splash-screen.png" alt="Splash Screen" width="200"/><br/>
+      <strong>Splash Screen</strong>
+    </td>
+    <td align="center">
+      <img src="assets/screenshots/login-screen.png" alt="Login Screen" width="200"/><br/>
+      <strong>Login Screen</strong>
+    </td>
+    <td align="center">
+      <img src="assets/screenshots/google-login.png" alt="Google Login" width="200"/><br/>
+      <strong>Google Login</strong>
+    </td>
+  </tr>
+</table>
 
 
 ---
