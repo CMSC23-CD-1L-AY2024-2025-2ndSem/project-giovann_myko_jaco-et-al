@@ -350,13 +350,13 @@ class ActivitiesTab extends StatelessWidget
           children: 
           [
             IconButton(
-              icon: Icon(Icons.edit, size: 18),
-              onPressed: () => _showEditActivityDialog(activity),
+              icon: Icon(Icons.edit, size: 18, color: isOwner ? AppColors.primary: AppColors.gray),
+              onPressed: () => isOwner ? _showEditActivityDialog(activity) : null,
             ),
 
             IconButton(
               icon: Icon(Icons.delete, size: 18),
-              onPressed: () => controller.deleteActivity(activity.id),
+              onPressed: () => isOwner ?controller.deleteActivity(activity.id): null,
             ),
           ],
         ),

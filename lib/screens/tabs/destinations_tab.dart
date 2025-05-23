@@ -345,12 +345,12 @@ class DestinationsTab extends StatelessWidget
           children: 
           [
             IconButton(
-              icon: Icon(Icons.edit, size: 18),
-              onPressed: () => _showEditDestinationDialog(destination),
+              icon: Icon(Icons.edit, size: 18, color: isOwner ? AppColors.primary: AppColors.gray ),
+              onPressed: () =>  isOwner ? _showEditDestinationDialog(destination) : null,
             ),
             IconButton(
-              icon: Icon(Icons.delete, size: 18),
-              onPressed: () => controller.deleteDestination(destination.id),
+              icon: Icon(Icons.delete, size: 18, color: isOwner ? AppColors.primary: AppColors.gray),
+              onPressed: () => isOwner ? controller.deleteDestination(destination.id) : null,
             ),
           ],
         ),

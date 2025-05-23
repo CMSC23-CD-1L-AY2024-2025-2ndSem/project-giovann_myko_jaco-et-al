@@ -341,12 +341,12 @@ class ExpensesTab extends StatelessWidget
           children: 
           [
             IconButton(
-              icon: Icon(Icons.edit, size: 18),
-              onPressed: () => _showEditExpenseDialog(expense),
+              icon: Icon(Icons.edit, size: 18, color: isOwner ? AppColors.primary: AppColors.gray),
+              onPressed: () => isOwner ? _showEditExpenseDialog(expense) : null,
             ),
             IconButton(
-              icon: Icon(Icons.delete, size: 18),
-              onPressed: () => controller.deleteExpense(expense.id),
+              icon: Icon(Icons.delete, size: 18, color: isOwner ? AppColors.primary: AppColors.gray),
+              onPressed: () => isOwner ? controller.deleteExpense(expense.id) : null,
             ),
           ],
         ),
