@@ -44,9 +44,7 @@ class _ItineraryScreenState extends State<ItineraryScreen>
   @override
   Widget build(BuildContext context) 
   {
-    final isOwner = (widget.plan.creator == currentUserId)
-        ? true
-        : false;
+    final isOwner = (widget.plan.creator == currentUserId) ? true : false;
     return DefaultTabController(
       length: 3,
       child: Scaffold(
