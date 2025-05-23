@@ -597,10 +597,12 @@ class _TravelOverviewPageState extends State<TravelOverviewPage>
   ) {
     return GestureDetector(
       onTap: () {
-        showAddAccommodation(context, (newDetails) async {
+        if(AuthenticationController.instance.authUser!.uid == plan!.creator){
+          showAddAccommodation(context, (newDetails) async {
           plan?.accomodation = newDetails;
           await TravelPlanDatabase.instance.updateTravelPlan(widget.plan);
         }, initialDetails: plan?.accomodation);
+        }
       },
       child: SizedBox(
         width: width * 0.88,
@@ -1184,12 +1186,14 @@ class _TravelOverviewPageState extends State<TravelOverviewPage>
                   ),
                 ),
                 onTap: () async {
-                  showAddFlight(context, (newFlightDetails) async {
+                  if(AuthenticationController.instance.authUser!.uid == plan!.creator){
+                    showAddFlight(context, (newFlightDetails) async {
                     plan?.flight = newFlightDetails;
                     await TravelPlanDatabase.instance.updateTravelPlan(
                       widget.plan,
                     );
                   }, widget.plan.flight);
+                  }
                 },
               ),
             ],
@@ -1202,78 +1206,79 @@ class _TravelOverviewPageState extends State<TravelOverviewPage>
   // USE AS PLACEHOLDER
 
   Widget notesTile(double width, double height, TravelPlan? plan) {
-    final TextEditingController notesController = TextEditingController();
+  final TextEditingController notesController = TextEditingController();
+  final bool isCreator = AuthenticationController.instance.authUser?.uid == plan?.creator;
 
-    if (plan?.notes != null && plan!.notes!.isNotEmpty) {
-      notesController.text = plan.notes!;
-    }
+  if (plan?.notes != null && plan!.notes!.isNotEmpty) {
+    notesController.text = plan.notes!;
+  }
 
-    return SizedBox(
-      width: width * 0.88,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ListTile(
-            contentPadding: EdgeInsets.zero,
-            minTileHeight: height * 0.03,
-            minVerticalPadding: 0,
-            leading: Icon(
-              Icons.notes_rounded,
-              color: AppColors.black,
-              size: width * 0.08,
-            ),
-            title: Text(
-              "Notes",
-              style: TextStyle(
-                fontFamily: "Cal Sans",
-                fontSize: height * 0.03002,
-              ),
+  return SizedBox(
+    width: width * 0.88,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          minTileHeight: height * 0.03,
+          minVerticalPadding: 0,
+          leading: Icon(
+            Icons.notes_rounded,
+            color: AppColors.black,
+            size: width * 0.08,
+          ),
+          title: Text(
+            "Notes",
+            style: TextStyle(
+              fontFamily: "Cal Sans",
+              fontSize: height * 0.03002,
             ),
           ),
-          Divider(height: height * 0.0036, thickness: height * 0.0009),
-          Focus(
-            onFocusChange: (hasFocus) async {
-              if (!hasFocus) {
-                final trimmedNotes = notesController.text.trim();
-                if (trimmedNotes != plan?.notes) {
-                  plan?.notes = trimmedNotes;
-                  await TravelPlanDatabase.instance.updateTravelPlan(
-                    widget.plan,
-                  );
-                }
+        ),
+        Divider(height: height * 0.0036, thickness: height * 0.0009),
+        Focus(
+          onFocusChange: (hasFocus) async {
+            if (!hasFocus && isCreator) {
+              final trimmedNotes = notesController.text.trim();
+              if (trimmedNotes != plan?.notes) {
+                plan?.notes = trimmedNotes;
+                await TravelPlanDatabase.instance.updateTravelPlan(plan!);
               }
-            },
-            child: TextField(
-              controller: notesController,
-              cursorColor: AppColors.black,
-              maxLines: null,
-              cursorHeight: height * 0.02,
-              style: TextStyle(
+            }
+          },
+          child: TextField(
+            controller: notesController,
+            enabled: isCreator,
+            cursorColor: AppColors.black,
+            maxLines: null,
+            cursorHeight: height * 0.02,
+            style: TextStyle(
+              fontSize: height * 0.015,
+              fontWeight: FontWeight.w400,
+              color: AppColors.black,
+              letterSpacing: -0.3,
+            ),
+            decoration: InputDecoration(
+              contentPadding: EdgeInsets.only(
+                left: width * 0.02,
+                right: width * 0.02,
+                top: height * 0.01,
+              ),
+              border: InputBorder.none,
+              hintStyle: TextStyle(
                 fontSize: height * 0.015,
                 fontWeight: FontWeight.w400,
-                color: AppColors.black,
-                letterSpacing: -0.3,
+                color: Color.fromRGBO(155, 155, 156, 1),
               ),
-              decoration: InputDecoration(
-                contentPadding: EdgeInsets.only(
-                  left: width * 0.02,
-                  right: width * 0.02,
-                  top: height * 0.01,
-                ),
-                border: InputBorder.none,
-                hintStyle: TextStyle(
-                  fontSize: height * 0.015,
-                  fontWeight: FontWeight.w400,
-                  color: Color.fromRGBO(155, 155, 156, 1),
-                ),
-                hintText: "Enter your notes here!",
-              ),
+              hintText: "Enter your notes here!",
             ),
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
+
 }
 
 class ChecklistTile extends StatefulWidget {
@@ -1316,17 +1321,20 @@ class _ChecklistTileState extends State<ChecklistTile> {
   Widget build(BuildContext context) {
     final width = widget.width;
     final height = widget.height;
+    final bool isCreator = AuthenticationController.instance.authUser?.uid == widget.plan?.creator;
 
     return GestureDetector(
-      onTap: () async {
-        if (!isChecklist) {
-          setState(() {
-            isChecklist = true;
-            checklistItems.add(Checklist());
-          });
-          await _updateChecklistInDb();
-        }
-      },
+      onTap: isCreator
+          ? () async {
+              if (!isChecklist) {
+                setState(() {
+                  isChecklist = true;
+                  checklistItems.add(Checklist());
+                });
+                await _updateChecklistInDb();
+              }
+            }
+          : null,
       child: SizedBox(
         width: width * 0.88,
         child: Column(
@@ -1362,25 +1370,30 @@ class _ChecklistTileState extends State<ChecklistTile> {
                       Checkbox(
                         value: item.isChecked,
                         activeColor: AppColors.primary,
-                        onChanged: (val) async {
-                          setState(() {
-                            item.isChecked = val ?? false;
-                          });
-                          await _updateChecklistInDb();
-                        },
+                        onChanged: isCreator
+                            ? (val) async {
+                                setState(() {
+                                  item.isChecked = val ?? false;
+                                });
+                                await _updateChecklistInDb();
+                              }
+                            : null,
                       ),
                       Expanded(
                         child: Focus(
                           onFocusChange: (hasFocus) async {
-                            if (!hasFocus) {
+                            if (!hasFocus && isCreator) {
                               await _updateChecklistInDb();
                             }
                           },
                           child: TextFormField(
                             initialValue: item.title,
-                            onChanged: (val) {
-                              item.title = val;
-                            },
+                            onChanged: isCreator
+                                ? (val) {
+                                    item.title = val;
+                                  }
+                                : null,
+                            readOnly: !isCreator,
                             style: TextStyle(
                               letterSpacing: -0.3,
                               fontSize: height * 0.017,
@@ -1403,27 +1416,31 @@ class _ChecklistTileState extends State<ChecklistTile> {
                       ),
                       IconButton(
                         icon: const Icon(Icons.close, size: 18),
-                        onPressed: () async {
-                          setState(() {
-                            checklistItems.removeAt(index);
-                            if (checklistItems.isEmpty) {
-                              isChecklist = false;
-                            }
-                          });
-                          await _updateChecklistInDb();
-                        },
+                        onPressed: isCreator
+                            ? () async {
+                                setState(() {
+                                  checklistItems.removeAt(index);
+                                  if (checklistItems.isEmpty) {
+                                    isChecklist = false;
+                                  }
+                                });
+                                await _updateChecklistInDb();
+                              }
+                            : null,
                       ),
                     ],
                   );
                 },
               ),
               TextButton.icon(
-                onPressed: () async {
-                  setState(() {
-                    checklistItems.add(Checklist());
-                  });
-                  await _updateChecklistInDb();
-                },
+                onPressed: isCreator
+                    ? () async {
+                        setState(() {
+                          checklistItems.add(Checklist());
+                        });
+                        await _updateChecklistInDb();
+                      }
+                    : null,
                 icon: const Icon(Icons.add, size: 18, color: AppColors.black),
                 label: Text(
                   "Add item",
@@ -1455,3 +1472,4 @@ class _ChecklistTileState extends State<ChecklistTile> {
     );
   }
 }
+

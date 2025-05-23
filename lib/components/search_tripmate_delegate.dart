@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:planago/controllers/authentication_controller.dart';
 import 'package:planago/controllers/firestore/travel_plan_database.dart';
 import 'package:planago/controllers/user_controller.dart';
 import 'package:planago/models/travel_plan_model.dart';
@@ -201,50 +202,77 @@ class SearchTripmateDelegate extends SearchDelegate {
               ],
             ),
             Obx(() {
-              final isInPlan = reactivePeople.contains(user.uid);
+              final bool isCreator =
+                  AuthenticationController.instance.authUser?.uid ==
+                  plan.creator;
+              final bool isInPlan = reactivePeople.contains(user.uid);
+              final bool isViewingCreator = user.uid == plan.creator;
+
+              // Disable button if not creator
+              final bool isButtonEnabled = isCreator;
+
+              // Define button label
+              String buttonLabel;
+              if (isCreator) {
+                buttonLabel = isInPlan ? 'Remove' : 'Add';
+              } else {
+                buttonLabel =
+                    isViewingCreator ? 'Creator' : (isInPlan ? 'Added' : 'Add');
+              }
 
               return GestureDetector(
-                onTap: () async {
-                  if (isInPlan) {
-                    await TravelPlanDatabase.instance.removePersonFromPlan(
-                      plan.id!,
-                      user.uid,
-                    );
-                    reactivePeople.remove(user.uid);
-                  } else {
-                    await TravelPlanDatabase.instance.addPersonToPlan(
-                      plan.id!,
-                      user.uid,
-                    );
-                    reactivePeople.add(user.uid);
-                  }
+                onTap:
+                    isButtonEnabled
+                        ? () async {
+                          if (isInPlan) {
+                            await TravelPlanDatabase.instance
+                                .removePersonFromPlan(plan.id!, user.uid);
+                            reactivePeople.remove(user.uid);
+                          } else {
+                            await TravelPlanDatabase.instance.addPersonToPlan(
+                              plan.id!,
+                              user.uid,
+                            );
+                            reactivePeople.add(user.uid);
+                          }
 
-                  plan.people = reactivePeople.toList();
-                  await TravelPlanDatabase.instance.getTripSuggestions(plan);
-                },
+                          plan.people = reactivePeople.toList();
+                          await TravelPlanDatabase.instance.getTripSuggestions(
+                            plan,
+                          );
+                        }
+                        : null,
                 child: AnimatedContainer(
                   height: screenHeight * 0.036,
                   width: screenWidth * 0.23,
                   duration: Duration(milliseconds: 300),
                   decoration: BoxDecoration(
                     color:
-                        isInPlan ? AppColors.primary : AppColors.mutedPrimary,
+                        isButtonEnabled
+                            ? (isInPlan
+                                ? AppColors.primary
+                                : AppColors.mutedPrimary)
+                            : Colors.grey.shade300,
                     borderRadius: BorderRadius.circular(5),
                     border: Border.all(
                       color:
-                          isInPlan
-                              ? Colors.transparent
-                              : AppColors.mutedPrimary,
+                          isButtonEnabled
+                              ? (isInPlan
+                                  ? Colors.transparent
+                                  : AppColors.mutedPrimary)
+                              : Colors.grey,
                     ),
                   ),
                   child: Center(
                     child: Text(
-                      isInPlan ? 'Remove' : 'Add',
+                      buttonLabel,
                       style: TextStyle(
                         color:
-                            isInPlan
-                                ? AppColors.mutedWhite
-                                : AppColors.mutedBlack,
+                            isButtonEnabled
+                                ? (isInPlan
+                                    ? AppColors.mutedWhite
+                                    : AppColors.mutedBlack)
+                                : Colors.grey,
                       ),
                     ),
                   ),

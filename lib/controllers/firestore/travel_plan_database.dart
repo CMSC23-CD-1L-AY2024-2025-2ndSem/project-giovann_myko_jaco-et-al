@@ -67,54 +67,35 @@ class TravelPlanDatabase extends GetxController
     return null;
   }
   
-  Future<String?> getUserIdByUsername(String username) async 
-  {
-    var query = await _db
-    .collection('Users')
-    .where('Following', arrayContains: username)
-    .get();
+Future<String?> getUserIdByUsername(String username) async {
+  try {
 
-    if (query.docs.isNotEmpty) 
-    {
+    if(AuthenticationController.instance.authUser == null) return null; //if no current user
+
+    var currentUserDoc = await _db.collection('Users').doc(AuthenticationController.instance.authUser!.uid).get();
+
+    // Check if the 'Followers' field contains the given username
+    List<dynamic> followers = currentUserDoc.data()?['Followers'] ?? [];
+
+    if (followers.contains(username)) {
+      //If yes, query the Users collection for the matching username
       var userQuery = await _db
           .collection('Users')
           .where('Username', isEqualTo: username)
           .limit(1)
           .get();
 
-      if (userQuery.docs.isNotEmpty) 
-      {
+      if (userQuery.docs.isNotEmpty) {
         return userQuery.docs.first.id;
       }
     }
 
-    // // If not found, check 'Followers' array
-    // query = await _db
-    //     .collection('Users')
-    //     .where('Followers', arrayContains: username)
-    //     .limit(1)
-    //     .get();
-
-    // if (query.docs.isNotEmpty) 
-    // {
-    //   return query.docs.first.id;
-    // }
-
-    //temporary testing
-    // query = await _db
-    //     .collection('Users')
-    //     .where('Username', isEqualTo: username)
-    //     .limit(1)
-    //     .get();
-
-    // if (query.docs.isNotEmpty) 
-    // {
-    //   return query.docs.first.id;
-    // }
-
-    // Not found in either array
+    return null; // Username not found in Followers or no matching document
+  } catch (e) {
     return null;
   }
+}
+
 
   Future<void> updateChecklist(TravelPlan plan, List<Checklist> updatedChecklist) async 
   {
@@ -158,45 +139,53 @@ class TravelPlanDatabase extends GetxController
 
   final RxList<UserModel> tripmateSuggestion = <UserModel>[].obs;
 
-  Future<void> getTripSuggestions(TravelPlan plan) async {
-    try {
-      final currentUserId = AuthenticationController.instance.authUser?.uid;
-      if (currentUserId == null) {
-        tripmateSuggestion.clear();
-        return;
-      }
 
-      final userDoc = await _db.collection("Users").doc(currentUserId).get();
-      final userData = userDoc.data();
-      if (userData == null) {
-        tripmateSuggestion.clear();
-        return;
-      }
+Future<void> getTripSuggestions(TravelPlan plan) async {
+  try {
+    final currentUserId = AuthenticationController.instance.authUser?.uid;
 
-      final followers = List<String>.from(userData["Followers"] ?? []);
-      print(followers);
-      final planPeopleIds = plan.people ?? [];
-
-      final Set<String> userIds = {...followers, ...planPeopleIds};
-      userIds.remove(currentUserId);
-
-      final List<UserModel> users = [];
-      for (final uid in userIds) {
-        final userSnap = await _db.collection("Users").doc(uid).get();
-        if (userSnap.exists) {
-          users.add(UserModel.fromSnapshot(userSnap));
-        }
-      }
-
-      users.sort(
-        (a, b) => a.username.toLowerCase().compareTo(b.username.toLowerCase()),
-      );
-
-      tripmateSuggestion.assignAll(users);
-    } on FirebaseException catch (e) {
-      throw Exception("Firebase error [${e.code}]: ${e.message}");
+    if (currentUserId == null) {
+      tripmateSuggestion.clear();
+      return;
     }
+
+    final userDoc = await _db.collection("Users").doc(currentUserId).get();
+    final userData = userDoc.data();
+    if (userData == null) {
+      tripmateSuggestion.clear();
+      return;
+    }
+
+    final followers = List<String>.from(userData["Followers"] ?? []);
+    final planPeopleIds = plan.people ?? [];
+
+    // Combine followers and existing plan members
+    final Set<String> userIds = {...followers, ...planPeopleIds};
+
+    // If current user is not the creator, add the creator to suggestions
+    if (currentUserId != plan.creator) {
+      userIds.add(plan.creator);
+    }
+
+    // Exclude the current user
+    userIds.remove(currentUserId);
+
+    final List<UserModel> users = [];
+    for (final uid in userIds) {
+      final userSnap = await _db.collection("Users").doc(uid).get();
+      if (userSnap.exists) {
+        users.add(UserModel.fromSnapshot(userSnap));
+      }
+    }
+    // Sort by username
+    users.sort((a, b) => a.username.toLowerCase().compareTo(b.username.toLowerCase()));
+
+    tripmateSuggestion.assignAll(users);
+  } on FirebaseException catch (e) {
+    throw Exception("Firebase error [${e.code}]: ${e.message}");
   }
+}
+
 
   Future<void> addPersonToPlan(String planId, String uid) async {
     try {

@@ -116,7 +116,7 @@ class _QRCodeScreenState extends State<QRCodeScreen>
                 TextField(
                   controller: _usernameController,
                   decoration: InputDecoration(
-                    hintText: 'username_013',
+                    hintText: 'Enter username',
                     border: OutlineInputBorder(),
                     errorText: usernameError,
                   ),
@@ -158,7 +158,6 @@ class _QRCodeScreenState extends State<QRCodeScreen>
                       });
                       return;
                     }
-
                     Navigator.pop(context);
                     final result = await TravelPlanDatabase.instance.addPeople(
                       widget.plan.id!,
