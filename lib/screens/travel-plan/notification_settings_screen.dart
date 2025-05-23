@@ -320,7 +320,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
               child: ElevatedButton(
                 onPressed: () async 
                 {
-                  if (_notificationsEnabled && _customDaysError == null) 
+                  if (_notificationsEnabled) 
                   {
                     await _notificationService.scheduleTravelPlanReminder(
                       widget.plan,
@@ -328,7 +328,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                     );
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('Notification set for $_selectedDays days before trip'),
+                        content: Text('You will be reminded $_selectedDays day${_selectedDays == 1 ? '' : 's'} before the trip.'),
                         backgroundColor: AppColors.primary,
                       ),
                     );
