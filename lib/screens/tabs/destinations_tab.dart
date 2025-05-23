@@ -270,7 +270,7 @@ class DestinationsTab extends StatelessWidget
                 children: 
                 [
                   Text(
-                    'Destination',
+                    destination.name,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                     ),
