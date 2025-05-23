@@ -1,5 +1,6 @@
 import 'package:planago/models/acommodation_details_model.dart';
 import 'package:planago/models/flight_details_model.dart';
+import 'package:planago/models/travel_model.dart';
 
 class TravelPlan 
 {
@@ -16,6 +17,7 @@ class TravelPlan
   List<Checklist>? checklist;
   List<String>? people;
   String? notes;
+  List<Itinerary>? itinerary;
 
   TravelPlan(
   {
@@ -32,6 +34,7 @@ class TravelPlan
     this.checklist,
     this.people,
     this.notes,
+    this.itinerary
   });
 
   // initialize to empty travel plan
@@ -78,6 +81,10 @@ class TravelPlan
       people: json['people'] != null
           ? List<String>.from(json['people'])
           : [],
+      itinerary: json['itinerary'] != null
+          ? List<Itinerary>.from(
+              (json['itinerary'] as List).map((item) => Itinerary.fromJson(item)))
+          : [],
     );
   }
 
@@ -98,6 +105,7 @@ class TravelPlan
       'checklist': checklist?.map((item) => item.toJson()).toList() ?? [],
       'notes': notes,
       'people': people,
+      'itinerary': itinerary?.map((item) => item.toJson()).toList() ?? [],
     };
   }
 

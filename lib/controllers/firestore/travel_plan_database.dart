@@ -72,29 +72,36 @@ class TravelPlanDatabase extends GetxController
 
   Future<String?> getUserIdByUsername(String username) async 
   {
-    // First, check 'Following' array
     var query = await _db
-        .collection('Users')
-        .where('Following', arrayContains: username)
-        .limit(1)
-        .get();
+    .collection('Users')
+    .where('Following', arrayContains: username)
+    .get();
 
     if (query.docs.isNotEmpty) 
     {
-      return query.docs.first.id;
+      var userQuery = await _db
+          .collection('Users')
+          .where('Username', isEqualTo: username)
+          .limit(1)
+          .get();
+
+      if (userQuery.docs.isNotEmpty) 
+      {
+        return userQuery.docs.first.id;
+      }
     }
 
-    // If not found, check 'Followers' array
-    query = await _db
-        .collection('Users')
-        .where('Followers', arrayContains: username)
-        .limit(1)
-        .get();
+    // // If not found, check 'Followers' array
+    // query = await _db
+    //     .collection('Users')
+    //     .where('Followers', arrayContains: username)
+    //     .limit(1)
+    //     .get();
 
-    if (query.docs.isNotEmpty) 
-    {
-      return query.docs.first.id;
-    }
+    // if (query.docs.isNotEmpty) 
+    // {
+    //   return query.docs.first.id;
+    // }
 
     //temporary testing
     // query = await _db
@@ -125,23 +132,22 @@ class TravelPlanDatabase extends GetxController
     super.onClose();
   }
 
-  //Function for adding user on a travel plan
   Future<String> addPeople(String id, String uid) async 
   {
-    final plan = await getPlanById(id); //finds document
-    //check is null
+    final plan = await getPlanById(id);
     if(plan != null)
     {
-      final people = plan.people ?? [];
+      final people = List<String>.from(plan.people ?? []);
       if(people.contains(uid))
       {
         return "Already in this Plan";
       }
       people.add(uid);
-      plan.copyWith(people: people);
+      final updatedPlan = plan.copyWith(people: people);
+      await updateTravelPlan(updatedPlan);
+      return "Successfully added to Plan!";
     }
-    await updateTravelPlan(plan!);
-    return "Successfully added to Plan!";
+    return "Plan not found";
   }
 
   //Function for delete a travel plan given an id

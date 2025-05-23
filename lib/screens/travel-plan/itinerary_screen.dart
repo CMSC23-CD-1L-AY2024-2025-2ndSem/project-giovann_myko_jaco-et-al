@@ -1,15 +1,6 @@
-/*
-In travel_overview_page.dart look for the following code snippet:
-
-
-  onPressed: () 
-  {
-    //fix this. dapat hindi gagawa ng panibagong instantance ng itinerary if pipindutin ulit ang existing itinerary.
-    Get.to(() => ItineraryScreen(plan: plan));
-  },
-*/
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:planago/controllers/firestore/itinerary_database.dart';
 import 'package:planago/models/travel_plan_model.dart';
 import 'package:planago/utils/constants/colors.dart';
 import '/controllers/itinerary_controller.dart';
@@ -29,12 +20,19 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
   final ItineraryController controller = Get.put(ItineraryController());
 
   @override
-  void initState() {
+  void initState() 
+  {
     super.initState();
-    if (widget.plan.startDate != null && widget.plan.endDate != null) {
-      controller.setDurationFromDates(widget.plan.startDate!, widget.plan.endDate!);
-    }
     controller.setTravelersFromPlan(widget.plan);
+
+    ItineraryDatabase.instance.getItinerary(widget.plan.id!).then((itinerary) {
+      if (itinerary.isNotEmpty) {
+        controller.setItinerary(itinerary);
+      } else if (widget.plan.startDate != null && widget.plan.endDate != null) {
+        // Only set duration and initialize if there is no existing itinerary
+        controller.setDurationFromDates(widget.plan.startDate!, widget.plan.endDate!);
+      }
+    });
   }
 
   @override
@@ -56,27 +54,33 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
               Tab(
                 child: Obx(() => Text(
                   'Destination',
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     color: controller.selectedTabIndex.value == 0
                         ? AppColors.primary
                         : Colors.grey,
+                    fontSize: 12,
                   ),
                 )),
               ),
               Tab(
                 child: Obx(() => Text(
                   'Daily Activities',
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     color: controller.selectedTabIndex.value == 1
                         ? AppColors.primary
                         : Colors.grey,
+                    fontSize: 12,
                   ),
                 )),
               ),
               Tab(
                 child: Obx(() => Text(
                   'Expenses',
+                  textAlign: TextAlign.center,
                   style: TextStyle(
+                    fontSize: 12,
                     color: controller.selectedTabIndex.value == 2
                         ? AppColors.primary
                         : Colors.grey,
@@ -88,7 +92,8 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
         ),
         body: TabBarView(
           physics: NeverScrollableScrollPhysics(),
-          children: [
+          children: 
+          [
             DestinationsTab(controller: controller),
             ActivitiesTab(controller: controller),
             ExpensesTab(controller: controller),

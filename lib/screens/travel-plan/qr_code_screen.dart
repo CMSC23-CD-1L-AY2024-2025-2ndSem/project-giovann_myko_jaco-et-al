@@ -158,7 +158,7 @@ class _QRCodeScreenState extends State<QRCodeScreen>
                       });
                       return;
                     }
-                    
+
                     Navigator.pop(context);
                     final result = await TravelPlanDatabase.instance.addPeople(
                       widget.plan.id!,
@@ -174,7 +174,6 @@ class _QRCodeScreenState extends State<QRCodeScreen>
                         colorText: Colors.black,
                       );
                     } 
-                    
                     else 
                     {
                       Get.snackbar(
@@ -188,13 +187,6 @@ class _QRCodeScreenState extends State<QRCodeScreen>
                     Get.offUntil(
                       MaterialPageRoute(builder: (_) => NavigationMenu()),
                       (route) => route.settings.name == '/navigation',
-                    );
-
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Travel plan shared with $_username'),
-                        backgroundColor: AppColors.primary,
-                      ),
                     );
                   }
                 },

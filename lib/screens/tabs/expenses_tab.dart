@@ -33,27 +33,27 @@ class ExpensesTab extends StatelessWidget
   {
     if (value >= 1e9) 
     {
-      return '$currency${(value / 1e9).toStringAsFixed(2)}B';
+      return '$currency ${(value / 1e9).toStringAsFixed(2)}B';
     } 
     
     else if (value >= 1e6) 
     {
-      return '$currency${(value / 1e6).toStringAsFixed(2)}M';
+      return '$currency ${(value / 1e6).toStringAsFixed(2)}M';
     } 
     
     else if (value >= 1e3) 
     {
-      return '$currency${(value / 1e3).toStringAsFixed(2)}k';
+      return '$currency ${(value / 1e3).toStringAsFixed(2)}k';
     } 
     
     else 
     {
-      return '$currency${value.toStringAsFixed(2)}';
+      return '$currency ${value.toStringAsFixed(2)}';
     }
   }
 
   final ItineraryController controller;
-  ExpensesTab({required this.controller, Key? key}) : super(key: key);
+  const ExpensesTab({required this.controller, super.key});
   @override
   Widget build(BuildContext context) 
   {
@@ -132,9 +132,11 @@ class ExpensesTab extends StatelessWidget
                 itemCount: controller.currentDayExpenses.length,
                 itemBuilder: (context, index) 
                 {
-                  final expense = controller.currentDayExpenses[index];
+                  final sortedExpenses = List<Expense>.from(controller.currentDayExpenses);
+                  sortedExpenses.sort((a, b) => b.amount.compareTo(a.amount));
+                  final expense = sortedExpenses[index];
                   final isFirst = index == 0;
-                  final isLast = index == controller.currentDayExpenses.length - 1;
+                  final isLast = index == sortedExpenses.length - 1;
                   
                   return _buildExpenseItem(expense, isFirst, isLast);
                 },
@@ -202,7 +204,7 @@ class ExpensesTab extends StatelessWidget
       context: Get.context!,
       builder: (context) 
       {
-        return Container(
+        return SizedBox(
           height: 300,
           child: Column(
             children: 
@@ -299,7 +301,7 @@ class ExpensesTab extends StatelessWidget
               Row(
                 children: 
                 [
-                  Icon(Icons.attach_money, size: 14, color: Colors.grey),
+                  Icon(Icons.monetization_on_outlined, size: 14, color: Colors.grey),
                   SizedBox(width: 4),
                   Text(
                     '${expense.amount}',
@@ -357,7 +359,7 @@ void _showAddExpenseDialog()
   controller.expenseAmountController.clear();
   controller.expenseCategoryController.clear();
 
-  final _formKey = GlobalKey<FormState>();
+  final formKey = GlobalKey<FormState>();
 
   Get.dialog(
     Dialog(
@@ -367,7 +369,7 @@ void _showAddExpenseDialog()
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
-          key: _formKey,
+          key: formKey,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -476,10 +478,11 @@ void _showAddExpenseDialog()
 
                   SizedBox(width: 8),
                   ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) 
+                    onPressed: () async 
+                    {
+                      if (formKey.currentState!.validate()) 
                       {
-                        controller.addExpense();
+                        await controller.addExpense();
                         Get.back();
                       }
                     },
@@ -508,7 +511,7 @@ void _showEditExpenseDialog(Expense expense)
   controller.expenseAmountController.text = expense.amount.toString();
   controller.expenseCategoryController.text = expense.category;
 
-  final _formKey = GlobalKey<FormState>();
+  final formKey = GlobalKey<FormState>();
 
   Get.dialog(
     Dialog(
@@ -518,7 +521,7 @@ void _showEditExpenseDialog(Expense expense)
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
-          key: _formKey,
+          key: formKey,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -623,7 +626,7 @@ void _showEditExpenseDialog(Expense expense)
                   ElevatedButton(
                     onPressed: () 
                     {
-                      if (_formKey.currentState!.validate()) 
+                      if (formKey.currentState!.validate()) 
                       {
                         controller.deleteExpense(expense.id);
                         controller.addExpense();
